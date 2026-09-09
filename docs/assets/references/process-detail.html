@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Process Detail - CL-IDP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Public+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#e6cafa",
+                        "surface-container-low": "#f4f3fa",
+                        "outline-variant": "#b0b1bc",
+                        "on-surface": "#30323b",
+                        "surface-dim": "#d9d9e4",
+                        "secondary-fixed": "#dde1f9",
+                        "on-secondary": "#faf8ff",
+                        "primary-fixed": "#b3c2f7",
+                        "tertiary-fixed-dim": "#d8bceb",
+                        "surface-variant": "#e1e2ed",
+                        "surface": "#faf8fe",
+                        "on-secondary-container": "#4c5164",
+                        "secondary-fixed-dim": "#cfd3eb",
+                        "surface-container-high": "#e8e7f1",
+                        "on-primary-fixed": "#182853",
+                        "on-background": "#30323b",
+                        "inverse-surface": "#0d0e12",
+                        "error": "#a83836",
+                        "surface-tint": "#4f5d8c",
+                        "on-secondary-fixed": "#393f51",
+                        "on-error": "#fff7f6",
+                        "surface-container-highest": "#e1e2ed",
+                        "primary-fixed-dim": "#a6b4e8",
+                        "tertiary-dim": "#604a72",
+                        "inverse-primary": "#b3c2f7",
+                        "secondary-dim": "#4d5266",
+                        "on-surface-variant": "#5d5f68",
+                        "error-container": "#fa746f",
+                        "surface-bright": "#faf8fe",
+                        "on-error-container": "#6e0a12",
+                        "primary-dim": "#43517f",
+                        "background": "#faf8fe",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eeedf6",
+                        "outline": "#797a84",
+                        "tertiary": "#6d567f",
+                        "primary": "#4f5d8c",
+                        "on-primary": "#faf8ff",
+                        "on-tertiary-fixed": "#422d53",
+                        "secondary-container": "#dde1f9",
+                        "primary-container": "#b3c2f7",
+                        "tertiary-container": "#e6cafa",
+                        "on-secondary-fixed-variant": "#565b6f",
+                        "on-tertiary": "#fff6fe",
+                        "secondary": "#595e72",
+                        "on-tertiary-fixed-variant": "#604a71",
+                        "on-primary-container": "#2d3c68",
+                        "error-dim": "#67040d",
+                        "on-primary-fixed-variant": "#374572",
+                        "on-tertiary-container": "#564067",
+                        "inverse-on-surface": "#9d9ca2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Public Sans"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface-container-low text-on-surface font-body h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-20">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<img alt="User profile" class="w-10 h-10 object-cover rounded-full" data-alt="A clean, minimalist 3D rendering of an abstract geometric logo. The logo features a series of interlocking rings in shades of deep blue and crisp white. The rendering is highly detailed, emphasizing smooth, matte surfaces. The lighting is bright and evenly distributed, creating a sense of professional clarity and precision. The style is modern, corporate, and highly polished, suitable for an enterprise administration dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD-0rqtSFs7IclnzuUeZve8lHP6IjSLhfIQG6WRfwmqO7U58X27us2sLaO8BhYDUqc0KPmRvtasIqUi3EH1oyDJJ2Ktl-xWEsfR18HGXsO1c3JXcvtzLGKY-SxKxIj_6SziciCihFM5Vx5a58yyx2PoZOYKMpxQKDPS4V8g48wVUUihjAS0_yv00I7bJZCuEtksl2THN7yBILgfTrJYyT7pP9bM5Ymy0D0Q75lZ08bg-ZZmxXnibXXSHuRmOMS6mYaVSli5vgFzDhz"/>
+</div>
+<div>
+<div class="text-xl font-headline font-bold text-primary dark:text-inverse-primary">CL-IDP</div>
+<div class="text-xs text-on-surface-variant font-label uppercase tracking-wider">Admin Console</div>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary hover:bg-primary-dim text-on-primary font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Process
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-primary dark:text-inverse-primary font-semibold border-r-4 border-primary bg-primary/5" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Processes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-dim transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span>Jobs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-dim transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-64 flex flex-col h-screen relative">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-[calc(100%-16rem)] flex justify-between items-center h-16 px-8 bg-surface dark:bg-background border-b border-outline-variant dark:border-outline z-10">
+<div class="flex items-center gap-2 text-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Processes</a>
+<span class="text-outline material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-bold border-b-2 border-primary pb-1">Vendor Invoices</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container border border-outline-variant rounded-full text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64" placeholder="Search..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border border-outline-variant ml-2">
+<img alt="Admin Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator. The subject is a woman in her late 30s with dark hair, wearing a simple, elegant dark blue blouse. She is smiling subtly. The background is a clean, out-of-focus modern office setting with lots of natural light and glass walls. The lighting is soft and flattering, highlighting a crisp, high-resolution corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnsz-BOS7_j2FyJVOQcI4r6xfE5Y7nbChD2ohxHpcjzV5ApxC1ti3NLrVcVhQNNYuLemAt0kxenvM5d2YsQLY9bYeALXx6erQMxu7k3l9cP8Y69QxhfgZIVETbQou_MUq3TfFsFt1EGy6libq7AsvT1BSdEslZykvCiU5smvrNyc64UVKk1ZvwoRuJpQrHtDsshvCm7lZZ90-p7GJ1Mlp49U4-EfY9qIczBzeaqaRQul1yITsI4s4wo4ZpiVgJXG6ocoLRtTm5_1pF"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto pt-24 px-8 pb-12 bg-surface-container-lowest">
+<div class="max-w-6xl mx-auto space-y-6">
+<!-- Header Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="space-y-3 flex-1">
+<div class="flex items-center gap-3">
+<h1 class="text-2xl font-headline font-bold text-on-surface">Vendor Invoices</h1>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                Ready
+                            </div>
+</div>
+<p class="text-on-surface-variant text-sm">Extracts vendor, line items, and totals from invoice documents.</p>
+<div class="flex flex-wrap items-center gap-3 pt-1">
+<span class="px-2.5 py-1 bg-surface-container border border-outline-variant rounded text-xs font-medium text-on-surface-variant">Invoice</span>
+<span class="px-2.5 py-1 bg-surface-container border border-outline-variant rounded text-xs font-medium text-on-surface-variant">Purchase Order</span>
+<div class="w-px h-4 bg-outline-variant mx-1"></div>
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">rule</span>
+                                Threshold: 85%
+                            </span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">mail</span>
+                                finance-ops@acme.com
+                            </span>
+</div>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<button class="px-4 py-2 border border-outline-variant rounded-lg text-sm font-semibold text-on-surface hover:bg-surface-container-high transition-colors">
+                            Edit
+                        </button>
+<button class="px-4 py-2 flex items-center gap-2 text-sm font-semibold text-error hover:bg-error-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+                            Delete
+                        </button>
+</div>
+</div>
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Upload -->
+<div class="lg:col-span-5 bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col">
+<h2 class="text-lg font-headline font-bold text-on-surface mb-4">Upload Document</h2>
+<div class="flex-1 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center p-8 text-center bg-surface-container-lowest hover:bg-surface-container-low hover:border-primary transition-all cursor-pointer group min-h-[240px]">
+<div class="w-16 h-16 rounded-full bg-primary-container text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">cloud_upload</span>
+</div>
+<p class="text-sm font-semibold text-on-surface mb-2">Drag and drop a file here, or click to browse</p>
+<p class="text-xs text-on-surface-variant">PDF, PNG, JPG, or TIFF · up to 20MB, 20 pages</p>
+</div>
+</div>
+<!-- Right Column: Recent Jobs -->
+<div class="lg:col-span-7 bg-surface rounded-xl border border-outline-variant p-0 shadow-sm flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h2 class="text-lg font-headline font-bold text-on-surface">Recent Jobs</h2>
+<label class="flex items-center gap-2 cursor-pointer">
+<span class="text-xs text-on-surface-variant font-medium">Show only needs review</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</label>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-lowest text-xs uppercase tracking-wider text-on-surface-variant font-label">
+<th class="px-6 py-3 font-semibold">File Name</th>
+<th class="px-6 py-3 font-semibold">Submitted</th>
+<th class="px-6 py-3 font-semibold">Status</th>
+<th class="px-6 py-3 font-semibold">Detected Form</th>
+</tr>
+</thead>
+<tbody class="text-sm font-body">
+<tr class="border-b border-surface-variant hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-3 font-medium text-on-surface">INV-2023-08-14.pdf</td>
+<td class="px-6 py-3 text-on-surface-variant">2 mins ago</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center gap-1.5 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+                                                Running
+                                            </span>
+</td>
+<td class="px-6 py-3 text-on-surface-variant">--</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-3 font-medium text-on-surface">Q3_Vendor_Supply.pdf</td>
+<td class="px-6 py-3 text-on-surface-variant">15 mins ago</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center gap-1.5 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                                Needs review
+                                            </span>
+</td>
+<td class="px-6 py-3 text-on-surface-variant">Invoice</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-3 font-medium text-on-surface">monthly_utilities.png</td>
+<td class="px-6 py-3 text-on-surface-variant">1 hr ago</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center gap-1.5 text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                                Succeeded
+                                            </span>
+</td>
+<td class="px-6 py-3 text-on-surface-variant">Invoice</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-3 font-medium text-on-surface">unknown_doc_091.jpg</td>
+<td class="px-6 py-3 text-on-surface-variant">3 hrs ago</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center gap-1.5 text-surface-tint bg-surface-container border border-outline-variant px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">help</span>
+                                                No matching form
+                                            </span>
+</td>
+<td class="px-6 py-3 text-on-surface-variant">--</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-3 font-medium text-on-surface">corrupted_file.pdf</td>
+<td class="px-6 py-3 text-on-surface-variant">Yesterday</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center gap-1.5 text-error bg-error-container/10 border border-error/20 px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">error</span>
+                                                Failed
+                                            </span>
+</td>
+<td class="px-6 py-3 text-on-surface-variant">--</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant bg-surface-container-lowest mt-auto">
+<a class="text-sm font-semibold text-primary hover:text-primary-dim transition-colors flex items-center gap-1 w-fit" href="#">
+                                View all jobs <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

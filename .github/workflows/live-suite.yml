@@ -1,0 +1,65 @@
+name: Live Suite
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  live-cu-and-playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CU_ENDPOINT: ${{ secrets.CU_ENDPOINT }}
+      CU_API_KEY: ${{ secrets.CU_API_KEY }}
+      CU_MODEL_DEPLOYMENT: ${{ secrets.CU_MODEL_DEPLOYMENT }}
+      WEB_ORIGIN: http://localhost:3100
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8010
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: uv sync --dev
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Start emulators
+        run: docker compose up -d
+
+      - name: Confirm emulator health
+        run: docker compose ps
+
+      - name: Backend live pytest suite
+        working-directory: apps/api
+        run: uv run pytest tests/ -m live -q
+
+      - name: Playwright live suite
+        working-directory: apps/web
+        run: npx playwright test

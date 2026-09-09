@@ -1,0 +1,46 @@
+[project]
+name = "enterprise-idp-api"
+version = "0.1.0"
+description = "FastAPI skeleton for Enterprise IDP"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "azure-ai-contentunderstanding>=1.2.0b3",
+    "azure-cosmos>=4.16.4",
+    "azure-identity>=1.26.0b2",
+    "azure-storage-blob>=12.31.0b1",
+    "azure-storage-queue>=12.18.0b1",
+    "email-validator>=2.3.0",
+    "fastapi>=0.116.1",
+    "httpx>=0.28.1,<1",
+    "opentelemetry-exporter-otlp-proto-http>=1.44.0",
+    "opentelemetry-instrumentation-fastapi>=0.65b0",
+    "opentelemetry-sdk>=1.44.0",
+    "pillow>=12.3.0",
+    "pydantic-settings>=2.15.0",
+    "pypdf>=6.16.2",
+    "python-multipart>=0.0.32",
+    "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.1",
+    "pytest>=8.4.2",
+    "ruff>=0.13.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+markers = [
+    "live: tests that require a live Azure AI Content Understanding resource",
+]

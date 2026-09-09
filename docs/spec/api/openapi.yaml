@@ -1,0 +1,1084 @@
+openapi: 3.0.3
+info:
+  title: Enterprise IDP API
+  description: >
+    API for onboarding business processes, discovering available Azure AI
+    Content Understanding analyzers, and triggering/reviewing document
+    inference pipeline runs.
+
+
+    This document is hand-written and authoritative: the FastAPI backend
+    implements it, and the TypeScript client is generated from it.
+
+
+    Note: the API is entirely unauthenticated by design for this demo. See
+    the Security Posture section of TECHNOLOGY.md.
+  version: "0.2.0"
+servers:
+  - url: /api
+security: []
+tags:
+  - name: processes
+    description: Business process configuration
+  - name: analyzers
+    description: Available Azure AI Content Understanding analyzers
+  - name: jobs
+    description: Pipeline trigger, job polling, and review/approve
+  - name: system
+    description: Service health
+
+paths:
+  /healthz:
+    get:
+      tags: [system]
+      summary: Liveness and readiness probe
+      description: >
+        Reports whether the service is up and whether its dependencies
+        (Cosmos DB, Blob/Queue storage, Content Understanding) are
+        reachable. Returns 503 when a required dependency is unavailable.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "503":
+          description: One or more dependencies unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /processes:
+    get:
+      tags: [processes]
+      summary: List business processes
+      description: >
+        Returns all business processes, sorted by `createdAt` descending
+        (newest first). No pagination in this demo.
+      operationId: listProcesses
+      responses:
+        "200":
+          description: List of business processes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BusinessProcess"
+    post:
+      tags: [processes]
+      summary: Create a business process
+      description: >
+        Creates the process and asynchronously provisions a Content
+        Understanding routing analyzer over the selected analyzers (see
+        `routingAnalyzerStatus` on the returned resource).
+      operationId: createProcess
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BusinessProcessInput"
+      responses:
+        "201":
+          description: Created business process
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProcess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          description: >
+            A business process with this name already exists (case-
+            insensitive match).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: >
+            Content Understanding was unreachable while resolving analyzer
+            display names, so the process was not saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /processes/{processId}:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+    get:
+      tags: [processes]
+      summary: Get a business process
+      operationId: getProcess
+      responses:
+        "200":
+          description: Business process
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProcess"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [processes]
+      summary: Update a business process
+      description: >
+        Overwrites the existing configuration (no versioning). The routing
+        analyzer is rebuilt (resetting `routingAnalyzerStatus` to
+        `building`) **only if `allowedAnalyzerIds` changed** — editing other
+        fields leaves the process immediately usable.
+
+
+        No optimistic concurrency: concurrent updates are last-write-wins.
+      operationId: updateProcess
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BusinessProcessInput"
+      responses:
+        "200":
+          description: Updated business process
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProcess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: >
+            Another business process already has this name (case-
+            insensitive match).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: >
+            Content Understanding was unreachable while resolving analyzer
+            display names, so the process was not saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags: [processes]
+      summary: Delete a business process
+      description: >
+        Deletes the process, all of its jobs, and all of its stored
+        documents. Irreversible, with no confirmation beyond the client's
+        own.
+
+
+        The Content Understanding analyzers provisioned for this process are
+        intentionally **not** deleted; they are left in the CU account and
+        identifiable by their `idp_` ID prefix.
+      operationId: deleteProcess
+      responses:
+        "204":
+          description: Process, jobs, and documents deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /analyzers:
+    get:
+      tags: [analyzers]
+      summary: List available Content Understanding analyzers
+      description: >
+        Returns the analyzers selectable as a process's allowed forms: a
+        curated catalog of prebuilt analyzers plus the custom analyzers in
+        the configured Content Understanding account.
+
+
+        Analyzers created and owned by this application (routing and derived
+        analyzers, prefixed `idp_`) are excluded — they are internal
+        plumbing, not user choices.
+      operationId: listAnalyzers
+      responses:
+        "200":
+          description: List of analyzers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Analyzer"
+        "502":
+          description: Content Understanding is unreachable or returned an error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /processes/{processId}/trigger:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+    post:
+      tags: [jobs]
+      summary: Trigger a pipeline run for an uploaded document
+      description: >
+        Accepts a single file upload and enqueues a classification/
+        extraction job against the process's routing analyzer. Returns
+        immediately with a job ID; poll the jobs endpoint for
+        status/results.
+      operationId: triggerJob
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: >
+                    A single PDF, PNG, JPG, or TIFF document, at most 20 MB
+                    and 20 pages.
+      responses:
+        "202":
+          description: Job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRef"
+        "400":
+          description: >
+            The upload was rejected synchronously — unsupported
+            content-type/extension (must be PDF, PNG, JPG, or TIFF), larger
+            than 20 MB, more than 20 pages, or more than one file. No job,
+            blob, or queue message is created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: >
+            The process's routing analyzer is not ready (still building or
+            failed).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /processes/{processId}/jobs:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+    get:
+      tags: [jobs]
+      summary: List jobs for a process
+      description: >
+        Job history for a single process — the recent-jobs preview on the
+        process detail screen and the full filterable table on the
+        `process-jobs` screen. Sorted by `submittedAt` descending (newest
+        first). All filters are combined with AND; omitting a filter means
+        "no constraint". The `fields` array is omitted from list items for
+        payload size — fetch a single job to get its extracted fields.
+        Capped by `limit` rather than paginated in this demo.
+      operationId: listJobs
+      parameters:
+        - name: status
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [queued, running, succeeded, failed]
+          description: >
+            Filter to jobs in any of the given statuses (repeat the
+            parameter to select multiple).
+        - name: detectedForm
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: >
+            Filter to jobs classified as any of the given form/analyzer
+            types (repeat the parameter to select multiple).
+        - name: hasViolations
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            Filter to jobs with at least one current (unreviewed) entry in
+            `confidenceViolations` — i.e. jobs whose aggregate confidence
+            was below threshold and still have actionable low-confidence
+            leaf paths.
+        - name: reviewed
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            Filter by whether any field on the job has been reviewed
+            (`reviewedAt` is set/unset).
+        - name: unclassified
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            Filter by whether the document matched none of the process's
+            allowed forms.
+        - name: fileName
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Case-insensitive substring match against the job's `fileName`.
+        - name: submittedFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Only jobs with `submittedAt` at or after this instant.
+        - name: submittedTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Only jobs with `submittedAt` at or before this instant.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+          description: >
+            Maximum number of jobs to return. The client is expected to
+            narrow its filters when the cap is hit.
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /processes/{processId}/jobs/summary:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+    get:
+      tags: [jobs]
+      summary: Aggregate job counts for a process
+      description: >
+        Returns counts across **all** matching jobs, accepting the same
+        filter parameters as `listJobs` (except `limit`). Counts are not
+        capped by `limit`, which is precisely why this endpoint exists — the
+        `process-jobs` header would otherwise understate a backlog larger
+        than one page.
+
+
+        Implementation note: this path overlaps `/jobs/{jobId}`, so it must
+        be registered before that route. Job IDs are UUIDs, so `summary` can
+        never be a legitimate job ID.
+      operationId: getJobsSummary
+      parameters:
+        - name: status
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [queued, running, succeeded, failed]
+        - name: detectedForm
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: hasViolations
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: reviewed
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: unclassified
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: fileName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: submittedFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: submittedTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Aggregate counts for the filtered set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobsSummary"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /processes/{processId}/jobs/{jobId}:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+      - $ref: "#/components/parameters/JobId"
+    get:
+      tags: [jobs]
+      summary: Get job status and results
+      description: >
+        Poll until `status` is `succeeded` or `failed`. On success, includes
+        detected form, extracted fields (with confidence/bounding box/page
+        number), and confidence threshold violations.
+      operationId: getJob
+      responses:
+        "200":
+          description: Job status/result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /processes/{processId}/jobs/{jobId}/document:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+      - $ref: "#/components/parameters/JobId"
+    get:
+      tags: [jobs]
+      summary: Fetch the original uploaded document for a job
+      description: >
+        Backend passthrough that streams the source document from Blob
+        Storage for rendering in the inference-review screen's left pane.
+
+
+        PDF, PNG, and JPG are served verbatim. **TIFF is converted to PDF**
+        for display, because browsers cannot render TIFF and a TIFF may
+        contain multiple pages that the review viewer must page through.
+        `Content-Type` therefore describes what is actually returned, which
+        for a TIFF job is `application/pdf`, not the original upload's type.
+      operationId: getJobDocument
+      responses:
+        "200":
+          description: >
+            Source document binary, possibly converted for display.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /processes/{processId}/jobs/{jobId}/review:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+      - $ref: "#/components/parameters/JobId"
+    put:
+      tags: [jobs]
+      summary: Save/approve reviewed field values
+      description: >
+        Persists human-reviewed/corrected field values for the job.
+
+
+        This is a **partial patch**: only the field paths present in the
+        request are touched, and omitted fields are left alone. Each named
+        field's `reviewedValue` is set while its originally extracted
+        `value` is preserved for audit, and the field path is removed from
+        `confidenceViolations` (paths are never re-added). A path that does
+        not exist on the job is rejected with `400` rather than silently
+        ignored.
+
+
+        `reviewedAt` is set on the first review call and does not move on
+        subsequent calls, which are permitted. Review does not feed back
+        into extraction, does not change the classification, and does not
+        trigger any additional notification email.
+
+
+        No optimistic concurrency: concurrent reviews are last-write-wins.
+      operationId: reviewJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fields]
+              properties:
+                fields:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: "#/components/schemas/ReviewedField"
+      responses:
+        "200":
+          description: Reviewed job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          description: >
+            A referenced field path does not exist on this job, or the job
+            is not in a reviewable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /processes/{processId}/jobs/{jobId}/retry:
+    parameters:
+      - $ref: "#/components/parameters/ProcessId"
+      - $ref: "#/components/parameters/JobId"
+    post:
+      tags: [jobs]
+      summary: Re-run a failed job
+      description: >
+        Creates a **new** job over the same already-uploaded document and
+        enqueues it. The original job is left untouched in `failed` state so
+        the failure stays visible in history; the new job records
+        `retryOfJobId` pointing back at it.
+      operationId: retryJob
+      responses:
+        "202":
+          description: Retry job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRef"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: >
+            The job is not in `failed` state, or the process's routing
+            analyzer is not ready.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  parameters:
+    ProcessId:
+      name: processId
+      in: path
+      required: true
+      schema:
+        type: string
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: The request was invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      description: >
+        Uniform error body returned with every 4xx and 5xx response, with
+        the single exception of `/healthz`, which returns a `Health` body on
+        503 so that probes get dependency detail rather than a generic
+        error.
+      properties:
+        code:
+          type: string
+          description: >
+            Stable machine-readable identifier, e.g. `process_not_found`,
+            `duplicate_process_name`, `unsupported_file_type`,
+            `file_too_large`, `too_many_pages`, `routing_analyzer_not_ready`,
+            `unknown_field_path`, `job_not_failed`,
+            `content_understanding_unavailable`.
+          example: unsupported_file_type
+        message:
+          type: string
+          description: Human-readable explanation, safe to show to a user.
+        details:
+          type: object
+          additionalProperties: true
+          description: >
+            Optional structured context (e.g. the offending field path, the
+            actual file size, the conflicting process ID).
+
+    Health:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [ok, unavailable]
+          description: >
+            Per-dependency reachability, keyed by `cosmos`, `blob`, `queue`,
+            `contentUnderstanding`, `smtp`.
+        version:
+          type: string
+
+    BusinessProcessInput:
+      type: object
+      required:
+        - name
+        - description
+        - allowedAnalyzerIds
+        - confidenceThreshold
+        - ownerEmail
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        allowedAnalyzerIds:
+          type: array
+          minItems: 1
+          maxItems: 199
+          uniqueItems: true
+          items:
+            type: string
+          description: >
+            IDs of selected Content Understanding analyzers. At most 199:
+            Content Understanding permits 200 classification categories and
+            the app reserves one for the `other` catch-all. The literal
+            value `other` is reserved and rejected.
+        confidenceThreshold:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: >
+            Stored/transmitted as a 0–1 fraction. The UI collects/displays
+            this as a 0–100% value and converts to/from this range.
+        ownerEmail:
+          type: string
+          format: email
+
+    BusinessProcess:
+      allOf:
+        - $ref: "#/components/schemas/BusinessProcessInput"
+        - type: object
+          required: [id, allowedAnalyzers, routingAnalyzerStatus, createdAt, updatedAt]
+          properties:
+            id:
+              type: string
+            allowedAnalyzers:
+              type: array
+              items:
+                $ref: "#/components/schemas/AnalyzerRef"
+              description: >
+                Display names for `allowedAnalyzerIds`, resolved from the
+                analyzer catalog at save time and stored with the process,
+                so list screens can render labels without a live Content
+                Understanding call. Presentation only —
+                `allowedAnalyzerIds` remains authoritative, and a name may
+                be stale if the analyzer was renamed since the last save.
+            routingAnalyzerStatus:
+              type: string
+              enum: [building, ready, failed]
+              description: >
+                Provisioning status of the Content Understanding routing
+                analyzer built over `allowedAnalyzerIds`. Rebuilt on create,
+                and on update only when `allowedAnalyzerIds` changes.
+                Uploads are rejected with 409 unless this is `ready`.
+            routingAnalyzerError:
+              type: string
+              description: >
+                Human-readable failure reason, set when
+                routingAnalyzerStatus is `failed` (including the case where
+                a selected analyzer no longer exists in the Content
+                Understanding account). Cleared when the next rebuild
+                starts, so a `building` process never shows a stale error.
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    AnalyzerRef:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    Analyzer:
+      type: object
+      required: [id, name, kind]
+      properties:
+        id:
+          type: string
+          description: >
+            Content Understanding analyzer ID, e.g. `prebuilt-invoice`.
+        name:
+          type: string
+          description: Friendly display name.
+        description:
+          type: string
+          description: >
+            Short description of the document type. Also used, truncated as
+            needed, as the routing analyzer's category description.
+        kind:
+          type: string
+          enum: [prebuilt, custom]
+          description: >
+            `prebuilt` for entries from the curated catalog, `custom` for
+            analyzers found in the Content Understanding account.
+
+    JobsSummary:
+      type: object
+      required: [total, needsReview, failed, unclassified, totalEstimatedCostUsd]
+      properties:
+        total:
+          type: integer
+        needsReview:
+          type: integer
+          description: >
+            Jobs with a non-empty `confidenceViolations` list, meaning the
+            job's aggregate confidence was below the process threshold and at
+            least one below-threshold leaf still needs review.
+        failed:
+          type: integer
+        unclassified:
+          type: integer
+        totalEstimatedCostUsd:
+          type: number
+          format: float
+          description: >
+            Estimated Azure AI Content Understanding cost, in USD, for every
+            job matching the current filters (sum of each job's
+            `estimatedCostUsd`). Derived from published per-page list
+            pricing, not actual billing data — see `Job.estimatedCostUsd`.
+
+    JobRef:
+      type: object
+      required: [jobId]
+      properties:
+        jobId:
+          type: string
+
+    Job:
+      type: object
+      required: [id, processId, fileName, status, submittedAt]
+      properties:
+        id:
+          type: string
+        processId:
+          type: string
+        fileName:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+        submittedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        detectedForm:
+          type: string
+          nullable: true
+          description: >
+            Classified analyzer/form ID (set once succeeded). Null when the
+            document matched none of the process's allowed forms — see
+            `unclassified`.
+        detectedFormName:
+          type: string
+          description: Display name for `detectedForm`.
+        unclassified:
+          type: boolean
+          description: >
+            True when the document did not match any form allowed by this
+            process. The job is still `succeeded` — the pipeline worked and
+            the answer is "this document doesn't belong here" — but there is
+            nothing to extract or review. Distinct from `failed`, which
+            means processing itself went wrong.
+        retryOfJobId:
+          type: string
+          description: >
+            Set when this job was created by retrying an earlier failed job;
+            references that job's ID.
+        pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PageInfo"
+          description: >
+            Source page geometry, so the viewer can size pages correctly and
+            compensate for scan skew. Returned by `getJob` only.
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtractedField"
+          description: >
+            Extracted fields. Returned by `getJob`; omitted from `listJobs`
+            items for payload size — use `fieldCount` there instead. Empty
+            when the job is `unclassified` or when the analyzer extracted
+            nothing.
+        fieldCount:
+          type: integer
+          description: >
+            Number of extracted leaf fields on the job, so list views can
+            show a count without receiving the full `fields` array.
+        averageConfidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          nullable: true
+          description: >
+            Arithmetic mean of all present confidence-bearing leaf fields on
+            the job, shown regardless of review status. `null` when the job
+            has no fields yet or none carry a confidence score (e.g. queued,
+            running, failed, or unclassified jobs). This is the same
+            aggregate used internally to gate `confidenceViolations`, but is
+            always surfaced here so callers can see the overall confidence
+            even when the job doesn't need review.
+        confidenceViolations:
+          type: array
+          items:
+            type: string
+          description: >
+            JSON Pointer paths (e.g. `/invoiceTotal`,
+            `/items/0/description`) of leaf fields currently below the
+            process's confidence threshold and not yet reviewed/approved,
+            but only when the arithmetic mean of all present
+            confidence-bearing leaf fields on the job is below that same
+            threshold. When the aggregate is equal to or above the
+            threshold, this list is empty even if some individual leaves are
+            lower. Populated when the job succeeds; a path is removed once a
+            reviewed value is saved for it (paths are never re-added).
+            Fields with no confidence score are never included. A
+            classified job with no confidence-bearing leaves has no
+            aggregate and therefore an empty list. The business owner
+            notification email is sent once, when this list first becomes
+            non-empty on job success — it is not resent as the list
+            shrinks.
+        estimatedCostUsd:
+          type: number
+          format: float
+          nullable: true
+          description: >
+            Estimated Azure AI Content Understanding cost, in USD, to
+            analyze this document with a custom analyzer — derived from its
+            page count (`pages`) and published per-page list pricing (see
+            `app.pricing` in the API source). Best-effort estimate for cost
+            visibility, not actual Azure billing data. `0` before the job
+            has a known page count (e.g. still `queued`/`running`).
+        error:
+          type: string
+          description: >
+            Human-readable failure reason, set when status is `failed` —
+            e.g. the Content Understanding call failed, the job exceeded its
+            processing timeout, or its retry budget was exhausted.
+        reviewedAt:
+          type: string
+          format: date-time
+          description: >
+            Timestamp of the first `PUT .../review` call for this job;
+            unset if no field has ever been reviewed. There is no
+            per-user attribution (no authentication in this demo).
+
+    PageInfo:
+      type: object
+      required: [page, width, height, unit]
+      properties:
+        page:
+          type: integer
+        width:
+          type: number
+          format: float
+        height:
+          type: number
+          format: float
+        unit:
+          type: string
+          enum: [inch, pixel]
+          description: >
+            Unit of `width`/`height` as reported by Content Understanding
+            (inches for PDFs, pixels for images). Bounding boxes are
+            already normalized and do **not** use this unit; it is provided
+            for aspect-ratio and diagnostic purposes.
+        angle:
+          type: number
+          format: float
+          description: >
+            Detected page rotation in degrees, clockwise, range (-180, 180].
+            Bounding polygons are expressed in this rotated frame.
+
+    ExtractedField:
+      type: object
+      required: [name, path, type]
+      description: >
+        A recursively typed field, mirroring Content Understanding's model
+        rather than flattening to strings. Scalar types carry a scalar
+        `value`; `array` carries `items`; `object` carries `properties`.
+      properties:
+        name:
+          type: string
+          description: >
+            Field name as reported by the analyzer. For an element of an
+            array, which has no name of its own, this is its stringified
+            index (`"0"`, `"1"`, ...).
+        path:
+          type: string
+          description: >
+            JSON Pointer (RFC 6901) addressing this field within the job's
+            `fields` structure, e.g. `/invoiceTotal` or
+            `/items/0/description`. This is what `confidenceViolations`
+            lists and what the review endpoint accepts.
+
+
+            JSON Pointer is used instead of a dotted syntax because analyzer
+            field names may themselves contain `.` and `[]`; JSON Pointer
+            defines escaping (`~0` for `~`, `~1` for `/`) so every path is
+            unambiguous. UIs display `name`, not `path`.
+          example: /items/0/description
+        type:
+          type: string
+          enum: [string, date, time, number, integer, boolean, array, object]
+        value:
+          description: >
+            The extracted value for scalar types — a string for
+            `string`/`date`/`time`, a number for `number`/`integer`, a
+            boolean for `boolean`. Absent for `array` and `object`, and for
+            a scalar the analyzer could not resolve.
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtractedField"
+          description: Child fields, present when `type` is `array`.
+        properties:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ExtractedField"
+          description: Child fields by name, present when `type` is `object`.
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: >
+            Extraction confidence, on leaf fields only. **May be absent** —
+            Content Understanding omits it for generated (as opposed to
+            extracted) values. An absent confidence is not zero: such fields
+            are excluded from threshold evaluation and shown as "n/a".
+        boundingBox:
+          type: array
+          minItems: 8
+          maxItems: 8
+          items:
+            type: number
+          description: >
+            Polygon as `[x1,y1,x2,y2,x3,y3,x4,y4]`, **normalized to 0–1
+            page-relative coordinates** with a top-left origin. The backend
+            converts from Content Understanding's native units (inches for
+            PDFs, pixels for images) so the client never has to. Absent when
+            the service returned no grounding for the field.
+        page:
+          type: integer
+          description: 1-based page number the bounding box refers to.
+        reviewedValue:
+          type: string
+          description: >
+            Human-corrected value, if reviewed/approved. The original
+            extracted `value` is retained alongside it for audit.
+
+    ReviewedField:
+      type: object
+      required: [path, value]
+      properties:
+        path:
+          type: string
+          description: >
+            JSON Pointer to a **leaf** field, as returned in
+            `ExtractedField.path` (e.g. `/items/0/description`). An unknown
+            path, or one addressing an `array`/`object` container, is
+            rejected with `400`.
+          example: /items/0/description
+        value:
+          type: string
+          description: >
+            The human-approved value, submitted as a string regardless of
+            the field's extracted type. Submitting the unchanged extracted
+            value is valid and meaningful: it marks a correct
+            low-confidence field as approved, clearing its violation.

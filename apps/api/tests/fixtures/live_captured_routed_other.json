@@ -1,0 +1,51 @@
+{
+  "id": "3cc644e0-e765-4037-939b-83d1d6f41673",
+  "status": "Succeeded",
+  "result": {
+    "analyzerId": "idpfixture94226f05830747988e1f",
+    "apiVersion": "2025-11-01",
+    "createdAt": "2026-09-04T22:35:27Z",
+    "stringEncoding": "codePoint",
+    "warnings": [],
+    "contents": [
+      {
+        "path": "input1",
+        "markdown": "TEAM MEETING NOTES\n\nProject: Enterprise IDP\nAgenda\n\n\\- Discuss roadmap\n\n\\- Review dependencies\n\\- Decide next steps\n",
+        "kind": "document",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "unit": "inch",
+        "pages": [
+          {
+            "pageNumber": 1,
+            "angle": -0.0954,
+            "width": 8.5,
+            "height": 11
+          }
+        ],
+        "segments": [
+          {
+            "span": {
+              "offset": 0,
+              "length": 116
+            },
+            "segmentId": "segment1",
+            "startPageNumber": 1,
+            "endPageNumber": 1,
+            "category": "other"
+          }
+        ],
+        "analyzerId": "idpfixture94226f05830747988e1f",
+        "mimeType": "application/pdf"
+      }
+    ]
+  },
+  "usage": {
+    "documentPagesStandard": 1,
+    "contextualizationTokens": 1000,
+    "tokens": {
+      "gpt-5-mini-input": 192,
+      "gpt-5-mini-output": 19
+    }
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "id": "c4bfba40-f3ce-4286-a3ee-0f5a8bd23cda",
+  "status": "Succeeded",
+  "result": {
+    "analyzerId": "idpfixture94226f05830747988e1f",
+    "apiVersion": "2025-11-01",
+    "createdAt": "2026-09-04T22:35:19Z",
+    "stringEncoding": "codePoint",
+    "warnings": [],
+    "contents": [
+      {
+        "path": "input1",
+        "markdown": "INVOICE\nVendor: Contoso Supplies\n\nInvoice Number: INV-1001\nInvoice Date: 2026-09-01\nBill To: Fabrikam\nItem: Printer paper Qty: 10 Price: 45.00\n\nTotal: 450.00 USD\n",
+        "kind": "document",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "unit": "inch",
+        "pages": [
+          {
+            "pageNumber": 1,
+            "angle": -0.0684,
+            "width": 8.5,
+            "height": 11
+          }
+        ],
+        "segments": [
+          {
+            "span": {
+              "offset": 0,
+              "length": 162
+            },
+            "segmentId": "segment1",
+            "startPageNumber": 1,
+            "endPageNumber": 1,
+            "category": "prebuilt-invoice"
+          }
+        ],
+        "analyzerId": "idpfixture94226f05830747988e1f",
+        "mimeType": "application/pdf"
+      },
+      {
+        "path": "input1/segment1",
+        "category": "prebuilt-invoice",
+        "markdown": "INVOICE\nVendor: Contoso Supplies\n\nInvoice Number: INV-1001\nInvoice Date: 2026-09-01\nBill To: Fabrikam\nItem: Printer paper Qty: 10 Price: 45.00\n\nTotal: 450.00 USD\n",
+        "fields": {
+          "AmountDue": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number",
+                "valueNumber": 450,
+                "spans": [
+                  {
+                    "offset": 151,
+                    "length": 10
+                  }
+                ],
+                "confidence": 0.536,
+                "source": "D(1,1.4432,1.7881,2.3740,1.7876,2.3741,1.9716,1.4433,1.9721)"
+              },
+              "CurrencyCode": {
+                "type": "string",
+                "valueString": "USD"
+              }
+            }
+          },
+          "BalanceForward": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number",
+                "confidence": 0.952
+              },
+              "CurrencyCode": {
+                "type": "string"
+              }
+            }
+          },
+          "BillingAddress": {
+            "type": "string",
+            "confidence": 0.614
+          },
+          "BillingAddressRecipient": {
+            "type": "string",
+            "confidence": 0.591
+          },
+          "CountryRegion": {
+            "type": "string",
+            "valueString": "USA"
+          },
+          "CustomerAddress": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "CustomerAddressRecipient": {
+            "type": "string",
+            "confidence": 0.508
+          },
+          "CustomerId": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "CustomerName": {
+            "type": "string",
+            "valueString": "Fabrikam",
+            "spans": [
+              {
+                "offset": 93,
+                "length": 8
+              }
+            ],
+            "confidence": 0.538,
+            "source": "D(1,1.5527,1.2973,2.2516,1.2970,2.2516,1.4735,1.5533,1.4731)"
+          },
+          "CustomerTaxId": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "DueDate": {
+            "type": "date",
+            "confidence": 0.928
+          },
+          "InvoiceDate": {
+            "type": "date",
+            "valueDate": "2026-09-01",
+            "spans": [
+              {
+                "offset": 73,
+                "length": 10
+              }
+            ],
+            "confidence": 0.794,
+            "source": "D(1,2.0102,1.0440,2.8638,1.0416,2.8638,1.2231,2.0107,1.2235)"
+          },
+          "InvoiceId": {
+            "type": "string",
+            "valueString": "INV-1001",
+            "spans": [
+              {
+                "offset": 50,
+                "length": 8
+              }
+            ],
+            "confidence": 0.776,
+            "source": "D(1,2.2588,0.7943,2.9551,0.7902,2.9562,0.9707,2.2599,0.9748)"
+          },
+          "LineItems": {
+            "type": "array",
+            "valueArray": [
+              {
+                "type": "object",
+                "valueObject": {
+                  "Date": {
+                    "type": "date",
+                    "confidence": 0.952
+                  },
+                  "Description": {
+                    "type": "string",
+                    "valueString": "Printer paper",
+                    "spans": [
+                      {
+                        "offset": 108,
+                        "length": 13
+                      }
+                    ],
+                    "confidence": 0.609,
+                    "source": "D(1,1.4138,1.5416,2.3800,1.5417,2.3800,1.7426,1.4138,1.7425)"
+                  },
+                  "ProductCode": {
+                    "type": "string",
+                    "confidence": 0.904
+                  },
+                  "Quantity": {
+                    "type": "number",
+                    "valueNumber": 10,
+                    "spans": [
+                      {
+                        "offset": 127,
+                        "length": 2
+                      }
+                    ],
+                    "confidence": 0.427,
+                    "source": "D(1,2.7866,1.5410,2.9487,1.5407,2.9489,1.7405,2.7868,1.7409)"
+                  },
+                  "QuantityUnit": {
+                    "type": "string",
+                    "confidence": 0.904
+                  },
+                  "TaxAmount": {
+                    "type": "object",
+                    "valueObject": {
+                      "Amount": {
+                        "type": "number",
+                        "confidence": 0.927
+                      },
+                      "CurrencyCode": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "TaxRate": {
+                    "type": "number",
+                    "confidence": 0.927
+                  },
+                  "TotalAmount": {
+                    "type": "object",
+                    "valueObject": {
+                      "Amount": {
+                        "type": "number",
+                        "valueNumber": 450,
+                        "spans": [
+                          {
+                            "offset": 151,
+                            "length": 6
+                          }
+                        ],
+                        "confidence": 0.391,
+                        "source": "D(1,1.4432,1.7893,1.9640,1.7887,1.9643,1.9710,1.4438,1.9710)"
+                      },
+                      "CurrencyCode": {
+                        "type": "string",
+                        "valueString": "USD"
+                      }
+                    }
+                  },
+                  "UnitPrice": {
+                    "type": "object",
+                    "valueObject": {
+                      "Amount": {
+                        "type": "number",
+                        "valueNumber": 45,
+                        "spans": [
+                          {
+                            "offset": 137,
+                            "length": 5
+                          }
+                        ],
+                        "confidence": 0.564,
+                        "source": "D(1,3.4680,1.5393,3.9014,1.5382,3.9014,1.7352,3.4681,1.7376)"
+                      },
+                      "CurrencyCode": {
+                        "type": "string",
+                        "valueString": "USD"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "PaymentTerm": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "PONumber": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "RemittanceAddress": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "RemittanceAddressRecipient": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "ServiceAddress": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "ServiceAddressRecipient": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "ShippingAddress": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "ShippingAddressRecipient": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "SubtotalAmount": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number"
+              },
+              "CurrencyCode": {
+                "type": "string"
+              }
+            }
+          },
+          "TaxDetails": {
+            "type": "array"
+          },
+          "TotalAmount": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number",
+                "valueNumber": 450,
+                "spans": [
+                  {
+                    "offset": 151,
+                    "length": 6
+                  }
+                ],
+                "confidence": 0.621,
+                "source": "D(1,1.4432,1.7893,1.9640,1.7887,1.9643,1.9710,1.4438,1.9710)"
+              },
+              "CurrencyCode": {
+                "type": "string",
+                "valueString": "USD"
+              }
+            }
+          },
+          "TotalDiscountAmount": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number",
+                "confidence": 0.973
+              },
+              "CurrencyCode": {
+                "type": "string"
+              }
+            }
+          },
+          "TotalTaxAmount": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number"
+              },
+              "CurrencyCode": {
+                "type": "string"
+              }
+            }
+          },
+          "VendorAddress": {
+            "type": "string",
+            "confidence": 0.614
+          },
+          "VendorAddressRecipient": {
+            "type": "string",
+            "confidence": 0.858
+          },
+          "VendorName": {
+            "type": "string",
+            "valueString": "Contoso Supplies",
+            "spans": [
+              {
+                "offset": 16,
+                "length": 16
+              }
+            ],
+            "confidence": 0.785,
+            "source": "D(1,1.6203,0.5405,2.9409,0.5429,2.9406,0.7360,1.6199,0.7336)"
+          },
+          "VendorTaxId": {
+            "type": "string",
+            "confidence": 0.858
+          }
+        },
+        "kind": "document",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "unit": "inch",
+        "pages": [
+          {
+            "pageNumber": 1,
+            "angle": -0.0684,
+            "width": 8.5,
+            "height": 11
+          }
+        ],
+        "analyzerId": "prebuilt-invoice"
+      }
+    ]
+  },
+  "usage": {
+    "documentPagesStandard": 1,
+    "contextualizationTokens": 1000,
+    "tokens": {
+      "gpt-5-mini-input": 218,
+      "gpt-5-mini-output": 22,
+      "gpt-4.1-input": 8883,
+      "gpt-4.1-output": 555
+    }
+  }
+}

@@ -1,0 +1,200 @@
+services:
+  cosmosdb-emulator:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-latest
+    container_name: cl-idp-cosmosdb-emulator
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "1234:1234"
+      - "10250-10255:10250-10255"
+    environment:
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+    volumes:
+      - cosmosdb-emulator-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/ready"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 45s
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: cl-idp-azurite
+    command: >
+      azurite
+      --blobHost 0.0.0.0
+      --queueHost 0.0.0.0
+      --tableHost 0.0.0.0
+      --location /data
+      --debug /data/debug.log
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('node:net'); const ports=[10000,10001,10002]; let remaining=ports.length; let failed=false; for (const port of ports) { const socket=net.connect({host:'127.0.0.1', port}); socket.on('connect',()=>{socket.destroy(); if (--remaining===0 && !failed) process.exit(0);}); socket.on('error',()=>{failed=true; process.exit(1);}); }"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: cl-idp-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_BIND_ADDR: 0.0.0.0:1025
+      MP_UI_BIND_ADDR: 0.0.0.0:8025
+    volumes:
+      - mailpit-data:/data
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  otel-collector:
+    # All-in-one Grafana "LGTM" stack: Loki (logs), Tempo (traces),
+    # Prometheus/Mimir (metrics), an OTLP collector endpoint, and a Grafana
+    # UI wired to all three, pre-provisioned with datasources. This is the
+    # local-dev stand-in for the Azure Monitor exporter used in production.
+    image: grafana/otel-lgtm:latest
+    container_name: cl-idp-otel-collector
+    ports:
+      - "3001:3000" # Grafana UI (3000 is already used by the web app)
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    volumes:
+      # Provision the CL-IDP dashboard (logs/traces/metrics) so it persists
+      # across container recreation instead of only existing in Grafana's
+      # ephemeral internal sqlite db.
+      - ./infra/grafana/dashboards:/otel-lgtm/cl-idp-dashboards:ro
+      - ./infra/grafana/provisioning/dashboards/cl-idp.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/cl-idp.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 45s
+
+  api:
+    profiles: ["app"]
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      COSMOS_CONNECTION_STRING: "AccountEndpoint=https://cosmosdb-emulator:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      AZURITE_BLOB_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+      AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      WEB_ORIGIN: "http://localhost:3000"
+      NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+      COSMOS_TLS_INSECURE: "true"
+      AZURE_CONFIG_DIR: /root/.azure
+      CL_IDP_AZURE_HOST_CONFIG_DIR: /azure-host/.azure
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    env_file:
+      - path: ./apps/api/.env
+        required: false
+      - path: ./.env
+        required: false
+    volumes:
+      - ${HOME}/.azure:/azure-host/.azure:ro
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      cosmosdb-emulator:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from urllib.request import urlopen; import sys; response = urlopen('http://127.0.0.1:8000/healthz'); sys.exit(0 if response.status == 200 else 1)",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  worker:
+    profiles: ["app"]
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      COSMOS_CONNECTION_STRING: "AccountEndpoint=https://cosmosdb-emulator:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      AZURITE_BLOB_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+      AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      WEB_ORIGIN: "http://localhost:3000"
+      NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+      COSMOS_TLS_INSECURE: "true"
+      AZURE_CONFIG_DIR: /root/.azure
+      CL_IDP_AZURE_HOST_CONFIG_DIR: /azure-host/.azure
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    env_file:
+      - path: ./apps/api/.env
+        required: false
+      - path: ./.env
+        required: false
+    volumes:
+      - ${HOME}/.azure:/azure-host/.azure:ro
+    command: ["python", "-m", "app.worker.main"]
+    depends_on:
+      cosmosdb-emulator:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+
+  web:
+    profiles: ["app"]
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      additional_contexts:
+        shared: ./packages/shared
+      args:
+        NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  cosmosdb-emulator-data:
+  azurite-data:
+  mailpit-data:

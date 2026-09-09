@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed": "#dde1f9", "on-surface": "#30323b", "tertiary": "#6d567f", "surface-dim": "#d9d9e4", "on-background": "#30323b", "surface-bright": "#faf8fe", "secondary-container": "#dde1f9", "primary-fixed-dim": "#a6b4e8", "surface-tint": "#4f5d8c", "outline-variant": "#b0b1bc", "surface": "#faf8fe", "secondary-fixed-dim": "#cfd3eb", "error": "#a83836", "surface-container": "#eeedf6", "on-secondary-container": "#4c5164", "primary": "#4f5d8c", "surface-container-lowest": "#ffffff", "primary-fixed": "#b3c2f7", "background": "#faf8fe", "on-error-container": "#6e0a12", "on-secondary-fixed-variant": "#565b6f", "on-secondary-fixed": "#393f51", "on-tertiary-container": "#564067", "error-container": "#fa746f", "primary-container": "#b3c2f7", "on-tertiary": "#fff6fe", "primary-dim": "#43517f", "surface-container-highest": "#e1e2ed", "inverse-surface": "#0d0e12", "on-tertiary-fixed": "#422d53", "on-primary": "#faf8ff", "error-dim": "#67040d", "surface-variant": "#e1e2ed", "on-tertiary-fixed-variant": "#604a71", "on-secondary": "#faf8ff", "tertiary-fixed": "#e6cafa", "on-primary-container": "#2d3c68", "secondary": "#595e72", "inverse-primary": "#b3c2f7", "on-primary-fixed-variant": "#374572", "outline": "#797a84", "on-primary-fixed": "#182853", "inverse-on-surface": "#9d9ca2", "tertiary-container": "#e6cafa", "tertiary-dim": "#604a72", "surface-container-high": "#e8e7f1", "on-surface-variant": "#5d5f68", "secondary-dim": "#4d5266", "on-error": "#fff7f6", "surface-container-low": "#f4f3fa", "tertiary-fixed-dim": "#d8bceb" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": {}, "fontFamily": { "headline": [ "Inter" ], "display": [ "Inter" ], "body": [ "Inter" ], "label": [ "Public Sans" ] }, "fontSize": {} } } }</script></head><body class="bg-surface font-body text-on-surface"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between p-4"><div class="flex flex-col gap-6"><div class="px-2 pt-2 flex flex-col"><span class="text-lg font-headline font-bold tracking-tight text-primary">CL-IDP</span><span class="text-[10px] font-label font-semibold tracking-wider uppercase text-on-surface-variant">ADMIN CONSOLE</span></div><div class="px-2"><button class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary hover:bg-primary-dim px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>New Process</span></button></div><nav class="flex flex-col gap-1 px-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold"><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="processes" href="#"><span class="material-symbols-outlined text-[20px]">account_tree</span><span>Processes</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="jobs" href="#"><span class="material-symbols-outlined text-[20px]">work</span><span>Jobs</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Settings</span></a></nav></div><div class="px-2 pb-2"><div class="flex items-center gap-3 p-2 rounded-lg bg-surface-container"><span class="material-symbols-outlined text-secondary text-[20px]">database</span><div class="flex flex-col min-w-0"><span class="text-xs font-medium text-on-surface truncate">v2.4 Production</span><span class="text-[10px] text-on-surface-variant truncate">US-East Cluster</span></div></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 px-8 flex items-center justify-between gap-6"><div class="flex items-center gap-2 text-xs font-label text-on-surface-variant"><a class="hover:text-on-surface transition-colors" data-path="processes" href="#">Processes</a><span class="material-symbols-outlined text-[14px]">chevron_right</span><a class="hover:text-on-surface transition-colors" data-path="custom-analyzers" href="#">Custom Analyzers</a><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="font-semibold text-on-surface">Train Form Model</span></div><div class="flex items-center gap-4"><div class="relative flex items-center w-72"><span class="material-symbols-outlined absolute left-3 text-[18px] text-outline">search</span><input class="w-full bg-surface-container-lowest text-xs text-on-surface placeholder:text-outline rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary shadow-[0_1px_8px_rgba(0,0,0,0.02)]" placeholder="Search analyzers or documents..." type="search"/></div><div class="flex items-center gap-1"><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">help</span></button></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="w-full pt-16 px-6 bg-surface"><div class="flex flex-col w-full pb-12">
+<!-- Studio Top Command Bar -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 py-4 mb-3 border-b-0">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 flex-wrap">
+<h1 class="text-xl font-headline font-bold tracking-tight text-on-surface">Commercial Invoice &amp; Bill of Lading</h1>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-900 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          Draft v1.0
+        </span>
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium">
+          Model ID: cfa_commercial_inv_v1
+        </span>
+</div>
+<p class="text-xs text-on-surface-variant font-label">Neural custom extraction pipeline • Standard layout + line-item dynamic grid parser</p>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2.5 flex-wrap">
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-on-surface-variant bg-surface-container hover:bg-surface-container-high transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+        Export Schema
+      </button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-on-surface-variant bg-surface-container hover:bg-surface-container-high transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">save</span>
+        Save Draft
+      </button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-outline-variant bg-surface-container-low cursor-not-allowed shadow-sm" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">play_circle</span>
+        Test &amp; Run
+      </button>
+<button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary-dim shadow-md transition-all active:scale-[0.98]" id="trainModelBtn" type="button">
+<span class="material-symbols-outlined text-[17px]">rocket_launch</span>
+<span>Train Model</span>
+</button>
+</div>
+</div>
+<!-- Studio 3-Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+<!-- Column 1: Left Pane / Training Dataset & File Sidebar (2 cols) -->
+<div class="lg:col-span-2 flex flex-col gap-3">
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-3.5 border border-outline-variant/30 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface uppercase tracking-wider font-label">File</span>
+<span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-primary-container text-on-primary-container">8</span>
+</div>
+<!-- Drag and drop zone matching reference -->
+<div class="flex flex-col items-center justify-center p-3 rounded-lg border-2 border-dashed border-outline-variant/60 hover:border-primary/80 bg-surface-container-low/60 text-center cursor-pointer transition-all">
+<span class="material-symbols-outlined text-outline text-[28px] mb-1">cloud_upload</span>
+<span class="text-xs font-medium text-on-surface">Drag &amp; drop files here or</span>
+<button class="text-xs text-primary font-semibold hover:underline mt-0.5" type="button">Browse for files</button>
+</div>
+<!-- Thumbnails & file list -->
+<div class="flex flex-col gap-2 max-h-[560px] overflow-y-auto pr-0.5">
+<!-- Active Document Card Preview -->
+<div class="p-2 rounded-lg border-2 border-primary bg-primary-container/20 flex flex-col gap-1.5 cursor-pointer shadow-xs">
+<div class="w-full h-24 bg-white border border-outline-variant/40 rounded flex flex-col p-1.5 overflow-hidden shadow-xs">
+<div class="flex items-center gap-1 border-b border-slate-200 pb-1 mb-1">
+<span class="material-symbols-outlined text-[10px] text-primary">description</span>
+<span class="text-[8px] font-bold text-slate-800 truncate">Commercial Invoice</span>
+</div>
+<div class="space-y-0.5 text-[7px] text-slate-400">
+<div class="h-1 bg-slate-200 rounded w-3/4"></div>
+<div class="h-1 bg-slate-100 rounded w-full"></div>
+<div class="h-1 bg-slate-100 rounded w-5/6"></div>
+<div class="h-6 bg-slate-50 border border-slate-200 rounded my-1 flex items-center justify-center text-[7px] text-slate-400">TABLE GRID</div>
+<div class="h-1 bg-slate-200 rounded w-1/2 ml-auto"></div>
+</div>
+</div>
+<span class="text-[11px] font-medium text-primary truncate leading-tight">invoice_sample_01.pdf</span>
+</div>
+<!-- Item 2 -->
+<div class="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-low flex items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">picture_as_pdf</span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs text-on-surface truncate">invoice_sample_02.pdf</span>
+<span class="text-[10px] text-on-surface-variant">14 fields • 1 pg</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-low flex items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">picture_as_pdf</span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs text-on-surface truncate">invoice_sample_03.pdf</span>
+<span class="text-[10px] text-on-surface-variant">14 fields • 1 pg</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-low flex items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">description</span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs text-on-surface truncate">ocean_bol_sample_04.pdf</span>
+<span class="text-[10px] text-on-surface-variant">12 fields • 3 pgs</span>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-low flex items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">picture_as_pdf</span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs text-on-surface truncate">commercial_inv_05.pdf</span>
+<span class="text-[10px] text-on-surface-variant">14 fields • 1 pg</span>
+</div>
+</div>
+<!-- Item 6: Review -->
+<div class="p-1.5 rounded-lg border border-amber-200 bg-amber-50/50 hover:bg-amber-50 flex items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-amber-600 text-[18px]">warning</span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs text-on-surface truncate">logistics_bill_06.pdf</span>
+<span class="text-[10px] text-amber-800">Partially labeled</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 2: Center Pane / Document Viewer & Annotation Canvas (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-2">
+<!-- Document Header Bar -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-3 py-2 shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 min-w-0">
+<span class="material-symbols-outlined text-primary text-[18px]">description</span>
+<span class="text-xs font-semibold text-on-surface truncate">invoice_sample_01.pdf</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Collapse file pane" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Rendered Document Canvas Container -->
+<div class="relative bg-surface-container rounded-xl p-3 shadow-inner border border-outline-variant/30 overflow-hidden flex justify-center items-start min-h-[660px]">
+<!-- Document Sheet -->
+<div class="relative w-full max-w-[530px] bg-white text-slate-900 rounded-sm shadow-lg p-6 font-sans transition-all select-none text-[11px]">
+<!-- Watermark/OCR overlay tag -->
+<div class="absolute top-2 right-2 flex items-center gap-1 bg-surface-container-high/90 backdrop-blur-xs px-2 py-0.5 rounded text-[10px] text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            OCR: Azure Layout Engine v3.1
+          </div>
+<!-- Document Header -->
+<div class="flex justify-between items-start pb-4 border-b border-slate-200">
+<div>
+<!-- Labeled Box: vendor_name -->
+<div class="relative inline-block p-1 -m-1 rounded bg-sky-500/10 outline-2 outline-sky-500 ring-2 ring-sky-500/20">
+<span class="absolute -top-3 left-1 px-1.5 py-0.2 rounded bg-sky-600 text-white font-mono text-[8px] font-bold shadow-xs">
+                  vendor_name
+                </span>
+<h2 class="text-sm font-bold text-slate-900 tracking-tight">Pacific Cargo Logistics Ltd.</h2>
+</div>
+<p class="text-[10px] text-slate-600 mt-1">4280 Maritime Blvd, Terminal 4</p>
+<p class="text-[10px] text-slate-600">Seattle, WA 98134, USA</p>
+<p class="text-[10px] text-slate-600">tax-id: US-883920194</p>
+</div>
+<div class="text-right">
+<span class="text-[11px] font-bold tracking-wider uppercase text-slate-700 block">COMMERCIAL INVOICE</span>
+<!-- Labeled Box: invoice_number -->
+<div class="relative inline-block mt-1.5 p-1 -m-1 rounded bg-indigo-500/10 outline-2 outline-indigo-500 ring-2 ring-indigo-500/20">
+<span class="absolute -top-3 right-1 px-1.5 py-0.2 rounded bg-indigo-600 text-white font-mono text-[8px] font-bold shadow-xs">
+                  invoice_number
+                </span>
+<span class="font-mono text-[11px] font-bold text-slate-900">INV-2024-90412</span>
+</div>
+<!-- Labeled Box: invoice_date -->
+<div class="mt-2.5">
+<div class="relative inline-block p-1 -m-1 rounded bg-emerald-500/10 outline-2 outline-emerald-600 ring-2 ring-emerald-500/20">
+<span class="absolute -top-3 right-1 px-1.5 py-0.2 rounded bg-emerald-700 text-white font-mono text-[8px] font-bold shadow-xs">
+                    invoice_date
+                  </span>
+<span class="text-[10px] font-semibold text-slate-800">October 18, 2024</span>
+</div>
+</div>
+<!-- Labeled Box: due_date -->
+<div class="mt-2">
+<div class="relative inline-block p-1 -m-1 rounded bg-amber-500/10 outline-2 outline-amber-500 ring-2 ring-amber-500/20">
+<span class="absolute -top-3 right-1 px-1.5 py-0.2 rounded bg-amber-600 text-white font-mono text-[8px] font-bold shadow-xs">
+                    due_date
+                  </span>
+<span class="text-[10px] font-semibold text-slate-800">November 17, 2024</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bill To / Consignee Details -->
+<div class="grid grid-cols-2 gap-3 py-3 border-b border-slate-200 text-[10px]">
+<div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Billed To (Importer):</span>
+<p class="text-[11px] font-semibold text-slate-800 mt-0.5">Atlas Industrial Components Corp.</p>
+<p class="text-slate-600">842 Innovation Way, Suite 300</p>
+<p class="text-slate-600">Austin, TX 78759, USA</p>
+</div>
+<div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Port of Entry &amp; Carrier:</span>
+<p class="text-slate-700 mt-0.5"><strong class="text-slate-800">Vessel:</strong> Ever Ace / Voy 0214W</p>
+<p class="text-slate-700"><strong class="text-slate-800">POL:</strong> Busan, KR | <strong class="text-slate-800">POD:</strong> Seattle, US</p>
+<p class="text-slate-700"><strong class="text-slate-800">BOL Ref:</strong> MEDU-90219481</p>
+</div>
+</div>
+<!-- Labeled Dynamic Table Grid: line_items -->
+<div class="my-3 relative rounded-md bg-purple-500/5 outline-2 outline-purple-600 ring-2 ring-purple-500/15 p-2">
+<span class="absolute -top-2.5 left-2 px-1.5 py-0.2 rounded bg-purple-700 text-white font-mono text-[8px] font-bold shadow-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">table_rows</span>
+              table: line_items
+            </span>
+<table class="w-full text-left text-[10px] mt-1 border-collapse">
+<thead>
+<tr class="border-b border-purple-200 text-purple-950 font-bold bg-purple-50/50">
+<th class="py-1 px-1.5">Description</th>
+<th class="py-1 px-1.5 text-right">Qty</th>
+<th class="py-1 px-1.5 text-right">Unit ($)</th>
+<th class="py-1 px-1.5 text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-purple-100 text-slate-800">
+<tr>
+<td class="py-1 px-1.5 font-medium">Precision Ceramic Ball Bearings</td>
+<td class="py-1 px-1.5 text-right font-mono">1,500</td>
+<td class="py-1 px-1.5 text-right font-mono">18.50</td>
+<td class="py-1 px-1.5 text-right font-mono font-medium">$27,750.00</td>
+</tr>
+<tr>
+<td class="py-1 px-1.5 font-medium">Titanium Fastener Flange M8</td>
+<td class="py-1 px-1.5 text-right font-mono">800</td>
+<td class="py-1 px-1.5 text-right font-mono">14.00</td>
+<td class="py-1 px-1.5 text-right font-mono font-medium">$11,200.00</td>
+</tr>
+<tr>
+<td class="py-1 px-1.5 font-medium">Bespoke Gasket Seal Sets</td>
+<td class="py-1 px-1.5 text-right font-mono">650</td>
+<td class="py-1 px-1.5 text-right font-mono">14.30</td>
+<td class="py-1 px-1.5 text-right font-mono font-medium">$9,300.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Totals Area -->
+<div class="flex justify-end pt-1 pb-4">
+<div class="w-48 flex flex-col gap-1 text-right text-[10px]">
+<div class="flex justify-between text-slate-600">
+<span>Subtotal:</span>
+<span class="font-mono text-slate-800 font-medium">$48,250.00</span>
+</div>
+<div class="flex justify-between text-slate-600">
+<span>Freight &amp; Tax:</span>
+<span class="font-mono text-slate-800 font-medium">$0.00</span>
+</div>
+<!-- Labeled Box: total_amount (Active Selected) -->
+<div class="flex justify-between items-center pt-1.5 border-t border-slate-300">
+<span class="font-bold text-slate-900 text-[11px]">Total:</span>
+<div class="relative inline-block p-1 -m-1 rounded bg-rose-500/10 outline-2 outline-rose-500 ring-2 ring-rose-500/30">
+<span class="absolute -top-2.5 right-0 px-1 py-0.2 rounded bg-rose-600 text-white font-mono text-[8px] font-bold shadow-xs">
+                    total_amount
+                  </span>
+<span class="font-mono font-bold text-xs text-slate-950">$48,250.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Document Footer -->
+<div class="pt-3 border-t border-slate-200 flex justify-between items-center text-[9px] text-slate-500">
+<span>Authorized: <em class="font-serif text-slate-700">M. Tanaka</em></span>
+<span class="font-mono">Page 1 of 2</span>
+</div>
+</div>
+</div>
+<!-- Document Viewer Bottom Pagination & Zoom Bar matching reference -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2 shadow-sm flex items-center justify-between gap-3 text-xs text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-1.5 text-xs text-on-surface">
+<span class="w-7 text-center font-mono py-0.5 border border-outline-variant/60 rounded bg-white">1</span>
+<span>of</span>
+<span class="font-mono">2</span>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container" title="Zoom in" type="button">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container" title="Zoom out" type="button">
+<span class="material-symbols-outlined text-[18px]">zoom_out</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container" title="Fit to width" type="button">
+<span class="material-symbols-outlined text-[18px]">fit_screen</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container" title="Rotate" type="button">
+<span class="material-symbols-outlined text-[18px]">rotate_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Column 3: Right Pane / Schema Definition Table & Tabs (5 cols) -->
+<div class="lg:col-span-5 flex flex-col">
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 flex flex-col overflow-hidden">
+<!-- Header Tabs: Schema, Settings, Knowledge, Test -->
+<div class="flex items-center border-b border-outline-variant/30 bg-surface-container-lowest px-2 pt-1">
+<!-- Tab: Schema (Active) -->
+<button class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-primary border-b-2 border-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">table_chart</span>
+<span>Schema</span>
+</button>
+<!-- Tab: Settings -->
+<button class="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:text-on-surface border-b-2 border-transparent transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span>Settings</span>
+</button>
+<!-- Tab: Knowledge -->
+<button class="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:text-on-surface border-b-2 border-transparent transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">database</span>
+<span>Knowledge</span>
+</button>
+<!-- Tab: Test -->
+<button class="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:text-on-surface border-b-2 border-transparent transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>Test</span>
+</button>
+</div>
+<!-- Schema Action Toolbar -->
+<div class="flex items-center gap-2 p-2.5 border-b border-outline-variant/20 bg-surface-container-lowest flex-wrap text-xs">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-outline-variant/60 text-on-surface hover:bg-surface-container hover:border-primary text-xs font-medium transition-colors shadow-xs" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">add</span>
+<span>Add new field</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">auto_fix_high</span>
+<span>Suggest</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+<span>Import</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+<span>Export</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors ml-auto" type="button">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Schema settings</span>
+</button>
+</div>
+<!-- Schema Data Dense Table Container -->
+<div class="overflow-x-auto max-h-[580px] overflow-y-auto">
+<table class="w-full min-w-[560px] text-left border-collapse text-xs">
+<thead>
+<tr class="border-b border-outline-variant/30 text-[11px] font-semibold text-on-surface-variant bg-surface-container-low/50 sticky top-0 z-10 backdrop-blur-xs">
+<th class="py-2.5 px-3 whitespace-nowrap">Field Name</th>
+<th class="py-2.5 px-3 whitespace-nowrap">Field Description</th>
+<th class="py-2.5 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1">
+<span>Value Type</span>
+<span class="material-symbols-outlined text-[14px] text-outline">info</span>
+</div>
+</th>
+<th class="py-2.5 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1">
+<span>Method</span>
+<span class="material-symbols-outlined text-[14px] text-outline">info</span>
+</div>
+</th>
+<th class="py-2.5 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1">
+<span>Source &amp; Confidence</span>
+<span class="material-symbols-outlined text-[14px] text-outline">info</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 text-on-surface">
+<!-- Row 1: AmountDue -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">AmountDue</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Total Amount Due">Total Amount...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Object</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary rounded" title="View nested schema" type="button">
+<span class="material-symbols-outlined text-[16px]">grid_view</span>
+</button>
+</div>
+</td>
+<td class="py-2 px-3 text-center text-outline-variant">—</td>
+<td class="py-2 px-3 text-center text-outline-variant">—</td>
+</tr>
+<!-- Row 2: BalanceForward -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">BalanceFor...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Explicit previous balance">Explicit previo...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Object</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary rounded" title="View nested schema" type="button">
+<span class="material-symbols-outlined text-[16px]">grid_view</span>
+</button>
+</div>
+</td>
+<td class="py-2 px-3 text-center text-outline-variant">—</td>
+<td class="py-2 px-3 text-center text-outline-variant">—</td>
+</tr>
+<!-- Row 3: BillingAddressRecipient -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">BillingAddr...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Explicit billing address recipient">Explicit billing...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 4: BillingAddress -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">BillingAddr...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Name associated with bill">Name associa...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 5: CountryRegion -->
+<tr class="hover:bg-surface-container-low/40 transition-colors bg-primary-container/10">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">CountryRe...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Country or region identifier">Country or re...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Generate</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 6: CustomerAddress -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">Customer...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Mailing address of the buyer">Mailing addre...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 7: CustomerAddressRecipient -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">Customer...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Name associated with the destination address">Name associa...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 8: CustomerId -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">CustomerId</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Reference ID for customer">Reference ID ...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 9: CustomerName -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">Customer...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Customer being billed">Customer bei...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 10: CustomerTaxId -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">CustomerT...</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="The government registration tax number">The governm...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>String</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 11: DueDate -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">DueDate</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Date payment is due">Date paymen...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>Date</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+<!-- Row 12: InvoiceDate -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-2 px-3 font-medium font-mono text-[11px] whitespace-nowrap text-on-surface">InvoiceDate</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px] max-w-[130px] truncate" title="Date the invoice was issued">Date the invoi...</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-28 bg-white text-[11px]">
+<span>Date</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 whitespace-nowrap">
+<div class="flex items-center justify-between border border-outline-variant/50 rounded px-2 py-1 w-24 bg-white text-[11px]">
+<span>Extract</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</div>
+</td>
+<td class="py-2 px-3 text-center">
+<input class="w-4 h-4 rounded text-primary border-outline-variant/70 focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pinned Footer Action Bar matching reference -->
+<div class="flex items-center justify-center gap-3 p-3 border-t border-outline-variant/30 bg-surface-container-lowest">
+<button class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low hover:bg-surface-container text-on-surface text-xs font-medium transition-colors shadow-xs" type="button">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">save</span>
+<span>Save</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low hover:bg-surface-container text-on-surface text-xs font-medium transition-colors shadow-xs" type="button">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">undo</span>
+<span>Discard</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interaction for train button feedback
+  document.getElementById('trainModelBtn')?.addEventListener('click', function() {
+    const originalContent = this.innerHTML;
+    this.disabled = true;
+    this.classList.add('opacity-80', 'cursor-wait');
+    this.innerHTML = '<span class="material-symbols-outlined animate-spin text-[17px]">progress_activity</span><span>Queuing Pipeline...</span>';
+    setTimeout(() => {
+      this.innerHTML = '<span class="material-symbols-outlined text-[17px]">check_circle</span><span>Training Job #4910 Dispatched!</span>';
+      this.classList.replace('bg-primary', 'bg-emerald-600');
+      setTimeout(() => {
+        this.innerHTML = originalContent;
+        this.disabled = false;
+        this.classList.remove('opacity-80', 'cursor-wait');
+        this.classList.replace('bg-emerald-600', 'bg-primary');
+      }, 3500);
+    }, 1200);
+  });
+</script></main></div></body></html>

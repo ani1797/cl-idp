@@ -1,0 +1,88 @@
+{
+  "status": "Succeeded",
+  "result": {
+    "contents": [
+      {
+        "kind": "document",
+        "analyzerId": "idp_r_demo",
+        "unit": "pixel",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 1000, "height": 2000, "angle": 0.0}
+        ],
+        "segments": [
+          {"segmentId": "segment1", "category": "prebuilt-invoice"}
+        ]
+      },
+      {
+        "kind": "document",
+        "category": "prebuilt-invoice",
+        "analyzerId": "prebuilt-invoice",
+        "unit": "pixel",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 1000, "height": 2000, "angle": 0.0}
+        ],
+        "fields": {
+          "CustomerName": {
+            "type": "string",
+            "valueString": "Contoso",
+            "confidence": 0.96,
+            "source": "D(1,100,200,300,200,300,260,100,260)"
+          },
+          "InvoiceDate": {
+            "type": "date",
+            "valueDate": "2026-09-01",
+            "confidence": 0.72,
+            "source": "D(1,400,200,520,200,520,260,400,260)"
+          },
+          "InvoiceId": {
+            "type": "string",
+            "valueString": "INV-1001",
+            "source": "D(1,100,320,240,320,240,360,100,360)"
+          },
+          "AmountDue": {
+            "type": "object",
+            "valueObject": {
+              "Amount": {
+                "type": "number",
+                "valueNumber": 450.0,
+                "confidence": 0.64,
+                "source": "D(1,600,400,720,400,720,460,600,460)"
+              },
+              "CurrencyCode": {
+                "type": "string",
+                "valueString": "USD",
+                "confidence": 0.99,
+                "source": "D(1,740,400,820,400,820,460,740,460)"
+              }
+            }
+          },
+          "LineItems": {
+            "type": "array",
+            "valueArray": [
+              {
+                "type": "object",
+                "valueObject": {
+                  "Description": {
+                    "type": "string",
+                    "valueString": "Printer paper",
+                    "confidence": 0.5,
+                    "source": "D(1,100,600,360,600,360,660,100,660)"
+                  },
+                  "Quantity": {
+                    "type": "integer",
+                    "valueInteger": 10,
+                    "source": "D(1,380,600,430,600,430,660,380,660)"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

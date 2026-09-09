@@ -1,0 +1,293 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CL-IDP - Processes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#b0b1bc",
+            "on-error-container": "#6e0a12",
+            "inverse-primary": "#b3c2f7",
+            "secondary-fixed": "#dde1f9",
+            "surface-dim": "#d9d9e4",
+            "tertiary-dim": "#604a72",
+            "on-primary": "#faf8ff",
+            "surface-container-high": "#e8e7f1",
+            "on-primary-container": "#2d3c68",
+            "on-surface-variant": "#5d5f68",
+            "inverse-on-surface": "#9d9ca2",
+            "on-tertiary-fixed": "#422d53",
+            "surface-container": "#eeedf6",
+            "on-tertiary-container": "#564067",
+            "inverse-surface": "#0d0e12",
+            "on-surface": "#30323b",
+            "on-primary-fixed": "#182853",
+            "tertiary": "#6d567f",
+            "on-secondary-fixed": "#393f51",
+            "on-error": "#fff7f6",
+            "error-container": "#fa746f",
+            "outline": "#797a84",
+            "error": "#a83836",
+            "surface-variant": "#e1e2ed",
+            "secondary-container": "#dde1f9",
+            "on-tertiary-fixed-variant": "#604a71",
+            "on-primary-fixed-variant": "#374572",
+            "on-secondary": "#faf8ff",
+            "background": "#faf8fe",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#b3c2f7",
+            "surface-bright": "#faf8fe",
+            "secondary-dim": "#4d5266",
+            "on-secondary-fixed-variant": "#565b6f",
+            "primary-dim": "#43517f",
+            "primary-fixed-dim": "#a6b4e8",
+            "primary-container": "#b3c2f7",
+            "secondary": "#595e72",
+            "on-tertiary": "#fff6fe",
+            "error-dim": "#67040d",
+            "secondary-fixed-dim": "#cfd3eb",
+            "surface-tint": "#4f5d8c",
+            "on-secondary-container": "#4c5164",
+            "surface": "#faf8fe",
+            "on-background": "#30323b",
+            "surface-container-low": "#f4f3fa",
+            "surface-container-highest": "#e1e2ed",
+            "tertiary-container": "#e6cafa",
+            "tertiary-fixed-dim": "#d8bceb",
+            "tertiary-fixed": "#e6cafa",
+            "primary": "#4f5d8c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {},
+          "fontFamily": {
+            "headline": ["Inter"],
+            "display": ["Inter"],
+            "body": ["Inter"],
+            "label": ["Public Sans"]
+          },
+          "fontSize": {}
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body h-screen overflow-hidden flex antialiased">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline fixed left-0 top-0 h-screen flex flex-col py-6 w-64 z-20">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold shadow-sm">
+        CL
+      </div>
+<div>
+<h1 class="text-xl font-headline font-bold text-primary dark:text-inverse-primary tracking-tight">CL-IDP</h1>
+<p class="text-xs text-on-surface-variant dark:text-surface-variant uppercase tracking-wider font-semibold">Admin Console</p>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm active:scale-95 duration-100">
+<span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+        New Process
+      </button>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-2 font-body text-label-md">
+<a class="flex items-center gap-3 px-4 py-3 text-primary dark:text-inverse-primary font-semibold border-l-4 border-primary bg-primary/10 rounded-r-lg" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+        Processes
+      </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-dim transition-colors rounded-lg border-l-4 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">work</span>
+        Jobs
+      </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-dim transition-colors rounded-lg border-l-4 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">settings</span>
+        Settings
+      </a></nav>
+
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col ml-64 min-w-0 bg-background h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background border-b border-outline-variant dark:border-outline flex justify-between items-center h-16 px-8 shrink-0 z-10 sticky top-0 w-full font-headline text-headline-sm">
+<div class="flex items-center gap-6">
+<h2 class="text-primary dark:text-inverse-primary font-bold text-lg tracking-tight">Business Processes</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors text-sm">search</span>
+<input class="w-full bg-surface-container-low border-outline-variant/30 text-sm rounded-full pl-9 pr-4 py-1.5 focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant" placeholder="Search processes..." type="text">
+</div>
+<div class="h-6 w-px bg-outline-variant/30 mx-2"></div>
+<button class="text-on-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors hover:bg-surface-container-high p-1.5 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors hover:bg-surface-container-high p-1.5 rounded-full mr-2">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant cursor-pointer hover:ring-2 ring-primary ring-offset-1 transition-all">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of an administrative user in a corporate setting, bright lighting, light mode aesthetic, neutral color palette with a subtle blue tie, 85mm portrait photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmwX7_ctbNIeVe3T5b-jbTHctIoexL7pyZYtw0_CFAt788k_ZJvTiqsk9ixpkgPqhy56vgv4cxg3LgA0jl9Ky0x1kyUOPULh7BRblLGQqWZkRgV4m8pM_PWywrwTnjz1RsZI4RHBXl2wiLVxhx0aUwqmlUS2M0kVVfdmgrhgpye4IqpuN6J9DPamfxY0zIVOQnh0WNcG8dbZ_xuOXanHCHW2SzxxMhAigVlrQnPP92RzcVFou3uPp758kuQNxrtgQOda1B9Q3VWcog">
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 overflow-y-auto p-8 relative">
+<!-- Content Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 flex flex-col h-full max-h-full overflow-hidden">
+<!-- Card Header / Toolbar -->
+<div class="p-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-bright shrink-0">
+<div class="flex items-center gap-3">
+<div class="relative w-72 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors text-[18px]">filter_list</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 text-sm rounded-md pl-9 pr-4 py-2 focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-inner placeholder:text-on-surface-variant/70 text-on-surface font-medium" placeholder="Filter list..." type="text">
+</div>
+<button class="px-3 py-1.5 text-sm font-semibold text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-md border border-outline-variant/20 transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">tune</span> Options
+             </button>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors"><span class="material-symbols-outlined">view_list</span></button>
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors"><span class="material-symbols-outlined">grid_view</span></button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto flex-1 bg-surface-container-lowest">
+<table class="w-full text-left text-sm text-on-surface">
+<thead class="text-xs text-on-surface-variant bg-surface-container-low/50 sticky top-0 z-10 shadow-sm border-b border-outline-variant/30 font-semibold uppercase tracking-wider font-label">
+<tr>
+<th class="px-6 py-4 cursor-pointer hover:text-primary transition-colors group" scope="col">
+<div class="flex items-center gap-1">Name <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">arrow_downward</span></div>
+</th>
+<th class="px-6 py-4" scope="col">Description</th>
+<th class="px-6 py-4" scope="col">Allowed Analyzers</th>
+<th class="px-6 py-4 text-right" scope="col">Confidence</th>
+<th class="px-6 py-4" scope="col">Owner</th>
+<th class="px-6 py-4" scope="col">Status</th>
+<th class="px-6 py-4 text-center" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-3 font-semibold text-primary">Vendor Invoices</td>
+<td class="px-6 py-3 text-on-surface-variant text-xs max-w-[200px] truncate" title="Extracts line items, totals, and vendor details from inbound B2B invoices.">Extracts line items, totals, and vendor details...</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant/20">Invoice</span>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#137333]">85%</span>
+</td>
+<td class="px-6 py-3 text-xs text-on-surface-variant font-mono">finance-auto@corp.com</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-1.5 text-[#137333]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="text-xs font-semibold">Ready</span>
+</div>
+</td>
+<td class="px-6 py-3 text-center">
+<div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-3 font-semibold text-primary">Expense Receipts</td>
+<td class="px-6 py-3 text-on-surface-variant text-xs max-w-[200px] truncate" title="Processes employee travel and dining receipts for Concur integration.">Processes employee travel and dining receipts...</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant/20">Receipt</span>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#fef7e0] text-[#b06000]">90%</span>
+</td>
+<td class="px-6 py-3 text-xs text-on-surface-variant font-mono">hr-expenses@corp.com</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-1.5 text-[#b06000]">
+<span class="material-symbols-outlined text-[16px] animate-spin">autorenew</span>
+<span class="text-xs font-semibold">Building</span>
+</div>
+</td>
+<td class="px-6 py-3 text-center">
+<div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-3 font-semibold text-primary">Employee Tax Forms</td>
+<td class="px-6 py-3 text-on-surface-variant text-xs max-w-[200px] truncate" title="Classifies and extracts fields from W-2s and 1099s for payroll auditing.">Classifies and extracts fields from W-2s...</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant/20">W-2</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant/20 ml-1">1099</span>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#fce8e6] text-[#c5221f]">82%</span>
+</td>
+<td class="px-6 py-3 text-xs text-on-surface-variant font-mono">payroll-admin@corp.com</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-1.5 text-[#c5221f]">
+<span class="material-symbols-outlined text-[16px]">error</span>
+<span class="text-xs font-semibold">Failed</span>
+</div>
+</td>
+<td class="px-6 py-3 text-center">
+<div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-3 font-semibold text-primary">Purchase Orders</td>
+<td class="px-6 py-3 text-on-surface-variant text-xs max-w-[200px] truncate" title="Reconciles incoming POs against vendor master data in ERP.">Reconciles incoming POs against vendor...</td>
+<td class="px-6 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant/20">PO</span>
+</td>
+<td class="px-6 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#137333]">95%</span>
+</td>
+<td class="px-6 py-3 text-xs text-on-surface-variant font-mono">procurement@corp.com</td>
+<td class="px-6 py-3">
+<div class="flex items-center gap-1.5 text-[#137333]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="text-xs font-semibold">Ready</span>
+</div>
+</td>
+<td class="px-6 py-3 text-center">
+<div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer -->
+<div class="p-3 border-t border-outline-variant/20 bg-surface-container-low flex justify-between items-center text-xs text-on-surface-variant shrink-0">
+<div class="">Showing 1 to 4 of 4 entries</div>
+<div class="flex gap-1">
+<button class="px-2 py-1 border border-outline-variant/30 rounded bg-surface hover:bg-surface-container-highest transition-colors disabled:opacity-50" disabled="">Prev</button>
+<button class="px-2 py-1 border border-outline-variant/30 rounded bg-surface hover:bg-surface-container-highest transition-colors disabled:opacity-50" disabled="">Next</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

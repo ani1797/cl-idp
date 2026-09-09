@@ -1,0 +1,32 @@
+{
+  "status": "Succeeded",
+  "result": {
+    "contents": [
+      {
+        "kind": "document",
+        "analyzerId": "idp_r_demo",
+        "unit": "pixel",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 1200, "height": 1600, "angle": 0.0}
+        ],
+        "segments": [
+          {"segmentId": "segment1", "category": "custom-po-form"}
+        ]
+      },
+      {
+        "kind": "document",
+        "category": "custom-po-form",
+        "analyzerId": "idp_d_demo_custom",
+        "unit": "pixel",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 1200, "height": 1600, "angle": 0.0}
+        ],
+        "fields": {}
+      }
+    ]
+  }
+}

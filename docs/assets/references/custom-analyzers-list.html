@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed": "#dde1f9", "on-surface": "#30323b", "tertiary": "#6d567f", "surface-dim": "#d9d9e4", "on-background": "#30323b", "surface-bright": "#faf8fe", "secondary-container": "#dde1f9", "primary-fixed-dim": "#a6b4e8", "surface-tint": "#4f5d8c", "outline-variant": "#b0b1bc", "surface": "#faf8fe", "secondary-fixed-dim": "#cfd3eb", "error": "#a83836", "surface-container": "#eeedf6", "on-secondary-container": "#4c5164", "primary": "#4f5d8c", "surface-container-lowest": "#ffffff", "primary-fixed": "#b3c2f7", "background": "#faf8fe", "on-error-container": "#6e0a12", "on-secondary-fixed-variant": "#565b6f", "on-secondary-fixed": "#393f51", "on-tertiary-container": "#564067", "error-container": "#fa746f", "primary-container": "#b3c2f7", "on-tertiary": "#fff6fe", "primary-dim": "#43517f", "surface-container-highest": "#e1e2ed", "inverse-surface": "#0d0e12", "on-tertiary-fixed": "#422d53", "on-primary": "#faf8ff", "error-dim": "#67040d", "surface-variant": "#e1e2ed", "on-tertiary-fixed-variant": "#604a71", "on-secondary": "#faf8ff", "tertiary-fixed": "#e6cafa", "on-primary-container": "#2d3c68", "secondary": "#595e72", "inverse-primary": "#b3c2f7", "on-primary-fixed-variant": "#374572", "outline": "#797a84", "on-primary-fixed": "#182853", "inverse-on-surface": "#9d9ca2", "tertiary-container": "#e6cafa", "tertiary-dim": "#604a72", "surface-container-high": "#e8e7f1", "on-surface-variant": "#5d5f68", "secondary-dim": "#4d5266", "on-error": "#fff7f6", "surface-container-low": "#f4f3fa", "tertiary-fixed-dim": "#d8bceb" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": {}, "fontFamily": { "headline": [ "Inter" ], "display": [ "Inter" ], "body": [ "Inter" ], "label": [ "Public Sans" ] }, "fontSize": {} } } }
+  </script>
+  <title>Custom Analyzers</title>
+</head>
+<body class="bg-surface font-body text-on-surface">
+  <aside class="fixed left-0 top-0 z-50 flex h-full w-64 flex-col justify-between bg-surface-container-low p-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col px-2 pt-2">
+        <span class="text-lg font-headline font-bold tracking-tight text-primary">CL-IDP</span>
+        <span class="text-[10px] font-label font-semibold uppercase tracking-wider text-on-surface-variant">ADMIN CONSOLE</span>
+      </div>
+      <div class="px-2">
+        <button class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-on-primary shadow-sm transition-colors hover:bg-primary-dim" type="button">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>New Process</span>
+        </button>
+      </div>
+      <nav class="flex flex-col gap-1 px-1">
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface" href="#">
+          <span class="material-symbols-outlined text-[20px]">account_tree</span>
+          <span>Processes</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface" href="#">
+          <span class="material-symbols-outlined text-[20px]">work</span>
+          <span>Jobs</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-lg bg-primary-container px-3 py-2 text-sm font-semibold text-on-primary-container" href="#">
+          <span class="material-symbols-outlined text-[20px]">schema</span>
+          <span>Custom Analyzers</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface" href="#">
+          <span class="material-symbols-outlined text-[20px]">settings</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="px-2 pb-2">
+      <div class="flex items-center gap-3 rounded-lg bg-surface-container p-2">
+        <span class="material-symbols-outlined text-[20px] text-secondary">database</span>
+        <div class="flex min-w-0 flex-col">
+          <span class="truncate text-xs font-medium text-on-surface">v2.4 Production</span>
+          <span class="truncate text-[10px] text-on-surface-variant">US-East Cluster</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="pl-64">
+    <header class="fixed left-64 right-0 top-0 z-40 flex h-16 items-center justify-between gap-6 bg-surface/80 px-8 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
+      <div class="flex items-center gap-2 text-xs font-label text-on-surface-variant">
+        <a class="transition-colors hover:text-on-surface" href="#">Processes</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="font-semibold text-on-surface">Custom Analyzers</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="relative flex w-72 items-center">
+          <span class="material-symbols-outlined absolute left-3 text-[18px] text-outline">search</span>
+          <input class="w-full rounded-lg bg-surface-container-lowest py-2 pl-9 pr-3 text-xs text-on-surface placeholder:text-outline shadow-[0_1px_8px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search analyzers..." type="search" />
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button>
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[20px]">help</span></button>
+        </div>
+        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
+          <span class="material-symbols-outlined text-[18px] text-on-primary">person</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="min-h-screen bg-surface px-6 pt-16">
+      <div class="flex flex-col gap-5 pb-12 pt-5">
+        <section class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div class="flex max-w-3xl flex-col gap-2">
+            <div class="flex items-center gap-3">
+              <h1 class="text-[28px] font-headline font-bold tracking-tight text-on-surface">Custom Analyzers</h1>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-secondary-container px-2.5 py-1 text-[11px] font-semibold text-on-secondary-container">
+                <span class="material-symbols-outlined text-[14px]">tune</span>
+                Admin-managed catalog
+              </span>
+            </div>
+            <p class="max-w-3xl text-sm leading-6 text-on-surface-variant">
+              Reusable schema-based Azure AI Content Understanding analyzers trained by admins. Prebuilt analyzers still appear in process setup, while app-owned internal <span class="font-mono text-[12px]">idp_*</span> analyzers stay hidden from this list.
+            </p>
+          </div>
+          <div class="flex items-center gap-2.5 self-start">
+            <button class="inline-flex items-center gap-1.5 rounded-lg bg-surface-container px-3.5 py-2 text-xs font-semibold text-on-surface-variant shadow-sm transition-colors hover:bg-surface-container-high" type="button">
+              <span class="material-symbols-outlined text-[16px]">refresh</span>
+              Refresh
+            </button>
+            <button class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary shadow-md transition-all active:scale-[0.98] hover:bg-primary-dim" type="button">
+              <span class="material-symbols-outlined text-[17px]">add</span>
+              <span>New Analyzer</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-label font-semibold uppercase tracking-[0.2em] text-on-surface-variant">Ready</span>
+              <span class="material-symbols-outlined text-[18px] text-emerald-600">task_alt</span>
+            </div>
+            <div class="mt-3 text-3xl font-bold tracking-tight text-on-surface">2</div>
+            <p class="mt-1 text-xs text-on-surface-variant">Selectable in process setup</p>
+          </div>
+          <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-label font-semibold uppercase tracking-[0.2em] text-on-surface-variant">Training</span>
+              <span class="material-symbols-outlined text-[18px] text-primary">autorenew</span>
+            </div>
+            <div class="mt-3 text-3xl font-bold tracking-tight text-on-surface">1</div>
+            <p class="mt-1 text-xs text-on-surface-variant">Polling every 5s for 10 minutes</p>
+          </div>
+          <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-label font-semibold uppercase tracking-[0.2em] text-on-surface-variant">Drafts</span>
+              <span class="material-symbols-outlined text-[18px] text-amber-600">edit_note</span>
+            </div>
+            <div class="mt-3 text-3xl font-bold tracking-tight text-on-surface">1</div>
+            <p class="mt-1 text-xs text-on-surface-variant">Needs schema review before training</p>
+          </div>
+          <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-label font-semibold uppercase tracking-[0.2em] text-on-surface-variant">Needs attention</span>
+              <span class="material-symbols-outlined text-[18px] text-error">error</span>
+            </div>
+            <div class="mt-3 text-3xl font-bold tracking-tight text-on-surface">1</div>
+            <p class="mt-1 text-xs text-on-surface-variant">Latest training attempt failed</p>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+          <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div class="flex flex-1 flex-col gap-3 lg:flex-row lg:items-center">
+              <div class="relative max-w-md flex-1">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+                <input class="w-full rounded-lg border-0 bg-surface-container-low py-2.5 pl-9 pr-3 text-sm text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary" placeholder="Search by name, ID, or description" type="search" value="" />
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-on-primary shadow-sm" type="button">All</button>
+                <button class="rounded-full bg-surface-container px-3.5 py-1.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high" type="button">Draft</button>
+                <button class="rounded-full bg-surface-container px-3.5 py-1.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high" type="button">Training</button>
+                <button class="rounded-full bg-surface-container px-3.5 py-1.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high" type="button">Ready</button>
+                <button class="rounded-full bg-surface-container px-3.5 py-1.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-high" type="button">Failed</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span class="inline-flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+              1 analyzer is training — list auto-refreshes in place
+            </div>
+          </div>
+        </section>
+
+        <section class="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-sm">
+          <div class="border-b border-outline-variant/20 px-5 py-3">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h2 class="text-sm font-semibold text-on-surface">Analyzer catalog</h2>
+                <p class="mt-0.5 text-xs text-on-surface-variant">5 analyzers • sorted by most recent update • ready entries also appear in process setup unless deprecated</p>
+              </div>
+              <button class="inline-flex items-center gap-1 text-xs font-semibold text-primary" type="button">
+                <span class="material-symbols-outlined text-[16px]">filter_alt_off</span>
+                Clear filters
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse text-left">
+              <thead class="bg-surface-container-low text-[11px] font-label uppercase tracking-[0.18em] text-on-surface-variant">
+                <tr>
+                  <th class="px-5 py-3 font-semibold">Analyzer</th>
+                  <th class="px-4 py-3 font-semibold">Status</th>
+                  <th class="px-4 py-3 font-semibold">Base</th>
+                  <th class="px-4 py-3 font-semibold">Schema</th>
+                  <th class="px-4 py-3 font-semibold">Samples</th>
+                  <th class="px-4 py-3 font-semibold">Updated</th>
+                  <th class="px-5 py-3 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline-variant/20 text-sm">
+                <tr class="hover:bg-surface-container-low/40">
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-on-surface">Drug Prior Authorization (GLP-1)</span>
+                        <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Used by 3 processes</span>
+                      </div>
+                      <div class="font-mono text-[11px] text-on-surface-variant">drug_prior_auth_glp1</div>
+                      <p class="max-w-xl text-xs leading-5 text-on-surface-variant">Canada Life GLP-1 drug prior authorization form with grounded patient/member identity extraction.</p>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Ready
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top font-mono text-[12px] text-on-surface">prebuilt-document</td>
+                  <td class="px-4 py-4 align-top text-on-surface">7 fields</td>
+                  <td class="px-4 py-4 align-top text-on-surface">9 docs</td>
+                  <td class="px-4 py-4 align-top text-xs text-on-surface-variant">Sep 5, 2026 • 12:08 AM</td>
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-sm hover:bg-primary-dim" type="button">Edit Schema</button>
+                      <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container" type="button"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-surface-container-low/40">
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-on-surface">Group Benefits Application</span>
+                        <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Used by 2 processes</span>
+                      </div>
+                      <div class="font-mono text-[11px] text-on-surface-variant">group_benefits_application</div>
+                      <p class="max-w-xl text-xs leading-5 text-on-surface-variant">Selectpac application analyzer focused on first-page applicant and administrator details.</p>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Ready
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top font-mono text-[12px] text-on-surface">prebuilt-document</td>
+                  <td class="px-4 py-4 align-top text-on-surface">14 fields</td>
+                  <td class="px-4 py-4 align-top text-on-surface">12 docs</td>
+                  <td class="px-4 py-4 align-top text-xs text-on-surface-variant">Sep 4, 2026 • 11:42 PM</td>
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-sm hover:bg-primary-dim" type="button">Edit Schema</button>
+                      <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container" type="button"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="bg-primary-container/10 hover:bg-primary-container/20">
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-on-surface">Commercial Invoice &amp; Bill of Lading</span>
+                        <span class="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Draft</span>
+                      </div>
+                      <div class="font-mono text-[11px] text-on-surface-variant">cfa_commercial_inv_v1</div>
+                      <p class="max-w-xl text-xs leading-5 text-on-surface-variant">Draft extraction schema for invoice header fields, line items, and shipping references.</p>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                      <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                      Draft
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top font-mono text-[12px] text-on-surface">prebuilt-document</td>
+                  <td class="px-4 py-4 align-top text-on-surface">18 fields</td>
+                  <td class="px-4 py-4 align-top text-on-surface">8 docs</td>
+                  <td class="px-4 py-4 align-top text-xs text-on-surface-variant">Sep 5, 2026 • 12:18 AM</td>
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-sm hover:bg-primary-dim" type="button">Continue Training</button>
+                      <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container" type="button"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-surface-container-low/40">
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-on-surface">Member Enrollment Packet</span>
+                        <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700">Used by 1 process</span>
+                      </div>
+                      <div class="font-mono text-[11px] text-on-surface-variant">member_enrollment_packet</div>
+                      <p class="max-w-xl text-xs leading-5 text-on-surface-variant">Replacement training run in progress for a packet that mixes enrollment, consent, and beneficiary sections.</p>
+                      <div class="mt-1 flex max-w-sm items-center gap-3">
+                        <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-container-high">
+                          <div class="h-full w-[62%] rounded-full bg-primary"></div>
+                        </div>
+                        <span class="text-[11px] font-medium text-primary">62%</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-800">
+                      <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-500"></span>
+                      Training
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top font-mono text-[12px] text-on-surface">prebuilt-document</td>
+                  <td class="px-4 py-4 align-top text-on-surface">23 fields</td>
+                  <td class="px-4 py-4 align-top text-on-surface">15 docs</td>
+                  <td class="px-4 py-4 align-top text-xs text-on-surface-variant">Sep 5, 2026 • 12:21 AM</td>
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="rounded-lg bg-surface-container px-3 py-2 text-xs font-semibold text-primary shadow-sm hover:bg-surface-container-high" type="button">View Progress</button>
+                      <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container" type="button"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-red-50/70">
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-on-surface">Provider Appeal Intake</span>
+                        <span class="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700">Last ready revision still active</span>
+                      </div>
+                      <div class="font-mono text-[11px] text-on-surface-variant">provider_appeal_intake</div>
+                      <p class="max-w-xl text-xs leading-5 text-on-surface-variant">Latest replacement failed because nested object fields omitted required child properties in the submitted draft.</p>
+                      <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-800">
+                        Training error: Invalid field schema at <span class="font-mono">appealLines[].decision</span>. Fix the draft and retrain; existing processes keep using the last ready version until replacement succeeds.
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
+                      <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                      Failed
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top font-mono text-[12px] text-on-surface">prebuilt-document</td>
+                  <td class="px-4 py-4 align-top text-on-surface">11 fields</td>
+                  <td class="px-4 py-4 align-top text-on-surface">6 docs</td>
+                  <td class="px-4 py-4 align-top text-xs text-on-surface-variant">Sep 4, 2026 • 10:54 PM</td>
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="rounded-lg bg-error px-3 py-2 text-xs font-semibold text-on-error shadow-sm hover:opacity-95" type="button">View Error</button>
+                      <button class="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container" type="button"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-outline-variant/30 bg-surface-container p-4 text-xs leading-5 text-on-surface-variant shadow-sm">
+          Delete is only available when an analyzer is not referenced by any process. Referenced analyzers should be deprecated instead so they disappear from future process selection without forcing stale references; if one is removed out-of-band, process edit follows the existing stale-analyzer chip behavior.
+        </section>
+      </div>
+
+      <div class="pointer-events-none fixed inset-0 bg-[#181b29]/20"></div>
+      <div class="fixed inset-0 flex items-start justify-center px-6 pt-28 pb-12">
+        <div class="w-full max-w-2xl overflow-hidden rounded-[20px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0_20px_60px_rgba(24,27,41,0.22)]">
+          <div class="flex items-start justify-between gap-4 border-b border-outline-variant/20 px-6 py-5">
+            <div>
+              <h3 class="text-lg font-headline font-semibold tracking-tight text-on-surface">New Analyzer</h3>
+              <p class="mt-1 text-sm text-on-surface-variant">Create a metadata-only draft, then continue in the Train Form Model workbench.</p>
+            </div>
+            <button class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low" type="button">
+              <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+          <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_260px]">
+            <div class="space-y-4 px-6 py-5">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <label class="block text-sm">
+                  <span class="mb-1.5 block text-[11px] font-label font-semibold uppercase tracking-[0.18em] text-on-surface-variant">Name</span>
+                  <input class="w-full rounded-lg border-0 bg-surface-container-low px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary" value="Commercial Invoice & Bill of Lading" />
+                </label>
+                <label class="block text-sm">
+                  <span class="mb-1.5 block text-[11px] font-label font-semibold uppercase tracking-[0.18em] text-on-surface-variant">Analyzer ID</span>
+                  <input class="w-full rounded-lg border-0 bg-surface-container-low px-3 py-2.5 font-mono text-sm text-on-surface focus:ring-1 focus:ring-primary" value="cfa_commercial_inv_v1" />
+                  <span class="mt-1.5 block text-[11px] text-on-surface-variant">Letters, numbers, and underscores only. Hyphens are not allowed.</span>
+                </label>
+              </div>
+              <label class="block text-sm">
+                <span class="mb-1.5 block text-[11px] font-label font-semibold uppercase tracking-[0.18em] text-on-surface-variant">Base analyzer</span>
+                <div class="flex items-center justify-between rounded-lg bg-surface-container-low px-3 py-2.5 text-sm text-on-surface">
+                  <span class="font-mono">prebuilt-document</span>
+                  <span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+                </div>
+              </label>
+              <label class="block text-sm">
+                <span class="mb-1.5 block text-[11px] font-label font-semibold uppercase tracking-[0.18em] text-on-surface-variant">Short description</span>
+                <textarea class="min-h-[96px] w-full rounded-lg border-0 bg-surface-container-low px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary">General trade-document analyzer for commercial invoice headers, bill of lading references, and line-item extraction.</textarea>
+              </label>
+            </div>
+            <aside class="border-l border-outline-variant/20 bg-surface-container-low px-5 py-5">
+              <div class="rounded-xl bg-surface-container-lowest p-4 shadow-sm">
+                <h4 class="text-sm font-semibold text-on-surface">Create draft → hand-off contract</h4>
+                <ol class="mt-3 space-y-3 text-xs leading-5 text-on-surface-variant">
+                  <li class="flex gap-2"><span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-on-primary">1</span><span>Persist name, immutable ID, base analyzer, and description.</span></li>
+                  <li class="flex gap-2"><span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-on-primary">2</span><span>Open the training workbench in fresh <strong>draft</strong> state with empty schema and sample set.</span></li>
+                  <li class="flex gap-2"><span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-on-primary">3</span><span>The workbench owns schema editing, sample upload, save draft, and train/retrain.</span></li>
+                </ol>
+              </div>
+            </aside>
+          </div>
+          <div class="flex items-center justify-between gap-3 border-t border-outline-variant/20 bg-surface-container-low px-6 py-4">
+            <p class="text-xs text-on-surface-variant">On submit, create the draft then navigate directly to <span class="font-semibold text-on-surface">Train Form Model</span>.</p>
+            <div class="flex items-center gap-2">
+              <button class="rounded-lg bg-surface-container px-3.5 py-2 text-xs font-semibold text-on-surface-variant shadow-sm" type="button">Cancel</button>
+              <button class="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary shadow-md" type="button">Create Draft</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

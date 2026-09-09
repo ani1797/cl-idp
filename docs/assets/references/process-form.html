@@ -1,0 +1,267 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>New Business Process - CL-IDP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#9d9ca2",
+            "on-primary-fixed": "#182853",
+            "on-surface": "#30323b",
+            "on-secondary-fixed-variant": "#565b6f",
+            "surface-container-highest": "#e1e2ed",
+            "surface-container-high": "#e8e7f1",
+            "inverse-primary": "#b3c2f7",
+            "background": "#faf8fe",
+            "surface-tint": "#4f5d8c",
+            "on-tertiary-fixed": "#422d53",
+            "primary-fixed": "#b3c2f7",
+            "primary-fixed-dim": "#a6b4e8",
+            "outline": "#797a84",
+            "primary-dim": "#43517f",
+            "on-error-container": "#6e0a12",
+            "tertiary": "#6d567f",
+            "on-error": "#fff7f6",
+            "tertiary-container": "#e6cafa",
+            "surface-dim": "#d9d9e4",
+            "on-tertiary-fixed-variant": "#604a71",
+            "surface-bright": "#faf8fe",
+            "on-secondary-container": "#4c5164",
+            "secondary-fixed-dim": "#cfd3eb",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f3fa",
+            "on-background": "#30323b",
+            "on-secondary": "#faf8ff",
+            "secondary": "#595e72",
+            "error": "#a83836",
+            "on-primary-fixed-variant": "#374572",
+            "surface-variant": "#e1e2ed",
+            "primary-container": "#b3c2f7",
+            "tertiary-fixed": "#e6cafa",
+            "error-container": "#fa746f",
+            "error-dim": "#67040d",
+            "secondary-container": "#dde1f9",
+            "outline-variant": "#b0b1bc",
+            "on-primary": "#faf8ff",
+            "on-surface-variant": "#5d5f68",
+            "on-tertiary": "#fff6fe",
+            "tertiary-fixed-dim": "#d8bceb",
+            "inverse-surface": "#0d0e12",
+            "surface": "#faf8fe",
+            "on-tertiary-container": "#564067",
+            "tertiary-dim": "#604a72",
+            "primary": "#4f5d8c",
+            "secondary-fixed": "#dde1f9",
+            "secondary-dim": "#4d5266",
+            "on-secondary-fixed": "#393f51",
+            "surface-container": "#eeedf6",
+            "on-primary-container": "#2d3c68"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {},
+          "fontFamily": {
+            "headline": [
+              "Inter"
+            ],
+            "display": [
+              "Inter"
+            ],
+            "body": [
+              "Inter"
+            ],
+            "label": [
+              "Public Sans"
+            ]
+          },
+          "fontSize": {}
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background font-body h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline docked left-0 h-screen w-64 flex flex-col fixed left-0 top-0 py-4 gap-2 z-40 hidden md:flex">
+<div class="px-6 mb-6">
+<div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold text-sm tracking-wide shadow-sm">CL</div><div><div class="text-lg font-bold text-slate-900 tracking-tight leading-none">CL-IDP</div><div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mt-1 font-label">Admin Console</div></div></div>
+<button class="mt-6 w-full bg-slate-800 text-white py-2 px-4 rounded-lg font-medium hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 text-sm shadow-sm"><span class="material-symbols-outlined text-sm">add</span> New Process</button>
+</div>
+<div class="flex-1 px-3 space-y-1 overflow-y-auto"><a class="bg-blue-50 text-blue-700 font-medium rounded-lg px-3.5 py-2.5 flex items-center gap-3 text-sm transition-colors" href="#"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_tree</span> Processes</a><a class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-lg px-3.5 py-2.5 flex items-center gap-3 text-sm transition-colors font-medium" href="#"><span class="material-symbols-outlined text-[20px]">assignment</span> Jobs</a><a class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-lg px-3.5 py-2.5 flex items-center gap-3 text-sm transition-colors font-medium" href="#"><span class="material-symbols-outlined text-[20px]">settings</span> Settings</a></div>
+
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 relative bg-[#F5F7FA]">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-dim font-body text-sm font-medium docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center w-full px-6 py-2 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex text-sm font-medium text-on-surface-variant">
+<ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+<li class="inline-flex items-center">
+<a class="inline-flex items-center hover:text-primary transition-colors" href="#">
+                Processes
+              </a>
+</li>
+<li class="">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1">chevron_right</span>
+<span class="text-on-surface">New Process</span>
+</div>
+</li>
+</ol>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm cursor-pointer active:opacity-80">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-low border-none rounded-full text-sm focus:ring-2 focus:ring-primary focus:outline-none w-64 text-on-surface" placeholder="Search..." type="text">
+</div>
+<button class="text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors p-1.5 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors p-1.5 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant cursor-pointer active:opacity-80 flex-shrink-0 ml-2">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A macro photography portrait of a professional corporate user avatar, neutral lighting, minimal background, clean aesthetic, subtle warm tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCadGS9ZqmfQ7Db6z_iU2MxBZpGT4ujezRQLA_D7nxsqKd1F7CfCv-toDOuCLaBCyfRaZRkUoSn9zMZQvioIzmEI9c7gSVJ233QjssD420GELp5aXb_9V85_Idg4IwOtgYc93LIL8QEXMhtKuYAAP_Tyo2sc0LGaIVhixZ3to2BOPd5l8ND4p6SpqI9C6V8Cc2TijenPvGZ23BprV7neY9rDK6LARvC-MDH6jdX0T0SEXU0ftS4gD9IPGoV6hB6ppYnZc9vxMigp3CE">
+</div>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<main class="flex-1 overflow-y-auto p-6 lg:p-10">
+<div class="max-w-3xl mx-auto">
+<h1 class="text-3xl font-semibold font-headline text-on-surface mb-8 tracking-tight">New Business Process</h1>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+<div class="p-8 space-y-8 flex-1">
+<!-- Name Field -->
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-on-surface" for="process-name">
+                Name <span class="text-error">*</span>
+</label>
+<input class="w-full bg-surface border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 transition-shadow" id="process-name" placeholder="e.g. Vendor Invoices" required="" type="text">
+</div>
+<!-- Description Field -->
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-on-surface" for="process-desc">
+                Description <span class="text-error">*</span>
+</label>
+<textarea class="w-full bg-surface border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 transition-shadow resize-y" id="process-desc" placeholder="Describe the purpose of this extraction pipeline..." required="" rows="3"></textarea>
+</div>
+<hr class="border-outline-variant/40">
+<!-- Allowed Analyzers -->
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-1">
+                  Allowed Analyzers <span class="text-error">*</span>
+</label>
+<p class="text-xs text-on-surface-variant mb-3 font-label">Selected from the Azure AI Content Understanding analyzer catalog.</p>
+<!-- Multi-select Input Area -->
+<div class="min-h-[42px] border border-outline-variant rounded-lg bg-surface p-1.5 flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-shadow cursor-text relative">
+<!-- Selected Chips -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium bg-primary-container text-on-primary-container border border-primary/20">
+                    Invoice
+                    <button class="inline-flex items-center p-0.5 rounded-sm hover:bg-primary/20 text-on-primary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium bg-primary-container text-on-primary-container border border-primary/20">
+                    Purchase Order
+                    <button class="inline-flex items-center p-0.5 rounded-sm hover:bg-primary/20 text-on-primary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</span>
+<input class="flex-1 min-w-[150px] bg-transparent border-none text-sm text-on-surface focus:ring-0 p-1" placeholder="Search analyzers..." type="text">
+</div>
+</div>
+<!-- Dropdown List Simulation -->
+<div class="border border-outline-variant rounded-lg bg-surface-container-lowest shadow-sm overflow-hidden">
+<ul class="divide-y divide-outline-variant/40">
+<li class="p-3 hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-medium text-sm text-on-surface">Invoice</div>
+<div class="text-xs text-on-surface-variant mt-0.5 font-label">Extracts vendor, line items, totals from invoice documents</div>
+</div>
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+</div>
+</li>
+<li class="p-3 hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-medium text-sm text-on-surface">Receipt</div>
+<div class="text-xs text-on-surface-variant mt-0.5 font-label">Detailed expense extraction from retail receipts</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<!-- Stale Analyzer Edge Case -->
+<div class="mt-3">
+<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-error-container/20 text-error-container border border-error-container/50">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                  Legacy W-9 Form (analyzer no longer available)
+                  <button class="inline-flex items-center p-0.5 rounded-sm hover:bg-error-container/20 text-error-container ml-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</span>
+</div>
+</div>
+<hr class="border-outline-variant/40">
+<!-- Confidence Threshold -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface" for="threshold">
+                Overall Confidence Threshold
+              </label>
+<div class="flex items-center gap-4">
+<div class="relative w-24">
+<input class="w-full bg-surface border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 pr-8 transition-shadow font-mono" id="threshold" max="100" min="0" type="number" value="85">
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-on-surface-variant font-mono text-sm">
+                    %
+                  </div>
+</div>
+<input class="w-full h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="85">
+</div>
+</div>
+<!-- Business Owner Email -->
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-on-surface" for="owner-email">
+                Business Owner Email <span class="text-error">*</span>
+</label>
+<input class="w-full bg-surface border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 transition-shadow" id="owner-email" placeholder="owner@company.com" required="" type="email">
+</div>
+</div>
+<!-- Info Box -->
+<div class="bg-primary-container/20 border-t border-primary/10 p-4 flex gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="text-sm text-on-surface font-medium leading-relaxed">
+              Saving will provision a routing analyzer over the selected analyzers. This may take a few minutes before the process is ready to test.
+            </p>
+</div>
+<!-- Footer Action Bar -->
+<div class="bg-surface-container-low border-t border-outline-variant px-8 py-4 flex items-center justify-end gap-3">
+<button class="px-5 py-2 text-sm font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 rounded-lg transition-colors" type="button">
+              Cancel
+            </button>
+<button class="px-5 py-2 text-sm font-semibold text-on-primary bg-primary hover:bg-primary-dim rounded-lg shadow-sm transition-colors flex items-center gap-2" type="button">
+              Save
+            </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

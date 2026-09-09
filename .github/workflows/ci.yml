@@ -1,0 +1,59 @@
+name: Fast CI
+
+on:
+  pull_request:
+
+jobs:
+  fast-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: uv sync --dev
+
+      - name: Ruff
+        working-directory: apps/api
+        run: uv run ruff check .
+
+      - name: Mypy
+        working-directory: apps/api
+        run: uv run mypy .
+
+      - name: Backend tests (non-live)
+        working-directory: apps/api
+        run: uv run pytest tests/ -m "not live" -q
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: ESLint
+        working-directory: apps/web
+        run: npm run lint
+
+      - name: TypeScript
+        working-directory: apps/web
+        run: npx tsc --noEmit
+
+      - name: Vitest
+        working-directory: apps/web
+        run: npm run test

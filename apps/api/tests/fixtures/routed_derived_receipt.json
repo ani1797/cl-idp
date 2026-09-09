@@ -1,0 +1,61 @@
+{
+  "status": "Succeeded",
+  "result": {
+    "contents": [
+      {
+        "kind": "document",
+        "analyzerId": "idp_r_demo",
+        "unit": "inch",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 8.5, "height": 11.0, "angle": 1.25}
+        ],
+        "segments": [
+          {"segmentId": "segment1", "category": "prebuilt-receipt"}
+        ]
+      },
+      {
+        "kind": "document",
+        "category": "prebuilt-receipt",
+        "analyzerId": "idp_d_demo_receipt",
+        "unit": "inch",
+        "startPageNumber": 1,
+        "endPageNumber": 1,
+        "pages": [
+          {"pageNumber": 1, "width": 8.5, "height": 11.0, "angle": 1.25}
+        ],
+        "fields": {
+          "MerchantName": {
+            "type": "string",
+            "valueString": "Fourth Coffee",
+            "confidence": 0.98,
+            "source": "D(1,1.0,1.5,3.0,1.5,3.0,1.8,1.0,1.8)"
+          },
+          "Items": {
+            "type": "array",
+            "valueArray": [
+              {
+                "type": "object",
+                "valueObject": {
+                  "Name": {
+                    "type": "string",
+                    "valueString": "Latte",
+                    "confidence": 0.93,
+                    "source": "D(1,1.0,4.0,2.0,4.0,2.0,4.2,1.0,4.2)"
+                  },
+                  "TotalPrice": {
+                    "type": "number",
+                    "valueNumber": 5.5,
+                    "confidence": 0.91,
+                    "source": "D(1,6.0,4.0,7.0,4.0,7.0,4.2,6.0,4.2)"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

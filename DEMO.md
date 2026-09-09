@@ -47,19 +47,40 @@ worker as host processes (as above) rather than via the compose `app`
 profile, set `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` so they
 ship telemetry to the same collector.
 
-A ready-made dashboard, **CL-IDP — Pipeline Observability**, is
-auto-provisioned into the "CL-IDP" folder at
-<http://127.0.0.1:3001/d/cl-idp-overview> (login `admin`/`admin`). It
-covers: HTTP request rate/latency/error-rate for the API, worker job
-throughput/duration/success-ratio, per-stage call volume and p95 latency
-for the named pipeline spans (`trigger.request` → `queue.enqueue` →
-`worker.dequeue` → `cu.analyze.submit`/`cu.analyze.poll` →
-`job.persist`/`review.save`/`notify.email`), a live logs panel you can
-filter by `correlation_id` via the dashboard's variable box, and a cost
-row (see below). The dashboard JSON lives in
-`infra/grafana/dashboards/cl-idp-overview.json` and is mounted into the
-`otel-collector` container with `updateIntervalSeconds: 30`, so it
-persists across `docker compose down`/`up` and hot-reloads within ~30s of
+Two ready-made dashboards are auto-provisioned into the "CL-IDP" folder
+(login `admin`/`admin`):
+
+- **CL-IDP — Operations** — <http://127.0.0.1:3001/d/cl-idp-ops> — HTTP
+  request rate/latency/error-rate for the API; worker throughput, duration,
+  and success ratio; **form processing volumes** (triggered, succeeded,
+  failed, needs-review, reviewed, unclassified) both as totals and broken
+  down per business process; **average/p95 processing time per business
+  process × form type**; per-stage call volume and p95 latency for the
+  named pipeline spans (`trigger.request` → `queue.enqueue` →
+  `worker.dequeue` → `cu.analyze.submit`/`cu.analyze.poll` →
+  `job.persist`/`review.save`/`notify.email`); a **notifications** row
+  (emails sent/failed, top recipients); a live Tempo traces panel and a
+  live Loki logs panel, both filterable via the dashboard's
+  `process_id`/`correlation_id` variables.
+- **CL-IDP — FinOps** — <http://127.0.0.1:3001/d/cl-idp-finops> — total
+  and cumulative estimated cost, burn rate, and a naive linear forecast;
+  **cost per business process**; **cost per form type across all
+  processes**; **cost per form type within a single business process**
+  (pick one process in the `process_id` variable at the top to drill in);
+  business processes onboarded; pages processed; average cost per
+  document; and a notification-cost row (emails sent, top recipients).
+  It also has a "Token Usage" panel that's intentionally empty — this app's
+  only inference path (Azure AI Content Understanding custom analyzers) is
+  billed per page, not per token, so there's nothing to show yet; the panel
+  documents what to wire up if a token-metered step is added later.
+
+Both dashboards share `process_id`/`detected_form` template variables so
+any panel can be sliced or drilled into by business process and/or form
+type. The dashboard JSON lives in
+`infra/grafana/dashboards/cl-idp-ops.json` and
+`infra/grafana/dashboards/cl-idp-finops.json`, mounted into the
+`otel-collector` container with `updateIntervalSeconds: 30`, so they
+persist across `docker compose down`/`up` and hot-reload within ~30s of
 editing the file — no restart needed (edit the JSON directly, or export a
 new version from the Grafana UI and copy it back).
 
@@ -90,10 +111,42 @@ published Azure AI Content Understanding per-page list pricing (see
 `apps/api/app/pricing.py` — this is a best-effort estimate, not real Azure
 billing data). The same figure is emitted as a `worker_job_cost_usd_total`
 Prometheus counter, labeled by `process_id` and `detected_form`, so the
-dashboard's "Cost" row shows total cost accrued, a cumulative-cost
-timeseries, and a cost breakdown by business process and by document type.
+FinOps dashboard's cost panels can break it down by business process and
+by document type — including within a single process once you filter the
+`process_id` variable.
+
+### Other pipeline metrics behind the dashboards
+
+Beyond cost, the API and worker emit a handful of purpose-built OpenTelemetry
+counters/histograms/gauges that back the volume, SLA, and notification
+panels above:
+
+- `idp_business_processes_onboarded` (gauge) — current count of onboarded
+  business processes.
+- `idp_jobs_triggered_total{process_id}` — jobs accepted into the pipeline.
+- `worker_jobs_needs_review_total{process_id,detected_form}` /
+  `worker_jobs_unclassified_total{process_id}` — succeeded jobs flagged for
+  review, or that couldn't be classified.
+- `idp_jobs_reviewed_total{process_id,status=complete|partial}` — review-save
+  actions, split by whether all confidence violations were resolved.
+- `worker_pages_processed_total{process_id,detected_form}` and
+  `worker_job_pipeline_duration_seconds{process_id,detected_form}` (histogram)
+  — pages processed and end-to-end (trigger-to-completion) latency, sliced
+  by process and form type.
+- `worker_notification_emails_sent_total{process_id,recipient}` /
+  `worker_notification_emails_failed_total{process_id,recipient}` — review
+  notification email delivery, by business-process owner.
 
 ## 2. Train custom analyzers and seed demo data
+
+> If you're running the fully containerized stack via
+> `docker compose --profile app up -d --build` (see `README.md`) instead of
+> the host-process walkthrough in step 1, this entire step runs
+> automatically as a one-shot `seed` service on every `up` — it's
+> idempotent, so you can skip straight to step 3. Follow `docker compose
+> logs -f seed` to watch it, and re-run `docker compose up seed` any time
+> you want to force it again. The manual commands below are only needed
+> when running the API/worker as host processes.
 
 Train the custom analyzers once, then seed the three demo processes:
 

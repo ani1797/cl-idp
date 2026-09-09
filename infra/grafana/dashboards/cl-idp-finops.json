@@ -1,0 +1,1066 @@
+{
+  "id": null,
+  "uid": "cl-idp-finops",
+  "title": "CL-IDP \u2014 FinOps",
+  "description": "Cost visibility for the Enterprise IDP pipeline: spend by business process and form type, forecasts, unit economics, and onboarding/notification cost drivers. Select a single business process in the variable above to drill into its per-form cost breakdown.",
+  "tags": [
+    "cl-idp",
+    "enterprise-idp",
+    "finops"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "links": [
+    {
+      "title": "CL-IDP \u2014 Operations",
+      "type": "link",
+      "url": "/d/cl-idp-ops",
+      "icon": "external link",
+      "targetBlank": false
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "process_id",
+        "type": "query",
+        "label": "Business process (select one to drill down)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": {
+          "query": "label_values(worker_job_cost_usd_total, process_id)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "sort": 1
+      },
+      {
+        "name": "detected_form",
+        "type": "query",
+        "label": "Form type",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": {
+          "query": "label_values(worker_job_cost_usd_total, detected_form)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "sort": 1
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 2001,
+      "type": "row",
+      "title": "Cost Overview",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2002,
+      "type": "stat",
+      "title": "Total estimated cost (all time)",
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})"
+        }
+      ]
+    },
+    {
+      "id": 2003,
+      "type": "stat",
+      "title": "Cost in selected range",
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"}[$__range]))"
+        }
+      ]
+    },
+    {
+      "id": 2004,
+      "type": "stat",
+      "title": "Business processes onboarded",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "idp_business_processes_onboarded"
+        }
+      ]
+    },
+    {
+      "id": 2005,
+      "type": "stat",
+      "title": "Total pages processed",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(worker_pages_processed_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})"
+        }
+      ]
+    },
+    {
+      "id": 2006,
+      "type": "stat",
+      "title": "Avg cost per document",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"}) / sum(worker_jobs_processed_total{outcome=\"success\",process_id=~\"$process_id\"})"
+        }
+      ]
+    },
+    {
+      "id": 2007,
+      "type": "stat",
+      "title": "Forecast: next 24h spend (linear)",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "predict_linear(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"}[6h], 86400) - worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"}"
+        }
+      ],
+      "description": "Naive linear projection from the last 6h cost trend \u2014 directional only, not a committed forecast."
+    },
+    {
+      "id": 2008,
+      "type": "timeseries",
+      "title": "Cumulative estimated cost over time",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "legendFormat": "cumulative cost"
+        }
+      ],
+      "description": "Raw counter value over time \u2014 since worker_job_cost_usd_total only increases, this line is the running total cost as incurred."
+    },
+    {
+      "id": 2009,
+      "type": "timeseries",
+      "title": "Cost burn rate (per hour)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"}[$__rate_interval])) * 3600",
+          "legendFormat": "cost / hour"
+        }
+      ]
+    },
+    {
+      "id": 2010,
+      "type": "row",
+      "title": "Cost per Business Process",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2011,
+      "type": "bargauge",
+      "title": "Cost by business process (process_id)",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (process_id) (worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "legendFormat": "{{__name__}}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "description": "Cross-reference process_id against GET /processes to see the process name."
+    },
+    {
+      "id": 2012,
+      "type": "piechart",
+      "title": "Cost share by business process",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (process_id) (worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "legendFormat": "{{__name__}}",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2013,
+      "type": "table",
+      "title": "Business process cost detail",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id) (worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id) (worker_pages_processed_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id) (worker_jobs_processed_total{outcome=\"success\",process_id=~\"$process_id\"})",
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "process_id": "Business process",
+              "Value #A": "Total cost (USD)",
+              "Value #B": "Pages processed",
+              "Value #C": "Jobs succeeded"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ],
+      "description": "Cost, pages, and successful job counts per business process, joined via the Merge transformation."
+    },
+    {
+      "id": 2014,
+      "type": "row",
+      "title": "Cost per Form Type \u2014 Across All Business Processes",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2015,
+      "type": "bargauge",
+      "title": "Cost by form type (detected_form), all processes",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 28
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (detected_form) (worker_job_cost_usd_total{detected_form=~\"$detected_form\"})",
+          "legendFormat": "{{__name__}}",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2016,
+      "type": "piechart",
+      "title": "Cost share by form type, all processes",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 28
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (detected_form) (worker_job_cost_usd_total{detected_form=~\"$detected_form\"})",
+          "legendFormat": "{{__name__}}",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2017,
+      "type": "table",
+      "title": "Form type cost detail (all processes)",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 28
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (detected_form) (worker_job_cost_usd_total{detected_form=~\"$detected_form\"})",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (detected_form) (worker_pages_processed_total{detected_form=~\"$detected_form\"})",
+          "refId": "B"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "detected_form": "Form type",
+              "Value #A": "Total cost (USD)",
+              "Value #B": "Pages processed"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2018,
+      "type": "row",
+      "title": "Cost per Form Type \u2014 Within a Business Process (drill-down)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 37
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2019,
+      "type": "text",
+      "title": "How to drill down",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Use the **Business process** variable above to select a single process (default is *All*). The panels below re-filter live to `process_id=~\"$process_id\"` \u2014 pick one process to see its form-type cost mix in isolation; pick several, or *All*, to compare processes side by side."
+      }
+    },
+    {
+      "id": 2020,
+      "type": "bargauge",
+      "title": "Cost by form type, filtered by $process_id",
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 41
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (process_id, detected_form) (worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "legendFormat": "{{process_id}} / {{detected_form}}",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2021,
+      "type": "table",
+      "title": "Form type cost detail, filtered by $process_id",
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 41
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id, detected_form) (worker_job_cost_usd_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id, detected_form) (worker_pages_processed_total{process_id=~\"$process_id\",detected_form=~\"$detected_form\"})",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "sum by (process_id, detected_form) (worker_jobs_processed_total{outcome=\"success\",process_id=~\"$process_id\"} * 0)",
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "process_id": "Business process",
+              "detected_form": "Form type",
+              "Value #A": "Total cost (USD)",
+              "Value #B": "Pages processed"
+            },
+            "excludeByName": {
+              "Time": true,
+              "Value #C": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2022,
+      "type": "row",
+      "title": "Token Usage",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2023,
+      "type": "text",
+      "title": "Not yet instrumented",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**No token-level usage is currently emitted.** Azure AI Content Understanding custom analyzers (the only inference path in this app) are billed per-page, not per-token \u2014 see `app/pricing.py` and the cost panels above for actual spend drivers. If a token-metered step (e.g. an LLM-based post-processing or validation call) is added later, wire a `worker.tokens_used` counter labeled `{process_id, detected_form, token_type=prompt|completion}` and this row will report it the same way the cost panels do above."
+      }
+    },
+    {
+      "id": 2024,
+      "type": "row",
+      "title": "Notification Cost Drivers",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 55
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2025,
+      "type": "stat",
+      "title": "Emails sent (selected range)",
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 56
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(worker_notification_emails_sent_total{process_id=~\"$process_id\"}[$__range]))"
+        }
+      ]
+    },
+    {
+      "id": 2026,
+      "type": "table",
+      "title": "Top recipients (by emails sent)",
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 4,
+        "y": 56
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "instant": true,
+          "format": "table",
+          "expr": "topk(10, sum by (recipient) (increase(worker_notification_emails_sent_total{process_id=~\"$process_id\"}[$__range])))",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "recipient": "Recipient",
+              "Value": "Emails sent"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Emails sent",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "description": "Stakeholder communication volume by business-process owner \u2014 useful for gauging review-workload cost to the business, not just Azure spend."
+    },
+    {
+      "id": 2027,
+      "type": "bargauge",
+      "title": "Emails sent by business process",
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 56
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (process_id) (increase(worker_notification_emails_sent_total{process_id=~\"$process_id\"}[$__range]))",
+          "legendFormat": "{{__name__}}",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    }
+  ]
+}

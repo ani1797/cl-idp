@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import cast
@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.metrics import CallbackOptions, Observation
 
 from app.config import get_settings
 from app.cu import (
@@ -65,6 +66,23 @@ def initialize_observability(app: FastAPI) -> None:
         tracer_provider=trace.get_tracer_provider(),
         meter_provider=metrics.get_meter_provider(),
     )
+
+    def _observe_business_processes_onboarded(
+        options: CallbackOptions,
+    ) -> Iterable[Observation]:
+        _ = options
+        cosmos = getattr(app.state, "cosmos_service", None)
+        if cosmos is None:
+            return
+        yield Observation(len(cosmos.list_processes()))
+
+    meter = metrics.get_meter(__name__)
+    meter.create_observable_gauge(
+        "idp.business_processes_onboarded",
+        callbacks=[_observe_business_processes_onboarded],
+        description="Current number of business processes onboarded in the system.",
+    )
+
     app.state.otel_initialized = True
 
 

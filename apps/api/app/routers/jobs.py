@@ -15,7 +15,8 @@ from azure.core.exceptions import ResourceNotFoundError
 from azure.cosmos.exceptions import CosmosHttpResponseError, CosmosResourceNotFoundError
 from fastapi import FastAPI, Query, Response
 from fastapi.responses import JSONResponse
-from opentelemetry import trace
+from opentelemetry import metrics, trace
+from opentelemetry.metrics import Counter
 from PIL import Image, UnidentifiedImageError
 
 from app.db import CosmosService
@@ -51,6 +52,15 @@ LimitQuery = Annotated[int, Query(ge=1, le=500)]
 type LeafField = StringField | DateField | TimeField | NumberField | IntegerField | BooleanField
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
+_meter = metrics.get_meter(__name__)
+_jobs_reviewed_counter: Counter = _meter.create_counter(
+    "idp.jobs_reviewed",
+    description=(
+        "Number of review-save actions performed on jobs, by business process. "
+        "status=complete means all confidence violations were resolved; "
+        "status=partial means violations remain."
+    ),
+)
 
 
 @dataclass(slots=True)
@@ -334,6 +344,13 @@ def register_jobs_routes(application: FastAPI) -> None:
                 processId,
                 sorted(reviewed_paths),
                 len(remaining_violations),
+            )
+            _jobs_reviewed_counter.add(
+                1,
+                {
+                    "process_id": processId,
+                    "status": "partial" if remaining_violations else "complete",
+                },
             )
         return with_computed_fields(updated_job)
 

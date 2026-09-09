@@ -52,6 +52,40 @@ _job_cost_counter: Counter = _meter.create_counter(
         "processed document (see app.pricing for the per-page rate assumptions)."
     ),
 )
+_pipeline_duration_histogram: Histogram = _meter.create_histogram(
+    "worker.job_pipeline_duration_seconds",
+    unit="s",
+    description=(
+        "End-to-end time from job trigger to completion (submittedAt -> "
+        "completedAt) for successfully processed jobs, by process and detected form."
+    ),
+)
+_jobs_needs_review_counter: Counter = _meter.create_counter(
+    "worker.jobs_needs_review",
+    description=(
+        "Number of successfully processed jobs flagged for human review because "
+        "one or more extracted fields were below the confidence threshold."
+    ),
+)
+_jobs_unclassified_counter: Counter = _meter.create_counter(
+    "worker.jobs_unclassified",
+    description=(
+        "Number of successfully processed jobs that could not be classified "
+        "into any of the process's configured form types."
+    ),
+)
+_pages_processed_counter: Counter = _meter.create_counter(
+    "worker.pages_processed",
+    description="Number of document pages processed by Content Understanding, by process and detected form.",
+)
+_emails_sent_counter: Counter = _meter.create_counter(
+    "worker.notification_emails_sent",
+    description="Number of review-needed notification emails successfully sent, by process and recipient.",
+)
+_emails_failed_counter: Counter = _meter.create_counter(
+    "worker.notification_emails_failed",
+    description="Number of review-needed notification emails that failed to send, by process and recipient.",
+)
 
 DEFAULT_VISIBILITY_TIMEOUT_SECONDS = 300
 DEFAULT_JOB_TIMEOUT_SECONDS = 600
@@ -183,8 +217,11 @@ def process_next_message(
             terminal = False
             outcome = "error"
 
-    _jobs_processed_counter.add(1, {"outcome": outcome})
-    _job_duration_histogram.record(time.perf_counter() - started_at, {"outcome": outcome})
+    _jobs_processed_counter.add(1, {"outcome": outcome, "process_id": payload.processId})
+    _job_duration_histogram.record(
+        time.perf_counter() - started_at,
+        {"outcome": outcome, "process_id": payload.processId},
+    )
 
     if terminal:
         dependencies.queue.delete_message(queue_message)
@@ -446,8 +483,14 @@ def finalize_success(
                     violations=mapped_result.confidence_violations,
                 )
             notification_sent = True
+            _emails_sent_counter.add(
+                1, {"process_id": job.processId, "recipient": process.ownerEmail}
+            )
         except (OSError, smtplib.SMTPException):
             logger.exception("Failed to send notification email for job %s.", job.id)
+            _emails_failed_counter.add(
+                1, {"process_id": job.processId, "recipient": process.ownerEmail}
+            )
 
     field_summaries = summarize_fields_for_logging(mapped_result.fields)
     with tracer.start_as_current_span("job.persist") as span:
@@ -486,13 +529,19 @@ def finalize_success(
         len(mapped_result.confidence_violations),
         notification_sent,
     )
-    _job_cost_counter.add(
-        estimate_document_cost_usd(len(mapped_result.pages)),
-        {
-            "process_id": job.processId,
-            "detected_form": mapped_result.detected_form or "unclassified",
-        },
+    form_labels = {
+        "process_id": job.processId,
+        "detected_form": mapped_result.detected_form or "unclassified",
+    }
+    _job_cost_counter.add(estimate_document_cost_usd(len(mapped_result.pages)), form_labels)
+    _pages_processed_counter.add(len(mapped_result.pages), form_labels)
+    _pipeline_duration_histogram.record(
+        (datetime.now(UTC) - job.submittedAt).total_seconds(), form_labels
     )
+    if mapped_result.confidence_violations:
+        _jobs_needs_review_counter.add(1, form_labels)
+    if mapped_result.unclassified:
+        _jobs_unclassified_counter.add(1, {"process_id": job.processId})
 
 
 def mark_terminal_failure(

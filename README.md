@@ -113,9 +113,17 @@ docker compose --profile app up -d --build
 docker compose ps
 curl http://localhost:8000/healthz
 curl -I http://localhost:3000/
-uv run python apps/api/scripts/train_custom_analyzers.py
-uv run python apps/api/scripts/seed_custom_analyzer_processes.py --api-base-url http://localhost:8000
 ```
+
+A one-shot `seed` container runs automatically on every `up` (after `api`
+is healthy and `worker` has started): it trains/updates the custom Content
+Understanding analyzers and seeds the three demo business processes (see
+`DEMO.md` section 2 for exactly what gets created). It's idempotent —
+existing processes/jobs are reused rather than duplicated — so you can
+safely run `docker compose --profile app up -d` again at any time. Watch
+its progress with `docker compose logs -f seed`; it can take several
+minutes the first time since it trains real analyzers against Azure AI
+Content Understanding.
 
 Open <http://localhost:3000>.
 
@@ -124,11 +132,11 @@ Notes:
 - `NEXT_PUBLIC_API_BASE_URL` and `WEB_ORIGIN` stay host-facing
   (`http://localhost:8000` / `http://localhost:3000`) even in containers,
   because the browser still connects from the host machine.
-- The API/worker containers mount `${HOME}/.azure` read-only and copy it into
-  the container's writable Azure CLI config directory at startup. If `az login`
-  works on the host but CU auth fails in containers, verify that the mount
-  exists and that the container user is still `root` with home directory
-  `/root`.
+- The API/worker/seed containers mount `${HOME}/.azure` read-only and copy
+  it into the container's writable Azure CLI config directory at startup.
+  If `az login` works on the host but CU auth fails in containers, verify
+  that the mount exists and that the container user is still `root` with
+  home directory `/root`.
 - The web image bakes `NEXT_PUBLIC_API_BASE_URL` in at build time. If you
   change it, rebuild with `docker compose --profile app up -d --build`.
 - Stop the containerized app stack with `docker compose --profile app down`.

@@ -14,11 +14,11 @@ from seed import (
     SeedError,
     ensure_api_reachable,
     ensure_process,
+    resolve_repo_root,
     wait_for_process_ready,
 )
 
-
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = resolve_repo_root()
 SAMPLES_ROOT = REPO_ROOT / "samples"
 JOB_READY_TIMEOUT_SECONDS = 10 * 60
 JOB_POLL_SECONDS = 2

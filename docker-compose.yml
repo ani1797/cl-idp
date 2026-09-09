@@ -175,6 +175,45 @@ services:
       otel-collector:
         condition: service_healthy
 
+  # One-shot seeding of the real demo business processes via
+  # scripts/train_custom_analyzers.py (trains/updates the Canada Life
+  # custom Content Understanding analyzers used by the demo) followed by
+  # scripts/seed_custom_analyzer_processes.py (creates the three business
+  # processes routed to those analyzers, uploads their sample documents,
+  # and reviews one field per process). Both scripts are idempotent by
+  # name/analyzer-id/filename, and seed_custom_analyzer_processes.py also
+  # deletes any stale/legacy demo processes from older iterations, so this
+  # is safe to run on every `docker compose --profile app up`. The image's
+  # baked-in ./samples is intentionally partial, so the repo-root samples/
+  # directory is bind-mounted over it here to supply every sample file
+  # both scripts reference. Azure credentials are supplied the same way as
+  # the api/worker services (host ~/.azure mount consumed by the shared
+  # docker-entrypoint.sh).
+  seed:
+    profiles: ["app"]
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      CL_IDP_API_BASE_URL: "http://api:8000"
+    env_file:
+      - path: ./apps/api/.env
+        required: false
+      - path: ./.env
+        required: false
+    volumes:
+      - ${HOME}/.azure:/azure-host/.azure:ro
+      - ./samples:/app/samples:ro
+    command:
+      - sh
+      - -c
+      - python scripts/train_custom_analyzers.py && python scripts/seed_custom_analyzer_processes.py
+    depends_on:
+      api:
+        condition: service_healthy
+      worker:
+        condition: service_started
+
   web:
     profiles: ["app"]
     build:
@@ -198,3 +237,4 @@ volumes:
   cosmosdb-emulator-data:
   azurite-data:
   mailpit-data:
+

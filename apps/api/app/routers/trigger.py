@@ -13,7 +13,8 @@ from azure.core.exceptions import AzureError
 from azure.cosmos.exceptions import CosmosHttpResponseError, CosmosResourceNotFoundError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from opentelemetry import trace
+from opentelemetry import metrics, trace
+from opentelemetry.metrics import Counter
 from PIL import Image, UnidentifiedImageError
 from pypdf import PdfReader
 from starlette.datastructures import UploadFile
@@ -46,6 +47,11 @@ PDF_EXTENSIONS = {".pdf"}
 TIFF_EXTENSIONS = {".tif", ".tiff"}
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
+_meter = metrics.get_meter(__name__)
+_jobs_triggered_counter: Counter = _meter.create_counter(
+    "idp.jobs_triggered",
+    description="Number of jobs accepted and enqueued into the pipeline, by business process.",
+)
 
 
 class InvalidDocumentError(ValueError):
@@ -306,6 +312,7 @@ def register_trigger_routes(application: FastAPI) -> None:
                         process_id=processId,
                     )
                     queue_service(application).send_message(queue_message.model_dump_json())
+                    _jobs_triggered_counter.add(1, {"process_id": processId})
                     logger.info(
                         "Enqueued job %s for process %s routing_analyzer_id=%s",
                         job_id,

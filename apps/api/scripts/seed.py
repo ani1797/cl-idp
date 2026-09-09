@@ -13,14 +13,22 @@ import httpx
 API_ROOT = Path(__file__).resolve().parents[1]
 
 
-def _resolve_repo_root() -> Path:
+def resolve_repo_root() -> Path:
+    """Find the repo root by walking up from this script's own path.
+
+    Works whether the script runs from a host checkout (where parent
+    directory depth matches the repo layout) or inside a container built
+    from apps/api/Dockerfile (WORKDIR /app has no docker-compose.yml above
+    it), in which case callers are expected to rely on a samples/ bind
+    mount instead of the baked-in image copy.
+    """
     for candidate in Path(__file__).resolve().parents:
         if (candidate / "docker-compose.yml").exists() and (candidate / "apps").exists():
             return candidate
     return API_ROOT
 
 
-REPO_ROOT = _resolve_repo_root()
+REPO_ROOT = resolve_repo_root()
 SAMPLES_ROOT = REPO_ROOT / "samples"
 DEFAULT_API_BASE_URL = os.environ.get("CL_IDP_API_BASE_URL", "http://127.0.0.1:8000")
 PROCESS_READY_TIMEOUT_SECONDS = 10 * 60

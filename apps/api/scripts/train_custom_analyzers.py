@@ -13,10 +13,12 @@ API_ROOT = Path(__file__).resolve().parents[1]
 if str(API_ROOT) not in sys.path:
     sys.path.insert(0, str(API_ROOT))
 
+from seed import resolve_repo_root
+
 from app.config import Settings
 from app.cu.client import ContentUnderstandingError, CuClient
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = resolve_repo_root()
 SAMPLES_ROOT = REPO_ROOT / "samples"
 POLL_SECONDS = 2
 ANALYZE_TIMEOUT_SECONDS = 10 * 60

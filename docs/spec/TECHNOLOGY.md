@@ -134,17 +134,51 @@ environments.
 
 - **Local dev**: **Mailpit/MailHog** SMTP catcher running in Docker; the app
   sends real SMTP messages that are captured and viewable locally instead of
-  being delivered externally.
-- **Production**: real SMTP relay or **Azure Communication Services** /
-  SendGrid, swapped in via configuration only (same SMTP-sending code path
-  where possible).
+  being delivered externally. Default config (`MAIL_AUTH_MODE=none`,
+  `MAIL_TLS_MODE=none`) targets this unauthenticated relay.
+- **Production**: a pluggable `MailSender` (`app/mail.py`) selects behavior
+  purely from configuration, over the same SMTP-sending code path:
+  - **Unauthenticated SMTP relay** (`MAIL_AUTH_MODE=none`) — for a legacy
+    internal open relay, if one is already trusted/available.
+  - **Authenticated SMTP relay** (`MAIL_AUTH_MODE=basic`, `MAIL_TLS_MODE=
+    starttls` or `smtps`) — SMTP AUTH with credentials from Key Vault
+    (`SMTP_USERNAME`/`SMTP_PASSWORD`), for providers such as Exchange
+    Online/M365 SMTP AUTH, SendGrid, or Mailgun.
+  - **Private authenticated relay** — identical authenticated-SMTP config as
+    above, but the relay endpoint is only reachable over a private network
+    path (VNet integration/private endpoint), so app/API/worker compute must
+    be attached to the relevant VNet. This is an infra/networking concern
+    layered on top of authenticated SMTP, not a distinct application code
+    path.
+  - Note: **Azure Communication Services (including ACS Email) is being
+    retired** (new signups blocked Oct 2026, full retirement Sept 2028), so
+    it should **not** be adopted for a new production deployment — use one
+    of the modes above instead. It is used **only** for the hosted demo
+    (see below), as a stop-gap until a real enterprise/M365 relay is
+    available; Microsoft Graph `sendMail` was evaluated but is explicitly
+    out of scope for this system.
+- **Hosted demo (current state)**: the demo deployment (`rg-cl-idp-prod-eus2`)
+  uses **Azure Communication Services Email** (Azure-managed domain) as an
+  **authenticated SMTP relay** — `smtp.azurecomm.net:587`, STARTTLS, SMTP
+  AUTH via a dedicated Entra app registration (client-secret credentials,
+  password stored in Key Vault as `smtp-password`). This exercises the same
+  `MAIL_AUTH_MODE=basic`/`MAIL_TLS_MODE=starttls` code path a real
+  enterprise/M365 relay would use — no Graph consent or mailbox is
+  required, only an Azure RBAC role assignment (`Communication and Email
+  Service Owner`) scoped to the ACS resource. Provisioned by
+  `infra/modules/communication-email.bicep`, gated behind the
+  `enableAcsEmailDemo` parameter in `infra/main.bicep` (default `false` —
+  do not enable for a real production deployment; swap to a real relay by
+  setting `MAIL_AUTH_MODE`/`MAIL_TLS_MODE`/`SMTP_HOST`/`SMTP_USERNAME`/
+  `SMTP_PASSWORD` directly instead).
 - Used to notify the configured business owner email when an extraction
   falls below the process's confidence threshold. Sent synchronously by the
   backend job worker, exactly once per job, immediately after the job
   transitions to `succeeded` with a non-empty `confidenceViolations` list
   (single email listing all violating fields for that job — not one per
   field, and not resent on later re-poll/review).
-- **Delivery is best-effort.** If the SMTP send fails, the error is logged,
+- **Delivery is best-effort.** If the SMTP send fails (including auth/TLS
+  failures against an authenticated or private relay), the error is logged,
   the job remains `succeeded`, and `notificationSent` stays `false`. A
   notification failure never fails a job whose extraction succeeded.
 
@@ -360,7 +394,7 @@ permission any application component holds at runtime.
 | Job queue           | Azurite (Queue)                     | Azure Storage Queue                      |
 | Content Understanding | **Real Azure CU (no emulator)**   | Real Azure CU (Foundry account in the same resource group) |
 | CU credential       | `az login` / DefaultAzureCredential | Managed identity + RBAC (`disableLocalAuth: true`, no API key) |
-| Email               | Mailpit (SMTP catcher)              | Azure Communication Services / SendGrid  |
+| Email               | Mailpit (SMTP catcher, unauthenticated) | Azure Communication Services Email, via authenticated SMTP relay (`smtp.azurecomm.net`, SMTP AUTH with an Entra app + client secret) — **demo-only**; see note below. A real production deployment should use an authenticated SMTP relay (M365 SMTP AUTH / Mailgun / etc.) or the same over a private VNet relay instead. |
 | Auth                | None (any user)                     | None (or Entra ID if introduced later)   |
 | Web compute         | Docker Compose                      | Azure App Service (Linux, Node)          |
 | API compute         | Docker Compose                      | Azure App Service (Linux, Python)        |

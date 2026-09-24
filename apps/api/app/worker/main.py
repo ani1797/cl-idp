@@ -6,7 +6,6 @@ import smtplib
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from email.message import EmailMessage
 from typing import Any, Protocol
 
 from azure.core.exceptions import AzureError
@@ -17,6 +16,7 @@ from pydantic import ValidationError
 from app.config import Settings, get_settings
 from app.cu import ContentUnderstandingError, CuClient
 from app.db import DataStore, DocumentNotFoundError, create_data_store
+from app.mail import MailMessage, get_mail_sender
 from app.models import (
     ArrayField,
     BusinessProcessDocument,
@@ -622,28 +622,27 @@ def send_notification_email(
     job: JobDocument,
     violations: list[str],
 ) -> None:
-    message = EmailMessage()
-    message["From"] = "enterprise-idp@localhost"
-    message["To"] = process.ownerEmail
-    message["Subject"] = f"[Enterprise IDP] Review needed for {job.fileName}"
     review_url = f"{settings.web_origin.rstrip('/')}/processes/{process.id}/jobs/{job.id}"
-    message.set_content(
-        "\n".join(
-            [
-                "The following extracted fields were below the configured average confidence threshold:",
-                "",
-                f"Process: {process.name}",
-                f"Job ID: {job.id}",
-                f"File: {job.fileName}",
-                "",
-                *[f"- {path}" for path in violations],
-                "",
-                f"Review this document: {review_url}",
-            ]
-        )
+    body = "\n".join(
+        [
+            "The following extracted fields were below the configured average confidence threshold:",
+            "",
+            f"Process: {process.name}",
+            f"Job ID: {job.id}",
+            f"File: {job.fileName}",
+            "",
+            *[f"- {path}" for path in violations],
+            "",
+            f"Review this document: {review_url}",
+        ]
     )
-    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as client:
-        client.send_message(message)
+    message = MailMessage(
+        to=process.ownerEmail,
+        subject=f"[Enterprise IDP] Review needed for {job.fileName}",
+        body=body,
+        sender=settings.mail_from_address,
+    )
+    get_mail_sender(settings).send(message)
 
 
 def summarize_fields_for_logging(fields: list[Field]) -> list[dict[str, object]]:

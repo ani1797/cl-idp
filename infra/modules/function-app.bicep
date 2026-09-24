@@ -13,13 +13,22 @@ param logAnalyticsWorkspaceId string
 param storageAccountConnectionString string
 param appSettings array = []
 
+@description('Optional subnet resource ID for regional VNet integration (outbound), needed when the worker must reach a private authenticated mail relay (or any other private endpoint). Leave empty (default) for no VNet integration. NOTE: the default Y1/Dynamic Consumption plan does not support regional VNet integration on Linux — set `planSkuName`/`planTier` to an Elastic Premium plan (e.g. EP1/ElasticPremium) whenever this is non-empty.')
+param vnetIntegrationSubnetId string = ''
+
+@description('Function App hosting plan SKU name. Default Y1 (Consumption) has no VNet integration support; use an Elastic Premium SKU (e.g. EP1) when `vnetIntegrationSubnetId` is set.')
+param planSkuName string = 'Y1'
+
+@description('Function App hosting plan tier, paired with `planSkuName` (Dynamic for Y1, ElasticPremium for EPn).')
+param planTier string = 'Dynamic'
+
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: '${name}-plan'
   location: location
   tags: tags
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+    name: planSkuName
+    tier: planTier
   }
   kind: 'functionapp'
   properties: {
@@ -38,6 +47,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: plan.id
     httpsOnly: true
+    virtualNetworkSubnetId: empty(vnetIntegrationSubnetId) ? null : vnetIntegrationSubnetId
     siteConfig: {
       linuxFxVersion: 'Python|3.12'
       ftpsState: 'Disabled'

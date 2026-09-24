@@ -13,6 +13,9 @@ param logAnalyticsWorkspaceId string
 @description('Container registry login server to pull from (e.g. myacr.azurecr.io). Leave empty for code-based (Oryx) deployment.')
 param containerRegistryLoginServer string = ''
 
+@description('Optional subnet resource ID for regional VNet integration (outbound). Set this when the app must reach a private authenticated mail relay (or any other private endpoint) that is not reachable over the public internet. Leave empty (default) for no VNet integration — existing deployments are unaffected.')
+param vnetIntegrationSubnetId string = ''
+
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: '${name}-plan'
   location: location
@@ -37,6 +40,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: plan.id
     httpsOnly: true
+    virtualNetworkSubnetId: empty(vnetIntegrationSubnetId) ? null : vnetIntegrationSubnetId
     siteConfig: {
       linuxFxVersion: linuxFxVersion
       alwaysOn: skuName != 'F1'

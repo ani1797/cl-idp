@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -70,6 +71,20 @@ class Settings(BaseSettings):
     queue_name: str = Field(default="jobs", alias="QUEUE_NAME")
     smtp_host: str = Field(default="127.0.0.1", alias="SMTP_HOST")
     smtp_port: int = Field(default=1025, alias="SMTP_PORT")
+    # Mail relay auth/TLS mode. Defaults reproduce the historical
+    # unauthenticated/plaintext behavior (e.g. local Mailpit catcher, or a
+    # legacy internal open relay). Set to "basic"/"starttls" (or "smtps")
+    # for authenticated relays (M365 SMTP AUTH, SendGrid, Mailgun, or a
+    # private relay reachable only over a VNet/private endpoint).
+    mail_auth_mode: Literal["none", "basic"] = Field(default="none", alias="MAIL_AUTH_MODE")
+    mail_tls_mode: Literal["none", "starttls", "smtps"] = Field(
+        default="none", alias="MAIL_TLS_MODE"
+    )
+    smtp_username: str | None = Field(default=None, alias="SMTP_USERNAME")
+    smtp_password: str | None = Field(default=None, alias="SMTP_PASSWORD")
+    mail_from_address: str = Field(
+        default="enterprise-idp@localhost", alias="MAIL_FROM_ADDRESS"
+    )
     web_origin: str = Field(default="http://localhost:3000", alias="WEB_ORIGIN")
     next_public_api_base_url: str = Field(
         default="http://localhost:8000",

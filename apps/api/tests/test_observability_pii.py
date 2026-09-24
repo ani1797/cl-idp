@@ -39,7 +39,7 @@ def test_pipeline_logs_are_pii_safe_and_keep_correlation_ids(
     live_api_client: TestClient,
 ) -> None:
     app = cast(FastAPI, live_api_client.app)
-    cosmos = app.state.cosmos_service
+    cosmos = app.state.data_store
     process_id: str | None = None
     handler = CollectingLogHandler()
     root_logger = logging.getLogger()
@@ -79,7 +79,7 @@ def test_pipeline_logs_are_pii_safe_and_keep_correlation_ids(
 
         dependencies = WorkerDependencies(
             settings=app.state.settings,
-            cosmos=app.state.cosmos_service,
+            data_store=app.state.data_store,
             blob=app.state.blob_service,
             queue=app.state.queue_service,
             cu_client=app.state.cu_client,

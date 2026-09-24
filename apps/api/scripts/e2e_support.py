@@ -7,23 +7,21 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
-from azure.cosmos.exceptions import CosmosResourceNotFoundError
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.config import get_settings
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError, create_data_store
 from app.models import JobDocument, JobStatus
 from app.storage import BlobService
 
 
-def build_services() -> tuple[CosmosService, BlobService]:
+def build_services() -> tuple[DataStore, BlobService]:
     settings = get_settings()
-    cosmos = CosmosService(settings)
+    data_store = create_data_store(settings)
     blob = BlobService(settings)
-    cosmos.ensure_containers()
+    data_store.ensure_schema()
     blob.ensure_container()
-    return cosmos, blob
+    return data_store, blob
 
 
 def guess_content_type(file_name: str) -> str:
@@ -39,26 +37,26 @@ def guess_content_type(file_name: str) -> str:
 
 
 def cleanup_process(process_id: str) -> None:
-    cosmos, blob = build_services()
+    data_store, blob = build_services()
     try:
-        _ = cosmos.read_process(process_id)
-    except CosmosResourceNotFoundError:
+        _ = data_store.read_process(process_id)
+    except DocumentNotFoundError:
         print(json.dumps({"deleted": False, "reason": "missing_process"}))
         return
 
-    for job in cosmos.list_jobs_for_process(process_id):
-        cosmos.delete_job(process_id, job.id)
+    for job in data_store.list_jobs_for_process(process_id):
+        data_store.delete_job(process_id, job.id)
 
     for blob_name in blob.list_blob_names(prefix=f"{process_id}/"):
         blob.delete_blob(blob_name)
 
-    cosmos.delete_process(process_id)
+    data_store.delete_process(process_id)
     print(json.dumps({"deleted": True, "processId": process_id}))
 
 
 def seed_failed_job(process_id: str, file_path: Path, file_name: str, error: str) -> None:
-    cosmos, blob = build_services()
-    _ = cosmos.read_process(process_id)
+    data_store, blob = build_services()
+    _ = data_store.read_process(process_id)
 
     content = file_path.read_bytes()
     content_type = guess_content_type(file_name)
@@ -67,7 +65,7 @@ def seed_failed_job(process_id: str, file_path: Path, file_name: str, error: str
     blob_path = f"{process_id}/{job_id}/{file_name}"
     blob.upload_bytes(blob_path, content, content_type)
 
-    job = cosmos.upsert_job(
+    job = data_store.upsert_job(
         JobDocument(
             id=job_id,
             processId=process_id,

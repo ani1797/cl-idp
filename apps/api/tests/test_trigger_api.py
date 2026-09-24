@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 from pypdf import PdfWriter
 
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import AnalyzerRef, BusinessProcessDocument, JobStatus, RoutingAnalyzerStatus
 from app.storage import BlobService, QueueService
 
@@ -173,13 +173,13 @@ def test_trigger_happy_path_creates_blob_job_and_queue_message(api_client: TestC
     }
 
 
-def backend_services(api_client: TestClient) -> tuple[CosmosService, BlobService, QueueService]:
+def backend_services(api_client: TestClient) -> tuple[DataStore, BlobService, QueueService]:
     app = cast(FastAPI, api_client.app)
-    return app.state.cosmos_service, app.state.blob_service, app.state.queue_service
+    return app.state.data_store, app.state.blob_service, app.state.queue_service
 
 
 def create_process(
-    cosmos: CosmosService,
+    cosmos: DataStore,
     *,
     process_id: str | None = None,
     routing_status: RoutingAnalyzerStatus = RoutingAnalyzerStatus.READY,
@@ -207,14 +207,18 @@ def create_process(
 
 def assert_no_trigger_artifacts(
     *,
-    cosmos: CosmosService,
+    cosmos: DataStore,
     blob: BlobService,
     queue: QueueService,
     process_id: str | None = None,
 ) -> None:
     jobs: list[Any]
     if process_id is None:
-        jobs = list(cosmos._jobs.query_items("SELECT c.id FROM c", enable_cross_partition_query=True))
+        jobs = [
+            job
+            for process in cosmos.list_processes()
+            for job in cosmos.list_jobs_for_process(process.id)
+        ]
         blob_names = blob.list_blob_names()
     else:
         jobs = cosmos.list_jobs_for_process(process_id)

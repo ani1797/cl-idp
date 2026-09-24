@@ -14,7 +14,7 @@ from app.cu import (
     provision_process_routing_analyzer,
     routing_analyzer_id,
 )
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import AnalyzerRef, BusinessProcessDocument, RoutingAnalyzerStatus
 from app.storage import BlobService
 
@@ -30,7 +30,7 @@ def process_payload(allowed_analyzer_ids: list[str]) -> dict[str, object]:
 
 
 def wait_for_process_status(
-    cosmos: CosmosService,
+    cosmos: DataStore,
     process_id: str,
     expected_status: RoutingAnalyzerStatus,
     *,
@@ -64,7 +64,7 @@ def cleanup_process_analyzers(process: BusinessProcessDocument) -> None:
 @pytest.mark.live
 def test_background_provisioning_builds_routing_analyzer_with_direct_fallback(
     live_api_client: TestClient,
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, _ = live_services
     response = live_api_client.post(
@@ -99,7 +99,7 @@ def test_background_provisioning_builds_routing_analyzer_with_direct_fallback(
 
 @pytest.mark.live
 def test_provisioning_fails_for_missing_selected_analyzer(
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, _ = live_services
     now = datetime.now(UTC)
@@ -123,7 +123,7 @@ def test_provisioning_fails_for_missing_selected_analyzer(
 
     provision_process_routing_analyzer(
         settings=get_settings(),
-        cosmos=cosmos,
+        data_store=cosmos,
         process_id=process.id,
     )
 
@@ -137,7 +137,7 @@ def test_provisioning_fails_for_missing_selected_analyzer(
 @pytest.mark.live
 def test_rebuild_with_changed_analyzer_set_keeps_deterministic_ids(
     live_api_client: TestClient,
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, _ = live_services
     created = live_api_client.post("/processes", json=process_payload(["prebuilt-invoice"]))

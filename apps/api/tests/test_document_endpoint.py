@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 from pypdf import PdfReader
 
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import JobDocument, JobStatus
 from app.storage import BlobService
 from tests.test_trigger_api import create_process, pdf_bytes
@@ -84,14 +84,14 @@ def test_document_endpoint_returns_404_for_missing_blob_or_job(api_client: TestC
     assert missing_job_response.json()["code"] == "job_not_found"
 
 
-def backend_services(api_client: TestClient) -> tuple[CosmosService, BlobService]:
+def backend_services(api_client: TestClient) -> tuple[DataStore, BlobService]:
     application = api_client.app
     assert isinstance(application, FastAPI)
-    return application.state.cosmos_service, application.state.blob_service
+    return application.state.data_store, application.state.blob_service
 
 
 def create_document_job(
-    cosmos: CosmosService,
+    cosmos: DataStore,
     blob: BlobService,
     *,
     process_id: str,

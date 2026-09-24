@@ -35,6 +35,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    db_backend: str = Field(default="mongo", alias="DB_BACKEND")
+    mongo_connection_string: str = Field(
+        default="mongodb://localhost:27017/?directConnection=true",
+        alias="MONGO_CONNECTION_STRING",
+    )
+    mongo_database_name: str = Field(default="enterprise-idp", alias="MONGO_DATABASE_NAME")
     cosmos_connection_string: str = Field(
         default=(
             "AccountEndpoint=https://localhost:8081/;"
@@ -60,6 +66,8 @@ class Settings(BaseSettings):
         ),
         alias="AZURITE_QUEUE_CONNECTION_STRING",
     )
+    blob_container_name: str = Field(default="documents", alias="BLOB_CONTAINER_NAME")
+    queue_name: str = Field(default="jobs", alias="QUEUE_NAME")
     smtp_host: str = Field(default="127.0.0.1", alias="SMTP_HOST")
     smtp_port: int = Field(default=1025, alias="SMTP_PORT")
     web_origin: str = Field(default="http://localhost:3000", alias="WEB_ORIGIN")

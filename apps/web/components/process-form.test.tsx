@@ -4,9 +4,9 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  ProcessForm,
   buildProcessInput,
   mapProcessToFormValues,
+  ProcessForm,
 } from "@/components/process-form";
 import { renderWithQueryClient } from "@/components/test-utils";
 import {
@@ -103,7 +103,7 @@ describe("ProcessForm", () => {
     renderWithQueryClient(<ProcessForm mode="create" />);
 
     await screen.findByText("Invoice");
-    fireEvent.change(screen.getByLabelText("Confidence threshold (%)"), {
+    fireEvent.change(screen.getByLabelText("Average Confidence threshold (%)"), {
       target: { value: "" },
     });
     fireEvent.change(screen.getByLabelText("Business owner email"), {
@@ -115,7 +115,7 @@ describe("ProcessForm", () => {
     expect(await screen.findByText("Name is required.")).toBeInTheDocument();
     expect(screen.getByText("Description is required.")).toBeInTheDocument();
     expect(screen.getByText("Select at least one analyzer.")).toBeInTheDocument();
-    expect(screen.getByText("Confidence threshold is required.")).toBeInTheDocument();
+    expect(screen.getByText("Average Confidence threshold is required.")).toBeInTheDocument();
     expect(screen.getByText("Enter a valid email address.")).toBeInTheDocument();
   });
 
@@ -124,14 +124,14 @@ describe("ProcessForm", () => {
     renderWithQueryClient(<ProcessForm mode="create" />);
 
     await screen.findByText("Invoice");
-    fireEvent.change(screen.getByLabelText("Confidence threshold (%)"), {
+    fireEvent.change(screen.getByLabelText("Average Confidence threshold (%)"), {
       target: { value: "101" },
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Save process" }));
 
     expect(
-      await screen.findByText("Confidence threshold must be between 0 and 100."),
+      await screen.findByText("Average Confidence threshold must be between 0 and 100."),
     ).toBeInTheDocument();
   });
 
@@ -207,7 +207,7 @@ describe("ProcessForm", () => {
       target: { value: "Routes claims" },
     });
     fireEvent.click(screen.getByRole("checkbox", { name: /Invoice/ }));
-    fireEvent.change(screen.getByLabelText("Confidence threshold (%)"), {
+    fireEvent.change(screen.getByLabelText("Average Confidence threshold (%)"), {
       target: { value: "42" },
     });
     fireEvent.change(screen.getByLabelText("Business owner email"), {

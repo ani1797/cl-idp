@@ -62,6 +62,13 @@ progress, not this README.
 
 26 full-stack-containerization ◀── needs 00, 02, 06, 09 (Dockerfiles for
                                      API/worker/web + compose wiring)
+
+28 cosmos-to-mongo-atlas-migration ◀── needs 02, 07, 08 (refactors the
+                                         Cosmos-coupled datastore, jobs
+                                         query, and review/retry code);
+                                         adds MongoDB Atlas as the default
+                                         backend, keeps Cosmos as a
+                                         config-selectable fallback
 ```
 
 > **Plan reconciliation note (post-audit, task 19):** the user reported

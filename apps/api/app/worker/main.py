@@ -10,14 +10,13 @@ from email.message import EmailMessage
 from typing import Any, Protocol
 
 from azure.core.exceptions import AzureError
-from azure.cosmos.exceptions import CosmosResourceNotFoundError
 from opentelemetry import metrics, trace
 from opentelemetry.metrics import Counter, Histogram
 from pydantic import ValidationError
 
 from app.config import Settings, get_settings
 from app.cu import ContentUnderstandingError, CuClient
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError, create_data_store
 from app.models import (
     ArrayField,
     BusinessProcessDocument,
@@ -122,7 +121,7 @@ class WorkerConfig:
 @dataclass(frozen=True)
 class WorkerDependencies:
     settings: Settings
-    cosmos: CosmosService
+    data_store: DataStore
     blob: BlobService
     queue: QueueService
     cu_client: AnalysisClient
@@ -130,16 +129,16 @@ class WorkerDependencies:
 
 def create_dependencies(settings: Settings | None = None) -> WorkerDependencies:
     resolved_settings = settings or get_settings()
-    cosmos = CosmosService(resolved_settings)
+    store = create_data_store(resolved_settings)
     blob = BlobService(resolved_settings)
     queue = QueueService(resolved_settings)
     cu_client = CuClient(resolved_settings)
-    cosmos.ensure_containers()
+    store.ensure_schema()
     blob.ensure_container()
     queue.ensure_queue()
     return WorkerDependencies(
         settings=resolved_settings,
-        cosmos=cosmos,
+        data_store=store,
         blob=blob,
         queue=queue,
         cu_client=cu_client,
@@ -271,7 +270,7 @@ def handle_queue_message(
             job_id=job.id,
             process_id=job.processId,
         )
-        running_job = dependencies.cosmos.upsert_job(
+        running_job = dependencies.data_store.upsert_job(
             job.model_copy(
                 update={
                     "status": JobStatus.RUNNING,
@@ -361,7 +360,7 @@ def handle_queue_message(
                 job_id=running_job.id,
                 process_id=running_job.processId,
             )
-            dependencies.cosmos.upsert_job(
+            dependencies.data_store.upsert_job(
                 running_job.model_copy(
                     update={
                         "status": JobStatus.QUEUED,
@@ -413,7 +412,7 @@ def reconcile_running_jobs(
 ) -> None:
     resolved_config = config or WorkerConfig()
     cutoff = datetime.now(UTC) - timedelta(seconds=resolved_config.job_timeout_seconds)
-    stuck_jobs = dependencies.cosmos.list_running_jobs_before(cutoff)
+    stuck_jobs = dependencies.data_store.list_running_jobs_before(cutoff)
     if not stuck_jobs:
         return
 
@@ -434,7 +433,7 @@ def reconcile_running_jobs(
                 job_id=job.id,
                 process_id=job.processId,
             )
-            dependencies.cosmos.upsert_job(
+            dependencies.data_store.upsert_job(
                 job.model_copy(
                     update={
                         "status": JobStatus.QUEUED,
@@ -500,7 +499,7 @@ def finalize_success(
             job_id=job.id,
             process_id=job.processId,
         )
-        dependencies.cosmos.upsert_job(
+        dependencies.data_store.upsert_job(
             job.model_copy(
                 update={
                     "status": JobStatus.SUCCEEDED,
@@ -557,7 +556,7 @@ def mark_terminal_failure(
             job_id=job.id,
             process_id=job.processId,
         )
-        dependencies.cosmos.upsert_job(
+        dependencies.data_store.upsert_job(
             job.model_copy(
                 update={
                     "status": JobStatus.FAILED,
@@ -600,8 +599,8 @@ def try_read_job(
     job_id: str,
 ) -> JobDocument | None:
     try:
-        return dependencies.cosmos.read_job(process_id, job_id)
-    except CosmosResourceNotFoundError:
+        return dependencies.data_store.read_job(process_id, job_id)
+    except DocumentNotFoundError:
         return None
 
 
@@ -611,8 +610,8 @@ def try_read_process(
     process_id: str,
 ) -> BusinessProcessDocument | None:
     try:
-        return dependencies.cosmos.read_process(process_id)
-    except CosmosResourceNotFoundError:
+        return dependencies.data_store.read_process(process_id)
+    except DocumentNotFoundError:
         return None
 
 
@@ -631,7 +630,7 @@ def send_notification_email(
     message.set_content(
         "\n".join(
             [
-                "The following extracted fields were below the configured confidence threshold:",
+                "The following extracted fields were below the configured average confidence threshold:",
                 "",
                 f"Process: {process.name}",
                 f"Job ID: {job.id}",

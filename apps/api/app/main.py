@@ -7,7 +7,6 @@ from datetime import UTC, datetime
 from typing import cast
 from uuid import uuid4
 
-from azure.cosmos.exceptions import CosmosResourceNotFoundError
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,7 +24,7 @@ from app.cu import (
     provision_process_routing_analyzer,
     resolve_allowed_analyzers,
 )
-from app.db.cosmos import CosmosService
+from app.db import DataStore, DocumentNotFoundError, create_data_store
 from app.models import (
     Analyzer,
     BusinessProcess,
@@ -71,10 +70,10 @@ def initialize_observability(app: FastAPI) -> None:
         options: CallbackOptions,
     ) -> Iterable[Observation]:
         _ = options
-        cosmos = getattr(app.state, "cosmos_service", None)
-        if cosmos is None:
+        store = getattr(app.state, "data_store", None)
+        if store is None:
             return
-        yield Observation(len(cosmos.list_processes()))
+        yield Observation(len(store.list_processes()))
 
     meter = metrics.get_meter(__name__)
     meter.create_observable_gauge(
@@ -89,17 +88,17 @@ def initialize_observability(app: FastAPI) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
-    cosmos = CosmosService(settings)
+    store = create_data_store(settings)
     blob = BlobService(settings)
     queue = QueueService(settings)
     cu_client = CuClient(settings)
 
-    cosmos.ensure_containers()
+    store.ensure_schema()
     blob.ensure_container()
     queue.ensure_queue()
 
     app.state.settings = settings
-    app.state.cosmos_service = cosmos
+    app.state.data_store = store
     app.state.blob_service = blob
     app.state.queue_service = queue
     app.state.cu_client = cu_client
@@ -122,8 +121,8 @@ def error_response(
     )
 
 
-def cosmos_service(application: FastAPI) -> CosmosService:
-    return cast(CosmosService, application.state.cosmos_service)
+def data_store(application: FastAPI) -> DataStore:
+    return cast(DataStore, application.state.data_store)
 
 
 def blob_service(application: FastAPI) -> BlobService:
@@ -150,7 +149,7 @@ def schedule_routing_analyzer_provisioning(
     background_tasks.add_task(
         provision_process_routing_analyzer,
         settings=application.state.settings,
-        cosmos=cosmos_service(application),
+        data_store=data_store(application),
         process_id=process.id,
     )
 
@@ -172,9 +171,9 @@ def register_routes(application: FastAPI) -> None:
     @application.get("/healthz", response_model=Health, responses={503: {"model": Health}})
     async def healthz(response: Response) -> Health:
         dependencies = {
-            "cosmos": (
+            "database": (
                 DependencyStatus.OK
-                if application.state.cosmos_service.check_health()
+                if application.state.data_store.check_health()
                 else DependencyStatus.UNAVAILABLE
             ),
             "blob": (
@@ -215,7 +214,7 @@ def register_routes(application: FastAPI) -> None:
 
     @application.get("/processes", response_model=list[BusinessProcess], tags=["processes"])
     async def list_processes_endpoint() -> list[BusinessProcess]:
-        return cast(list[BusinessProcess], cosmos_service(application).list_processes())
+        return cast(list[BusinessProcess], data_store(application).list_processes())
 
     @application.post(
         "/processes",
@@ -228,7 +227,7 @@ def register_routes(application: FastAPI) -> None:
         payload: BusinessProcessInput,
         background_tasks: BackgroundTasks,
     ) -> BusinessProcess | JSONResponse:
-        existing_process = cosmos_service(application).find_process_by_name(payload.name)
+        existing_process = data_store(application).find_process_by_name(payload.name)
         if existing_process is not None:
             return error_response(
                 status_code=409,
@@ -276,7 +275,7 @@ def register_routes(application: FastAPI) -> None:
             createdAt=now,
             updatedAt=now,
         )
-        saved_process = cosmos_service(application).upsert_process(process)
+        saved_process = data_store(application).upsert_process(process)
         schedule_routing_analyzer_provisioning(application, background_tasks, saved_process)
         return saved_process
 
@@ -288,8 +287,8 @@ def register_routes(application: FastAPI) -> None:
     )
     async def get_process_endpoint(processId: str) -> BusinessProcess | JSONResponse:
         try:
-            return cosmos_service(application).read_process(processId)
-        except CosmosResourceNotFoundError:
+            return data_store(application).read_process(processId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="process_not_found",
@@ -308,15 +307,15 @@ def register_routes(application: FastAPI) -> None:
         background_tasks: BackgroundTasks,
     ) -> BusinessProcess | JSONResponse:
         try:
-            existing_process = cosmos_service(application).read_process(processId)
-        except CosmosResourceNotFoundError:
+            existing_process = data_store(application).read_process(processId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="process_not_found",
                 message="The requested business process was not found.",
             )
 
-        name_collision = cosmos_service(application).find_process_by_name(payload.name)
+        name_collision = data_store(application).find_process_by_name(payload.name)
         if name_collision is not None and name_collision.id != processId:
             return error_response(
                 status_code=409,
@@ -371,7 +370,7 @@ def register_routes(application: FastAPI) -> None:
                 "updatedAt": datetime.now(UTC),
             }
         )
-        saved_process = cosmos_service(application).upsert_process(updated_process)
+        saved_process = data_store(application).upsert_process(updated_process)
         if changed:
             schedule_routing_analyzer_provisioning(application, background_tasks, saved_process)
         return saved_process
@@ -384,21 +383,21 @@ def register_routes(application: FastAPI) -> None:
     )
     async def delete_process_endpoint(processId: str) -> Response:
         try:
-            cosmos_service(application).read_process(processId)
-        except CosmosResourceNotFoundError:
+            data_store(application).read_process(processId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="process_not_found",
                 message="The requested business process was not found.",
             )
 
-        for job in cosmos_service(application).list_jobs_for_process(processId):
-            cosmos_service(application).delete_job(processId, job.id)
+        for job in data_store(application).list_jobs_for_process(processId):
+            data_store(application).delete_job(processId, job.id)
 
         for blob_name in blob_service(application).list_blob_names(prefix=f"{processId}/"):
             blob_service(application).delete_blob(blob_name)
 
-        cosmos_service(application).delete_process(processId)
+        data_store(application).delete_process(processId)
         return Response(status_code=204)
 
     register_jobs_routes(application)

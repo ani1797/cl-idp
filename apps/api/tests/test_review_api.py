@@ -6,7 +6,7 @@ from typing import cast
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import (
     ArrayField,
     Field,
@@ -148,10 +148,10 @@ def test_review_allows_re_reviewing_same_path_without_moving_reviewed_at(api_cli
     assert body["confidenceViolations"] == ["/LineItems/0/description"]
 
 
-def backend_cosmos(api_client: TestClient) -> CosmosService:
+def backend_cosmos(api_client: TestClient) -> DataStore:
     app = api_client.app
     assert isinstance(app, FastAPI)
-    return cast(CosmosService, app.state.cosmos_service)
+    return cast(DataStore, app.state.data_store)
 
 
 def make_review_job(process_id: str) -> JobDocument:

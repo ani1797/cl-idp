@@ -34,8 +34,8 @@ NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev -- --hostname 127.0.0
 
 Wait for:
 
-- `docker compose ps` to show Azurite, Cosmos DB Emulator, Mailpit, and the
-  `otel-collector` (Grafana LGTM stack) as healthy/running
+- `docker compose ps` to show MongoDB, Azurite, Cosmos DB Emulator, Mailpit,
+  and the `otel-collector` (Grafana LGTM stack) as healthy/running
 - the API to report `Uvicorn running on http://127.0.0.1:8000`
 - the web app to report `Ready` on `http://127.0.0.1:3000`
 
@@ -153,7 +153,7 @@ Train the custom analyzers once, then seed the three demo processes:
 ```bash
 cd /home/anirudh/Projects/cl-idp/apps/api
 uv run python scripts/train_custom_analyzers.py
-uv run python scripts/seed_custom_analyzer_processes.py
+uv run python scripts/seed.py
 ```
 
 Expected seeded surface (any older `Demo - *` processes are deleted
@@ -176,7 +176,7 @@ automatically so exactly these three remain):
 Optional idempotency check:
 
 ```bash
-uv run python scripts/seed_custom_analyzer_processes.py
+uv run python scripts/seed.py
 ```
 
 On the second run the script should report that those processes and jobs

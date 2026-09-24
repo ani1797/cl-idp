@@ -20,7 +20,7 @@ MAILPIT_API = "http://127.0.0.1:8025/api/v1/messages"
 @pytest.mark.live
 def test_worker_processes_live_invoice_end_to_end(live_api_client: TestClient) -> None:
     app = cast(FastAPI, live_api_client.app)
-    cosmos = app.state.cosmos_service
+    cosmos = app.state.data_store
     process_id: str | None = None
 
     before_ids = {message["ID"] for message in list_mailpit_messages() if isinstance(message.get("ID"), str)}
@@ -55,7 +55,7 @@ def test_worker_processes_live_invoice_end_to_end(live_api_client: TestClient) -
 
         dependencies = WorkerDependencies(
             settings=app.state.settings,
-            cosmos=app.state.cosmos_service,
+            data_store=app.state.data_store,
             blob=app.state.blob_service,
             queue=app.state.queue_service,
             cu_client=app.state.cu_client,

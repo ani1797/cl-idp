@@ -8,7 +8,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import (
     ArrayField,
     Field,
@@ -294,13 +294,13 @@ def test_job_endpoints_return_404_for_missing_or_wrong_process(api_client: TestC
     assert wrong_process_response.json()["code"] == "job_not_found"
 
 
-def backend_cosmos(api_client: TestClient) -> CosmosService:
+def backend_cosmos(api_client: TestClient) -> DataStore:
     application = api_client.app
     assert isinstance(application, FastAPI)
-    return cast(CosmosService, application.state.cosmos_service)
+    return cast(DataStore, application.state.data_store)
 
 
-def seed_query_jobs(cosmos: CosmosService, process_id: str) -> dict[str, JobDocument]:
+def seed_query_jobs(cosmos: DataStore, process_id: str) -> dict[str, JobDocument]:
     base_time = datetime(2026, 1, 15, 9, 0, 0, tzinfo=UTC)
     jobs = {
         "queued": make_job(

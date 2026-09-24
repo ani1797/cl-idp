@@ -6,19 +6,25 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from azure.cosmos.exceptions import CosmosResourceNotFoundError
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app import main as app_main
 from app.config import AZURITE_ACCOUNT_KEY, COSMOS_EMULATOR_KEY, get_settings
 from app.cu import ContentUnderstandingError, CuClient
-from app.db import CosmosService
+from app.db import DataStore
 from app.storage import BlobService, QueueService
 
 
 @pytest.fixture(autouse=True)
 def configure_test_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    # Isolate the test suite's Mongo database from the "enterprise-idp"
+    # database the docker-compose dev stack (and seed scripts) use by
+    # default. Without this, running pytest against the default
+    # DB_BACKEND=mongo would repeatedly wipe seeded dev data via
+    # clean_backend_state, since tests otherwise share the same local
+    # mongo:7 instance as the dev/seed workflow.
+    monkeypatch.setenv("MONGO_DATABASE_NAME", "enterprise-idp-test")
     monkeypatch.setenv(
         "COSMOS_CONNECTION_STRING",
         f"AccountEndpoint=https://localhost:8081/;AccountKey={COSMOS_EMULATOR_KEY};",
@@ -37,6 +43,13 @@ def configure_test_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None
         f"AccountKey={AZURITE_ACCOUNT_KEY};"
         "QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;",
     )
+    # Same isolation problem as Mongo above, but for blob/queue storage:
+    # tests share the same Azurite account/ports as the docker-compose dev
+    # stack, so clean_backend_state()'s blob/queue clearing would otherwise
+    # delete seeded documents and drain the live worker's job queue. Use a
+    # dedicated container/queue name so tests never touch the dev ones.
+    monkeypatch.setenv("BLOB_CONTAINER_NAME", "documents-test")
+    monkeypatch.setenv("QUEUE_NAME", "jobs-test")
     monkeypatch.setenv("SMTP_HOST", "127.0.0.1")
     monkeypatch.setenv("SMTP_PORT", "1025")
     monkeypatch.setenv("WEB_ORIGIN", "http://localhost:3000")
@@ -59,13 +72,13 @@ def api_client() -> Iterator[TestClient]:
     with TestClient(app) as client:
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
-            fastapi_app.state.cosmos_service,
+            fastapi_app.state.data_store,
             fastapi_app.state.blob_service,
             fastapi_app.state.queue_service,
         )
         yield client
         clean_backend_state(
-            fastapi_app.state.cosmos_service,
+            fastapi_app.state.data_store,
             fastapi_app.state.blob_service,
             fastapi_app.state.queue_service,
         )
@@ -100,43 +113,37 @@ def live_api_client(live_cu_env: dict[str, str]) -> Iterator[TestClient]:
     with TestClient(app) as client:
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
-            fastapi_app.state.cosmos_service,
+            fastapi_app.state.data_store,
             fastapi_app.state.blob_service,
             fastapi_app.state.queue_service,
         )
         yield client
         clean_backend_state(
-            fastapi_app.state.cosmos_service,
+            fastapi_app.state.data_store,
             fastapi_app.state.blob_service,
             fastapi_app.state.queue_service,
         )
 
 
 @pytest.fixture
-def services(api_client: TestClient) -> tuple[CosmosService, BlobService]:
+def services(api_client: TestClient) -> tuple[DataStore, BlobService]:
     fastapi_app = cast(FastAPI, api_client.app)
-    return fastapi_app.state.cosmos_service, fastapi_app.state.blob_service
+    return fastapi_app.state.data_store, fastapi_app.state.blob_service
 
 
 @pytest.fixture
-def live_services(live_api_client: TestClient) -> tuple[CosmosService, BlobService]:
+def live_services(live_api_client: TestClient) -> tuple[DataStore, BlobService]:
     fastapi_app = cast(FastAPI, live_api_client.app)
-    return fastapi_app.state.cosmos_service, fastapi_app.state.blob_service
+    return fastapi_app.state.data_store, fastapi_app.state.blob_service
 
 
-def clean_backend_state(cosmos: CosmosService, blob: BlobService, queue: QueueService) -> None:
+def clean_backend_state(data_store: DataStore, blob: BlobService, queue: QueueService) -> None:
     queue.clear_messages()
 
-    jobs = list(cosmos._jobs.query_items("SELECT c.id, c.processId FROM c", enable_cross_partition_query=True))
-    for job in jobs:
-        cosmos.delete_job(job["processId"], job["id"])
-
-    processes = list(cosmos._processes.query_items("SELECT c.id FROM c", enable_cross_partition_query=True))
-    for process in processes:
-        try:
-            cosmos.delete_process(process["id"])
-        except CosmosResourceNotFoundError:
-            continue
+    for process in data_store.list_processes():
+        for job in data_store.list_jobs_for_process(process.id):
+            data_store.delete_job(process.id, job.id)
+        data_store.delete_process(process.id)
 
     for blob_name in blob.list_blob_names():
         blob.delete_blob(blob_name)

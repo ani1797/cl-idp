@@ -7,7 +7,6 @@ from azure.storage.blob import BlobServiceClient, ContentSettings
 
 from app.config import Settings
 
-DOCUMENTS_CONTAINER = "documents"
 AZURITE_BLOB_API_VERSION = "2023-11-03"
 
 
@@ -20,7 +19,9 @@ class BlobService:
             self.settings.azurite_blob_connection_string,
             api_version=AZURITE_BLOB_API_VERSION,
         )
-        self._container = self._service.get_container_client(DOCUMENTS_CONTAINER)
+        self._container = self._service.get_container_client(
+            self.settings.blob_container_name
+        )
 
     def ensure_container(self) -> None:
         try:

@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2100" viewBox="0 0 3300 2100" role="img" aria-labelledby="title desc">
+<title id="title">Canada Life IDP physical architecture and Azure landing zone</title>
+<desc id="desc">Four-view board showing Azure tenant hierarchy, subscriptions, Canada East production topology, Canada Central disaster recovery, non-production separation, delivery and operations.</desc>
+<rect width="3300" height="2100" fill="#f7f6f4"/>
+<rect x="0" y="0" width="1600" height="1000" fill="#fff" stroke="#a20a29" stroke-width="2"/>
+<text x="40" y="60" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="30" text-anchor="start">
+<tspan x="40" dy="0" font-weight="700">Canada Life IDP — Azure Landing Zone</tspan>
+<tspan x="40" dy="39" font-weight="400">Tenant hierarchy, subscriptions, ownership and inherited guardrails</tspan>
+</text>
+<rect x="40" y="135" width="300" height="600" rx="12" fill="#fff0f1" stroke="#79001a" stroke-width="2"/>
+<text x="65" y="176" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">MICROSOFT ENTRA TENANT</tspan>
+<tspan x="65" dy="20" font-weight="400"> </tspan>
+<tspan x="65" dy="20" font-weight="400">Canada Life tenant root</tspan>
+<tspan x="65" dy="20" font-weight="400"> </tspan>
+<tspan x="65" dy="20" font-weight="400">Identity controls</tspan>
+<tspan x="65" dy="20" font-weight="400">• MFA + Conditional Access</tspan>
+<tspan x="65" dy="20" font-weight="400">• PIM and access reviews</tspan>
+<tspan x="65" dy="20" font-weight="400">• emergency access accounts</tspan>
+<tspan x="65" dy="20" font-weight="400">• workload identity</tspan>
+<tspan x="65" dy="20" font-weight="400">federation</tspan>
+<tspan x="65" dy="20" font-weight="400">• managed identities</tspan>
+<tspan x="65" dy="20" font-weight="400"> </tspan>
+<tspan x="65" dy="20" font-weight="400">Tenant services</tspan>
+<tspan x="65" dy="20" font-weight="400">• Entra groups and app</tspan>
+<tspan x="65" dy="20" font-weight="400">registrations</tspan>
+<tspan x="65" dy="20" font-weight="400">• enterprise PKI/certificat</tspan>
+<tspan x="65" dy="20" font-weight="400">es</tspan>
+<tspan x="65" dy="20" font-weight="400">• Microsoft Purview</tspan>
+<tspan x="65" dy="20" font-weight="400">policies</tspan>
+<tspan x="65" dy="20" font-weight="400">• Defender XDR integration</tspan>
+<tspan x="65" dy="20" font-weight="400"> </tspan>
+<tspan x="65" dy="20" font-weight="400">No standing subscription</tspan>
+<tspan x="65" dy="20" font-weight="400">Owner access; privileged</tspan>
+<tspan x="65" dy="20" font-weight="400">elevation is time-bound and</tspan>
+<tspan x="65" dy="20" font-weight="400">audited.</tspan>
+</text>
+<rect x="380" y="135" width="400" height="600" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="405" y="176" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="start">
+<tspan x="405" dy="0" font-weight="700">MANAGEMENT GROUP HIERARCHY</tspan>
+<tspan x="405" dy="20" font-weight="400"> </tspan>
+<tspan x="405" dy="20" font-weight="400">Tenant Root</tspan>
+<tspan x="405" dy="20" font-weight="400">└─ Canada Life</tspan>
+<tspan x="405" dy="20" font-weight="400">   ├─ Platform</tspan>
+<tspan x="405" dy="20" font-weight="400">   │  ├─ Connectivity</tspan>
+<tspan x="405" dy="20" font-weight="400">   │  ├─ Management &amp; Security</tspan>
+<tspan x="405" dy="20" font-weight="400">   │  └─ Identity (tenant services)</tspan>
+<tspan x="405" dy="20" font-weight="400">   ├─ Landing Zones</tspan>
+<tspan x="405" dy="20" font-weight="400">   │  └─ Corp / Regulated</tspan>
+<tspan x="405" dy="20" font-weight="400">   │     └─ Intelligent Document</tspan>
+<tspan x="405" dy="20" font-weight="400">Processing</tspan>
+<tspan x="405" dy="20" font-weight="400">   ├─ Sandbox</tspan>
+<tspan x="405" dy="20" font-weight="400">   └─ Decommissioned</tspan>
+<tspan x="405" dy="20" font-weight="400"> </tspan>
+<tspan x="405" dy="20" font-weight="400">Policy and RBAC inherit downward.</tspan>
+<tspan x="405" dy="20" font-weight="400"> </tspan>
+<tspan x="405" dy="20" font-weight="400">IDP is classified as a regulated</tspan>
+<tspan x="405" dy="20" font-weight="400">corporate landing zone because it</tspan>
+<tspan x="405" dy="20" font-weight="400">processes PII, PHI and financial</tspan>
+<tspan x="405" dy="20" font-weight="400">records.</tspan>
+</text>
+<rect x="820" y="135" width="735" height="600" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="2"/>
+<text x="845" y="175" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="845" dy="0" font-weight="700">SUBSCRIPTION TOPOLOGY</tspan>
+<tspan x="845" dy="18.45" font-weight="400"> </tspan>
+<tspan x="845" dy="18.45" font-weight="700">PLATFORM — CONNECTIVITY</tspan>
+<tspan x="845" dy="18.45" font-weight="400">cl-plat-connectivity-prd</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• Canada East and Canada Central hub VNets</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• ExpressRoute/VPN, Azure Firewall Premium, Bastion, Private DNS Resolver</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• DDoS Network Protection plan and network monitoring</tspan>
+<tspan x="845" dy="18.45" font-weight="400">Owner: Enterprise Network Services</tspan>
+<tspan x="845" dy="18.45" font-weight="400"> </tspan>
+<tspan x="845" dy="18.45" font-weight="700">PLATFORM — MANAGEMENT &amp; SECURITY</tspan>
+<tspan x="845" dy="18.45" font-weight="400">cl-plat-mgmtsec-prd</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• Log Analytics, Sentinel, Automation, Monitor Private Link Scope</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• central immutable audit storage, Defender plans, policy remediation</tspan>
+<tspan x="845" dy="18.45" font-weight="400">Owner: Cloud Platform + Cyber Defence</tspan>
+<tspan x="845" dy="18.45" font-weight="400"> </tspan>
+<tspan x="845" dy="18.45" font-weight="700">APPLICATION LANDING ZONES</tspan>
+<tspan x="845" dy="18.45" font-weight="400">cl-idp-prod</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• primary and DR workload stamps, production data and integration services</tspan>
+<tspan x="845" dy="18.45" font-weight="400">cl-idp-nonprod</tspan>
+<tspan x="845" dy="18.45" font-weight="400">• development, test and performance environments; no production data</tspan>
+<tspan x="845" dy="18.45" font-weight="400">Owner: Central IT IDP Platform Team</tspan>
+<tspan x="845" dy="18.45" font-weight="400"> </tspan>
+<tspan x="845" dy="18.45" font-weight="400">Optional dedicated subscriptions can be added for exceptionally regulated LOBs</tspan>
+<tspan x="845" dy="18.45" font-weight="400">without changing the platform contracts.</tspan>
+</text>
+<rect x="40" y="780" width="1515" height="165" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="65" y="822" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">INHERITED POLICY INITIATIVES</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">Allowed regions: Canada East / Canada Central • Deny public network access on data services • Require private endpoints and diagnostic settings</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">Require managed identity, TLS 1.2+, approved SKUs, CMK on document/data stores, tags, budgets and resource locks • Defender for Cloud enabled</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">AKS: private cluster, Entra RBAC, Azure Policy, workload identity, network policy, approved registries and signed images • Exceptions require expiry,</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">owner and risk acceptance</tspan>
+</text>
+<rect x="1700" y="0" width="1600" height="1000" fill="#fff" stroke="#0078d4" stroke-width="2"/>
+<text x="1740" y="58" fill="#0078d4" font-family="Arial, Helvetica, sans-serif" font-size="28" text-anchor="start">
+<tspan x="1740" dy="0" font-weight="700">Canada East — Primary Physical Deployment</tspan>
+<tspan x="1740" dy="36.4" font-weight="400">Illustrative addresses; final ranges require Canada Life enterprise IPAM approval</tspan>
+</text>
+<rect x="1740" y="125" width="260" height="620" rx="12" fill="#fff0f1" stroke="#79001a" stroke-width="2"/>
+<text x="1765" y="165" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">ACCESS &amp; INTAKE</tspan>
+<tspan x="1765" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.45" font-weight="400">External / controlled</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">APIs</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Private Application Gateway</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Internal API Management</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">controls</tspan>
+<tspan x="1765" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Employees / internal apps</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Canada Life WAN</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Dual ExpressRoute paths</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Private DNS resolution</tspan>
+<tspan x="1765" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Channels</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Web upload</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">REST APIs</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Event streams</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Enterprise MFT / SFTP</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Shared mailbox connector</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Batch Blob drop</tspan>
+<tspan x="1765" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Identity</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Entra ID tokens</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">mTLS for system callers</tspan>
+<tspan x="1765" dy="18.45" font-weight="400">Tenant and process claims</tspan>
+</text>
+<rect x="2040" y="125" width="285" height="620" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="2065" y="165" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="2065" dy="0" font-weight="700">CONNECTIVITY HUB</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">10.100.0.0/16</tspan>
+<tspan x="2065" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2065" dy="18.3" font-weight="400">GatewaySubnet</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">ExpressRoute gateway</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">VPN backup gateway</tspan>
+<tspan x="2065" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2065" dy="18.3" font-weight="400">AzureFirewallSubnet</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">Azure Firewall Premium</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">central ingress/egress</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">policy</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">TLS inspection by approved</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">policy</tspan>
+<tspan x="2065" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2065" dy="18.3" font-weight="400">AzureBastionSubnet</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">break-glass administration</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">only</tspan>
+<tspan x="2065" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2065" dy="18.3" font-weight="700">DNS</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">Private DNS Resolver</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">inbound/outbound</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">central private DNS zones</tspan>
+<tspan x="2065" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2065" dy="18.3" font-weight="400">Network controls</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">DDoS plan</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">Network Watcher</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">flow logs</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">route tables</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">hub-to-spoke peering</tspan>
+<tspan x="2065" dy="18.3" font-weight="400">no transitive spoke peering</tspan>
+</text>
+<rect x="2365" y="125" width="535" height="620" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="3"/>
+<text x="2390" y="164" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="start">
+<tspan x="2390" dy="0" font-weight="700">IDP PRODUCTION SPOKE VNET — 10.120.0.0/16</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-appgw 10.120.1.0/24</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Application Gateway / internal ingress; end-to-end TLS</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-apim 10.120.2.0/24</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">API Management Premium; internal/private APIs only</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">APIs</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-aks-system 10.120.16.0/20</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Private AKS system node pool; cluster services and ingress</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">controllers</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-aks-workload 10.120.32.0/19</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Web/API pool • elastic worker pool • connector/ingestion pool</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Availability Zones • HPA • cluster autoscaler • pod</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">disruption budgets</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-private-endpoints 10.120.64.0/24</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Private endpoints for Blob, Service Bus, Key</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Vault, ACR, Monitor, Content Understanding and Atlas PrivateLink</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">snet-integration 10.120.65.0/24</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">Private self-hosted integration runtime / managed connectors</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">when required</tspan>
+<tspan x="2390" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2390" dy="16.8" font-weight="400">All non-local egress follows UDR → Azure Firewall. AKS API</tspan>
+<tspan x="2390" dy="16.8" font-weight="400">server is private.</tspan>
+</text>
+<rect x="2940" y="125" width="315" height="620" rx="12" fill="#ebfbee" stroke="#1e7b4d" stroke-width="2"/>
+<text x="2965" y="164" fill="#14532d" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="start">
+<tspan x="2965" dy="0" font-weight="700">REGIONAL / GLOBAL PaaS</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">Storage accounts</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">quarantine, clean, evidence,</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">exchange</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">CMK + lifecycle + Defender scan</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">Service Bus Premium</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">intake/work queues</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">priority lanes, retries, DLQs</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">output topics</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">MongoDB Atlas</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">processes, jobs, reviews, model</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">metadata</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">business-unit collection scoping</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">multi-region replica set cluster</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">Key Vault Premium</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">CMKs, certificates, secrets</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">private access only</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">ACR Premium</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">signed images + geo-replication</tspan>
+<tspan x="2965" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2965" dy="16.8" font-weight="400">Azure AI Content Understanding</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">routing/custom analyzers</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">private endpoint and managed</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">identity</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">Canadian availability remains a</tspan>
+<tspan x="2965" dy="16.8" font-weight="400">launch gate</tspan>
+</text>
+<rect x="1740" y="790" width="1515" height="155" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="1765" y="832" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">PRIMARY DATA PATH</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">Channel → Canada Life private network → internal APIM → quarantine Blob → Defender/DLP release → Service Bus → AKS worker → Content Understanding → Atlas result</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">Quality gate → straight-through delivery or native review queue → API / Service Bus topic / Event Grid / batch exchange → downstream claims and case</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">platforms</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">Every hop uses managed identity or Entra token, private DNS/private endpoint where applicable, tenant/process/correlation context, and centralized</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">telemetry.</tspan>
+</text>
+<rect x="0" y="1100" width="1600" height="1000" fill="#fff" stroke="#b08824" stroke-width="2"/>
+<text x="40" y="1158" fill="#b08824" font-family="Arial, Helvetica, sans-serif" font-size="28" text-anchor="start">
+<tspan x="40" dy="0" font-weight="700">Regional Recovery and Environment Separation</tspan>
+<tspan x="40" dy="36.4" font-weight="400">Canada Central warm standby plus isolated non-production landing zone</tspan>
+</text>
+<rect x="40" y="1230" width="300" height="570" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="65" y="1270" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">CANADA CENTRAL HUB</tspan>
+<tspan x="65" dy="18.45" font-weight="400">10.101.0.0/16</tspan>
+<tspan x="65" dy="18.45" font-weight="400"> </tspan>
+<tspan x="65" dy="18.45" font-weight="400">Same hub pattern as primary</tspan>
+<tspan x="65" dy="18.45" font-weight="400">ExpressRoute/VPN reachability</tspan>
+<tspan x="65" dy="18.45" font-weight="400">Azure Firewall Premium</tspan>
+<tspan x="65" dy="18.45" font-weight="400">Bastion</tspan>
+<tspan x="65" dy="18.45" font-weight="400">Private DNS Resolver</tspan>
+<tspan x="65" dy="18.45" font-weight="400">DDoS plan and diagnostics</tspan>
+<tspan x="65" dy="18.45" font-weight="400"> </tspan>
+<tspan x="65" dy="18.45" font-weight="400">Routes and DNS are</tspan>
+<tspan x="65" dy="18.45" font-weight="400">pre-provisioned and</tspan>
+<tspan x="65" dy="18.45" font-weight="400">continuously validated.</tspan>
+<tspan x="65" dy="18.45" font-weight="400"> </tspan>
+<tspan x="65" dy="18.45" font-weight="400">Firewall policy is centrally</tspan>
+<tspan x="65" dy="18.45" font-weight="400">managed and synchronized,</tspan>
+<tspan x="65" dy="18.45" font-weight="400">with region-specific</tspan>
+<tspan x="65" dy="18.45" font-weight="400">addresses and explicit</tspan>
+<tspan x="65" dy="18.45" font-weight="400">failover rules.</tspan>
+</text>
+<rect x="380" y="1230" width="420" height="570" rx="12" fill="#fff9db" stroke="#b08824" stroke-width="3" stroke-dasharray="12 8"/>
+<text x="405" y="1270" fill="#674c00" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="405" dy="0" font-weight="700">IDP DR SPOKE — 10.121.0.0/16</tspan>
+<tspan x="405" dy="18.45" font-weight="400"> </tspan>
+<tspan x="405" dy="18.45" font-weight="400">Matching subnet plan</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.1.0/24 Application Gateway</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.2.0/24 APIM</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.16.0/20 AKS system</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.32.0/19 AKS workload</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.64.0/24 private endpoints</tspan>
+<tspan x="405" dy="18.45" font-weight="400">10.121.65.0/24 integration</tspan>
+<tspan x="405" dy="18.45" font-weight="400"> </tspan>
+<tspan x="405" dy="18.45" font-weight="400">Warm capacity</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• private AKS system pool online</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• minimal API/worker replicas</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• images available in ACR replica</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• APIM and ingress preconfigured</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• secrets/certificates recoverable</tspan>
+<tspan x="405" dy="18.45" font-weight="400">• dashboards and alerts active</tspan>
+<tspan x="405" dy="18.45" font-weight="400"> </tspan>
+<tspan x="405" dy="18.45" font-weight="400">Scale target is proven by DR load testing,</tspan>
+<tspan x="405" dy="18.45" font-weight="400">not assumed.</tspan>
+</text>
+<rect x="840" y="1230" width="350" height="570" rx="12" fill="#ebfbee" stroke="#1e7b4d" stroke-width="2"/>
+<text x="865" y="1270" fill="#14532d" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="865" dy="0" font-weight="700">DATA PROTECTION</tspan>
+<tspan x="865" dy="18.45" font-weight="400"> </tspan>
+<tspan x="865" dy="18.45" font-weight="400">MongoDB Atlas</tspan>
+<tspan x="865" dy="18.45" font-weight="400">Canada East primary replica set</tspan>
+<tspan x="865" dy="18.45" font-weight="400">Canada Central secondary member</tspan>
+<tspan x="865" dy="18.45" font-weight="400">controlled regional failover</tspan>
+<tspan x="865" dy="18.45" font-weight="400"> </tspan>
+<tspan x="865" dy="18.45" font-weight="400">Blob Storage</tspan>
+<tspan x="865" dy="18.45" font-weight="400">GZRS/RA-GZRS where supported</tspan>
+<tspan x="865" dy="18.45" font-weight="400">last-sync monitoring</tspan>
+<tspan x="865" dy="18.45" font-weight="400">immutable audit replica/backup</tspan>
+<tspan x="865" dy="18.45" font-weight="400"> </tspan>
+<tspan x="865" dy="18.45" font-weight="400">Service Bus</tspan>
+<tspan x="865" dy="18.45" font-weight="400">paired namespace and configuration</tspan>
+<tspan x="865" dy="18.45" font-weight="400">jobs remain durable in Atlas</tspan>
+<tspan x="865" dy="18.45" font-weight="400">reconciliation recreates incomplete</tspan>
+<tspan x="865" dy="18.45" font-weight="400">work</tspan>
+<tspan x="865" dy="18.45" font-weight="400"> </tspan>
+<tspan x="865" dy="18.45" font-weight="400">Key Vault / CMKs</tspan>
+<tspan x="865" dy="18.45" font-weight="400">regional vaults or tested restore</tspan>
+<tspan x="865" dy="18.45" font-weight="400">pattern</tspan>
+<tspan x="865" dy="18.45" font-weight="400">soft delete + purge protection</tspan>
+<tspan x="865" dy="18.45" font-weight="400">separate key custodians</tspan>
+<tspan x="865" dy="18.45" font-weight="400"> </tspan>
+<tspan x="865" dy="18.45" font-weight="400">Backups are isolated, immutable,</tspan>
+<tspan x="865" dy="18.45" font-weight="400">encrypted and restore-tested.</tspan>
+</text>
+<rect x="1230" y="1230" width="325" height="570" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="2"/>
+<text x="1255" y="1270" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="1255" dy="0" font-weight="700">NON-PRODUCTION</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">cl-idp-nonprod</tspan>
+<tspan x="1255" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1255" dy="18.45" font-weight="400">VNet 10.122.0.0/16</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Peered to primary hub with</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">stricter egress controls</tspan>
+<tspan x="1255" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Environments</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Development</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Integration test</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Performance test</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Pre-production validation</tspan>
+<tspan x="1255" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Separate resources</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">AKS, Storage, Service Bus,</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Atlas, Key Vault and Content</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Understanding analyzer estate</tspan>
+<tspan x="1255" dy="18.45" font-weight="400"> </tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Controls</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">No production data</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">Synthetic/de-identified samples</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">lower quotas and budgets</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">same policy baseline</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">promotion through CI/CD only</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">no network path to production</tspan>
+<tspan x="1255" dy="18.45" font-weight="400">data plane</tspan>
+</text>
+<rect x="40" y="1845" width="1515" height="195" rx="12" fill="#f0eee3" stroke="#a20a29" stroke-width="2"/>
+<text x="65" y="1888" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">REGIONAL FAILOVER — PLANNING TARGET RTO 4 HOURS / RPO 15 MINUTES</tspan>
+<tspan x="65" dy="24.3" font-weight="400">Declare and authorize failover → freeze nonessential writes → verify replication point → promote Atlas/Storage and regional integration</tspan>
+<tspan x="65" dy="24.3" font-weight="400">endpoints</tspan>
+<tspan x="65" dy="24.3" font-weight="400">Scale DR AKS and APIM → update private DNS and internal routes → recreate incomplete Service Bus work from durable job state → validate</tspan>
+<tspan x="65" dy="24.3" font-weight="400">downstream delivery</tspan>
+<tspan x="65" dy="24.3" font-weight="400">Quarterly technical failover, annual business continuity exercise, and post-test evidence are mandatory. Failback is a separate controlled</tspan>
+<tspan x="65" dy="24.3" font-weight="400">change.</tspan>
+</text>
+<rect x="1700" y="1100" width="1600" height="1000" fill="#fff" stroke="#006a6a" stroke-width="2"/>
+<text x="1740" y="1158" fill="#006a6a" font-family="Arial, Helvetica, sans-serif" font-size="28" text-anchor="start">
+<tspan x="1740" dy="0" font-weight="700">Entire Solution — Workloads, Delivery, Operations and Ownership</tspan>
+<tspan x="1740" dy="36.4" font-weight="400">How the platform is built, governed, observed and consumed at enterprise scale</tspan>
+</text>
+<rect x="1740" y="1230" width="360" height="565" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="2"/>
+<text x="1765" y="1270" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">AKS WORKLOADS</tspan>
+<tspan x="1765" dy="18.3" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Web console</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Process catalogue and onboarding</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Model training/promotion UI</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Submission portal</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Review queue and adjudication</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">workbench</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">IT administration and FinOps</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">dashboards</tspan>
+<tspan x="1765" dy="18.3" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.3" font-weight="400">FastAPI control plane</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Process/model/job/review APIs</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">authorization and tenant policy</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">canonical result API</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">health and readiness endpoints</tspan>
+<tspan x="1765" dy="18.3" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.3" font-weight="400">Workers</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">quarantine release processor</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">routing/extraction workers</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">review notification workers</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">outbound delivery/reconciliation</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">workers</tspan>
+<tspan x="1765" dy="18.3" font-weight="400">scheduled cleanup and retention jobs</tspan>
+</text>
+<rect x="2140" y="1230" width="360" height="565" rx="12" fill="#fff9db" stroke="#b08824" stroke-width="2"/>
+<text x="2165" y="1270" fill="#674c00" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="2165" dy="0" font-weight="700">ENTERPRISE INTEGRATIONS</tspan>
+<tspan x="2165" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Inbound</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">APIM REST products</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Service Bus/Event Grid subscriptions</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">enterprise MFT/SFTP</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Microsoft Graph shared-mailbox</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">connector</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">governed Blob exchange</tspan>
+<tspan x="2165" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Outbound</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">synchronous canonical result API</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Service Bus topics by domain/LOB</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Event Grid lifecycle events</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">governed batch exchange</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">notifications through approved</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">enterprise communication service</tspan>
+<tspan x="2165" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Consumers</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">claims and case management</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">policy administration</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">payments</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">records management</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">fraud/risk services</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">analytics and reporting</tspan>
+<tspan x="2165" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.3" font-weight="400">Acknowledgement and replay are</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">correlated to the durable job</tspan>
+<tspan x="2165" dy="18.3" font-weight="400">record.</tspan>
+</text>
+<rect x="2540" y="1230" width="350" height="565" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="2565" y="1270" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="2565" dy="0" font-weight="700">DELIVERY PLATFORM</tspan>
+<tspan x="2565" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.3" font-weight="400">GitHub Enterprise</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">protected branches and environments</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">CODEOWNERS and security review</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">OIDC federation; no long-lived</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">Azure secrets</tspan>
+<tspan x="2565" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.3" font-weight="400">Infrastructure</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">Bicep modules for ALZ integration,</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">networks, AKS and PaaS</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">what-if, policy and security</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">scanning</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">separate prod/nonprod deployment</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">identities</tspan>
+<tspan x="2565" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.3" font-weight="400">Application delivery</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">container build and SBOM</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">vulnerability/signature checks</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">ACR Premium</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">GitOps/Flux or controlled Helm</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">deployment</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">progressive rollout and rollback</tspan>
+<tspan x="2565" dy="18.3" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.3" font-weight="400">Model delivery</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">evaluation evidence</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">model builder/approver separation</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">versioned analyzers</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">canary and rollback</tspan>
+<tspan x="2565" dy="18.3" font-weight="400">immutable promotion record</tspan>
+</text>
+<rect x="2930" y="1230" width="325" height="565" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="2955" y="1269" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="start">
+<tspan x="2955" dy="0" font-weight="700">OPERATIONS &amp; ASSURANCE</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Azure Monitor</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Application Insights</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">managed Prometheus/Grafana</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Log Analytics</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">AKS/Firewall/Private Link</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">diagnostics</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Microsoft Sentinel</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">SOC analytics, incidents and</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">automation</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Defender</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Cloud posture, containers, storage</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">malware and vulnerability</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">management</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="400">FinOps</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">budgets, anomaly alerts, per-LOB</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">showback for pages, storage, AI and</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">review</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="400">Records</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">source documents: 90 days</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">extraction/review: 7 years</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">immutable audit: 7 years</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">legal hold override</tspan>
+<tspan x="2955" dy="16.8" font-weight="400"> </tspan>
+<tspan x="2955" dy="16.8" font-weight="700">SRE</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">24x7 alerting for production</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">service catalogue, SLOs, capacity</tspan>
+<tspan x="2955" dy="16.8" font-weight="400">and runbooks</tspan>
+</text>
+<rect x="1740" y="1840" width="1515" height="200" rx="12" fill="#fff0f1" stroke="#a20a29" stroke-width="2"/>
+<text x="1765" y="1882" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">PHYSICAL DESIGN DECISIONS</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">• Shared enterprise landing zone services are separated from the IDP workload subscriptions; production and non-production never share data-plane</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">resources.</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">• No internet-facing application endpoint is deployed. Application ingress, AKS, data stores, keys, registry, monitoring and AI use private connectivity.</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">• Business-unit tenant ID is enforced consistently in identity claims, APIM policy, queue/session metadata, Atlas collections, Blob paths, quotas and</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">chargeback.</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">• CIDRs, SKUs and capacity are planning defaults. Final approval requires enterprise IPAM, dependency quotas, performance tests, threat modelling and DR</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">evidence.</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">• Content Understanding in Canada is a future-state assumption and explicit production launch gate until Microsoft regional availability is verified.</tspan>
+</text>
+</svg>

@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import JobDocument, JobQueueMessage, JobStatus
 from app.storage import BlobService, QueueService
 from app.worker.main import process_next_message
@@ -111,18 +111,18 @@ def test_retry_rejects_non_failed_job(api_client: TestClient) -> None:
     assert response.json()["code"] == "job_not_failed"
 
 
-def backend_services(api_client: TestClient) -> tuple[CosmosService, BlobService, QueueService]:
+def backend_services(api_client: TestClient) -> tuple[DataStore, BlobService, QueueService]:
     app = api_client.app
     assert isinstance(app, FastAPI)
     return (
-        cast(CosmosService, app.state.cosmos_service),
+        cast(DataStore, app.state.data_store),
         cast(BlobService, app.state.blob_service),
         cast(QueueService, app.state.queue_service),
     )
 
 
 def seed_failed_job(
-    cosmos: CosmosService,
+    cosmos: DataStore,
     blob: BlobService,
     process_id: str,
     *,

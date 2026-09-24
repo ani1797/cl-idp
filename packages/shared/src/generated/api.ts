@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Liveness and readiness probe
-         * @description Reports whether the service is up and whether its dependencies (Cosmos DB, Blob/Queue storage, Content Understanding) are reachable. Returns 503 when a required dependency is unavailable.
+         * @description Reports whether the service is up and whether its dependencies (MongoDB Atlas, Blob/Queue storage, Content Understanding) are reachable. Returns 503 when a required dependency is unavailable.
          */
         get: operations["getHealth"];
         put?: never;
@@ -290,7 +290,7 @@ export interface components {
         Health: {
             /** @enum {string} */
             status: "ok" | "degraded";
-            /** @description Per-dependency reachability, keyed by `cosmos`, `blob`, `queue`, `contentUnderstanding`, `smtp`. */
+            /** @description Per-dependency reachability, keyed by `database`, `blob`, `queue`, `contentUnderstanding`, `smtp`. */
             dependencies?: {
                 [key: string]: "ok" | "unavailable";
             };

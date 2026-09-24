@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2100" viewBox="0 0 3300 2100" role="img" aria-labelledby="title desc">
+<title id="title">Canada Life IDP enterprise secure Azure architecture</title>
+<desc id="desc">Four-view architecture board covering physical deployment, security boundaries, document processing, and enterprise operations.</desc>
+<rect width="3300" height="2100" fill="#f7f6f4"/>
+<rect x="0" y="0" width="1600" height="1000" fill="#ffffff" stroke="#a20a29" stroke-width="2"/>
+<text x="40" y="58" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="28" text-anchor="start">
+<tspan x="40" dy="0" font-weight="700">Canada Life IDP — Enterprise Secure Azure Platform</tspan>
+<tspan x="40" dy="36.4" font-weight="400">Canada East primary | Canada Central warm DR | Shared platform by business unit | RTO 4h</tspan>
+<tspan x="40" dy="36.4" font-weight="400">/ RPO 15m</tspan>
+</text>
+<rect x="40" y="140" width="300" height="600" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="65" y="184" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="19" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">ENTERPRISE CHANNELS</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400"> </tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Employees and reviewers</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Application REST APIs</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Event streams</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">SFTP / managed transfer</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Shared mailboxes</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Batch Blob drops</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400"> </tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">ZERO-TRUST EDGE</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400"> </tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Private Application</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="700">Gateway + APIM</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">DDoS Protection</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">API Management Premium</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">OAuth2 / mTLS / quotas</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Microsoft Entra ID</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">SSO, MFA, Conditional</tspan>
+<tspan x="65" dy="25.650000000000002" font-weight="400">Access, PIM</tspan>
+</text>
+<rect x="385" y="140" width="740" height="600" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="3"/>
+<text x="415" y="184" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="19" text-anchor="start">
+<tspan x="415" dy="0" font-weight="700">PRIMARY REGION — CANADA EAST</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Private hub-spoke VNet | Azure Firewall | Private DNS | Private</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Endpoints</tspan>
+<tspan x="415" dy="24.7" font-weight="400"> </tspan>
+<tspan x="415" dy="24.7" font-weight="700">PRIVATE AKS PLATFORM</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Next.js enterprise console • FastAPI control plane • elastic</tspan>
+<tspan x="415" dy="24.7" font-weight="400">document workers</tspan>
+<tspan x="415" dy="24.7" font-weight="400">connector services • native line-of-business review queues •</tspan>
+<tspan x="415" dy="24.7" font-weight="400">model promotion controller</tspan>
+<tspan x="415" dy="24.7" font-weight="400"> </tspan>
+<tspan x="415" dy="24.7" font-weight="700">DATA AND MESSAGING</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Blob Storage: quarantine → clean → evidence; source documents</tspan>
+<tspan x="415" dy="24.7" font-weight="400">retained 90 days</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Service Bus Premium: intake, work, priority, retry, DLQ and</tspan>
+<tspan x="415" dy="24.7" font-weight="400">output topics</tspan>
+<tspan x="415" dy="24.7" font-weight="400">MongoDB Atlas: tenant, process, job, extraction and review metadata</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Event Grid: lifecycle and integration events</tspan>
+<tspan x="415" dy="24.7" font-weight="400"> </tspan>
+<tspan x="415" dy="24.7" font-weight="700">AI PROCESSING</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Azure AI Content Understanding: routing and custom analyzers</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Managed identity + private endpoint + customer-managed key</tspan>
+<tspan x="415" dy="24.7" font-weight="400">where supported</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Production launch gate: Canadian regional availability</tspan>
+<tspan x="415" dy="24.7" font-weight="400"> </tspan>
+<tspan x="415" dy="24.7" font-weight="700">OUTPUTS</tspan>
+<tspan x="415" dy="24.7" font-weight="400">Synchronous APIs • Service Bus topics • Event Grid events •</tspan>
+<tspan x="415" dy="24.7" font-weight="400">governed batch files</tspan>
+</text>
+<rect x="1170" y="140" width="385" height="600" rx="12" fill="#fff9db" stroke="#b08824" stroke-width="3" stroke-dasharray="12 8"/>
+<text x="1195" y="183" fill="#674c00" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="1195" dy="0" font-weight="700">WARM DR — CANADA CENTRAL</tspan>
+<tspan x="1195" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Scaled-down private AKS</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Pre-provisioned network and APIM</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">ACR geo-replica</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Atlas multi-region replica set</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Blob geo-replication</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Paired Service Bus namespace</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Key Vault and CMK recovery</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Regional monitoring</tspan>
+<tspan x="1195" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1195" dy="23.76" font-weight="700">FAILOVER RUNBOOK</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">1. Declare incident</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">2. Promote regional data services</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">3. Scale AKS API and workers</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">4. Shift private DNS/routes</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">5. Validate identity and</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">integrations</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">6. Reconcile queued work</tspan>
+<tspan x="1195" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Quarterly failover exercise</tspan>
+<tspan x="1195" dy="23.76" font-weight="400">Annual business continuity test</tspan>
+</text>
+<rect x="40" y="785" width="1515" height="155" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="65" y="827" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="start">
+<tspan x="65" dy="0" font-weight="700">ENTERPRISE GUARDRAILS</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">Separate subscriptions: Connectivity | Security/Management | Production | Non-production     • Azure Policy + Defender for Cloud</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">Key Vault Premium / HSM-backed CMKs for document and data stores     • Azure Monitor, Application Insights, Log Analytics and Sentinel</tspan>
+<tspan x="65" dy="22.950000000000003" font-weight="400">Immutable Blob WORM audit: 7 years     • GitHub Actions + ACR + signed images + Bicep     • Business-unit RBAC, quotas, partitioning and chargeback</tspan>
+</text>
+<rect x="1700" y="0" width="1600" height="1000" fill="#ffffff" stroke="#006a6a" stroke-width="2"/>
+<text x="1740" y="60" fill="#006a6a" font-family="Arial, Helvetica, sans-serif" font-size="30" text-anchor="start">
+<tspan x="1740" dy="0" font-weight="700">Security Architecture — Explicit Trust Boundaries</tspan>
+</text>
+<rect x="1740" y="115" width="350" height="650" rx="12" fill="#fff0f1" stroke="#79001a" stroke-width="2"/>
+<text x="1765" y="158" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">IDENTITY AND INGRESS</tspan>
+<tspan x="1765" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Entra ID + MFA + Conditional</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Access</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">PIM, access reviews and</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">separation of duties</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Managed identities and</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">workload identity federation</tspan>
+<tspan x="1765" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Explicit roles</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Platform operator</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Security auditor</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Model builder / approver</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Process owner</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Reviewer / adjudicator</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Integration service</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Read-only auditor</tspan>
+<tspan x="1765" dy="23.76" font-weight="400"> </tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Private App Gateway + APIM</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">APIM OAuth2 / mTLS / rate</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">limits</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">Business-unit tenant context</tspan>
+<tspan x="1765" dy="23.76" font-weight="400">required</tspan>
+</text>
+<rect x="2140" y="115" width="520" height="650" rx="12" fill="#fff9db" stroke="#b08824" stroke-width="2"/>
+<text x="2165" y="158" fill="#674c00" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="2165" dy="0" font-weight="700">QUARANTINE AND PRIVATE WORKLOAD ZONE</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400"> </tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">No document reaches processing before release:</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">1. Extension, MIME, size and page validation</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">2. Write-once quarantine Blob</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">3. Defender malware scan</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">4. DLP and data classification policy</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">5. Reject, isolate or release clean object</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400"> </tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Private AKS controls</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Private API server and internal ingress</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Separate API, worker and connector node pools</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Entra RBAC + Kubernetes network policies</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Pod security and signed-image admission policy</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Restricted egress through Azure Firewall</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Secrets delivered from Key Vault CSI</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400"> </tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">Every request, queue message and storage</tspan>
+<tspan x="2165" dy="23.400000000000002" font-weight="400">operation carries tenant + process context.</tspan>
+</text>
+<rect x="2710" y="115" width="545" height="650" rx="12" fill="#ebfbee" stroke="#1e7b4d" stroke-width="2"/>
+<text x="2735" y="158" fill="#14532d" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="2735" dy="0" font-weight="700">PRIVATE DATA, AI AND EVIDENCE ZONE</tspan>
+<tspan x="2735" dy="23.04" font-weight="400"> </tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Private Endpoints only; public access disabled</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Private DNS; TLS in transit; deny-by-default</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">firewalls</tspan>
+<tspan x="2735" dy="23.04" font-weight="400"> </tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Blob Storage</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Business-unit/process prefixes and scoped</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">identities</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">90-day source retention; legal hold overrides</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">deletion</tspan>
+<tspan x="2735" dy="23.04" font-weight="400"> </tspan>
+<tspan x="2735" dy="23.04" font-weight="400">MongoDB Atlas</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Business-unit collection scoping and mandatory</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">authorization filter</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Extraction/review records retained 7 years</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Version-field concurrency, change history and</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">soft-delete workflow</tspan>
+<tspan x="2735" dy="23.04" font-weight="400"> </tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Content Understanding</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">analyzeBinary from clean object bytes</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">separate dev/test/prod analyzer resources</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">managed identity and least-privilege RBAC</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Canadian availability is a production gate</tspan>
+<tspan x="2735" dy="23.04" font-weight="400"> </tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Immutable Blob WORM</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">Security, admin, model promotion and</tspan>
+<tspan x="2735" dy="23.04" font-weight="400">reviewer-decision evidence retained 7 years</tspan>
+</text>
+<rect x="1740" y="810" width="1515" height="135" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="1765" y="852" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">DETECTION, RESPONSE AND PRIVACY</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">Azure Monitor + Application Insights + Log Analytics → Microsoft Sentinel / SOC     • Defender for Cloud and Defender for Storage</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">No document content or extracted values in logs     • Correlation IDs, field names, confidence, status and actor IDs only     • CMK for document/data</tspan>
+<tspan x="1765" dy="22.950000000000003" font-weight="400">stores; platform-managed keys elsewhere</tspan>
+</text>
+<rect x="0" y="1100" width="1600" height="1000" fill="#ffffff" stroke="#0078d4" stroke-width="2"/>
+<text x="40" y="1160" fill="#0078d4" font-family="Arial, Helvetica, sans-serif" font-size="30" text-anchor="start">
+<tspan x="40" dy="0" font-weight="700">Document Journey — Secure, Elastic and Auditable</tspan>
+</text>
+<rect x="40" y="1210" width="480" height="610" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="70" y="1256" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="start">
+<tspan x="70" dy="0" font-weight="700">1  INTAKE</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Web / API / event / SFTP / mailbox / Blob</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Authenticate caller; resolve business unit and</tspan>
+<tspan x="70" dy="20.48" font-weight="400">process</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Create idempotency key and correlation ID</tspan>
+<tspan x="70" dy="20.48" font-weight="400"> </tspan>
+<tspan x="70" dy="20.48" font-weight="700">2  QUARANTINE</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Validate file; store write-once; malware scan;</tspan>
+<tspan x="70" dy="20.48" font-weight="400">DLP/classify</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Reject or release a clean immutable source</tspan>
+<tspan x="70" dy="20.48" font-weight="400">object</tspan>
+<tspan x="70" dy="20.48" font-weight="400"> </tspan>
+<tspan x="70" dy="20.48" font-weight="700">3  ORCHESTRATE</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Persist job; enqueue Service Bus message</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Apply tenant quota, priority and SLA class</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Autoscale workers from queue depth and</tspan>
+<tspan x="70" dy="20.48" font-weight="400">oldest-message age</tspan>
+<tspan x="70" dy="20.48" font-weight="400">Retry transient failures; poison messages move</tspan>
+<tspan x="70" dy="20.48" font-weight="400">to DLQ</tspan>
+</text>
+<rect x="560" y="1210" width="480" height="610" rx="12" fill="#fff0f1" stroke="#79001a" stroke-width="2"/>
+<text x="590" y="1256" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="start">
+<tspan x="590" dy="0" font-weight="700">4  UNDERSTAND</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Stream clean Blob bytes to Content</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Understanding</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Routing analyzer classifies to the approved</tspan>
+<tspan x="590" dy="20.48" font-weight="400">form model</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Extract recursive typed fields, source</tspan>
+<tspan x="590" dy="20.48" font-weight="400">coordinates and confidence</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Record analyzer and policy version on the job</tspan>
+<tspan x="590" dy="20.48" font-weight="400"> </tspan>
+<tspan x="590" dy="20.48" font-weight="700">5  QUALITY GATE</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Evaluate confidence threshold, completeness</tspan>
+<tspan x="590" dy="20.48" font-weight="400">and business rules</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Unclassified documents are valid exception</tspan>
+<tspan x="590" dy="20.48" font-weight="400">outcomes</tspan>
+<tspan x="590" dy="20.48" font-weight="400">High-confidence results continue automatically</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Low-confidence or policy exceptions enter</tspan>
+<tspan x="590" dy="20.48" font-weight="400">review</tspan>
+<tspan x="590" dy="20.48" font-weight="400"> </tspan>
+<tspan x="590" dy="20.48" font-weight="700">6  HUMAN REVIEW</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Line-of-business skill queue with SLA and</tspan>
+<tspan x="590" dy="20.48" font-weight="400">priority routing</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Side-by-side document evidence and extracted</tspan>
+<tspan x="590" dy="20.48" font-weight="400">values</tspan>
+<tspan x="590" dy="20.48" font-weight="400">Approve, correct or escalate; preserve</tspan>
+<tspan x="590" dy="20.48" font-weight="400">original and reviewer attribution</tspan>
+</text>
+<rect x="1080" y="1210" width="475" height="610" rx="12" fill="#ebfbee" stroke="#1e7b4d" stroke-width="2"/>
+<text x="1110" y="1256" fill="#14532d" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="start">
+<tspan x="1110" dy="0" font-weight="700">7  DELIVER</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Publish canonical validated result by:</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">• synchronous API</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">• Service Bus topic</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">• Event Grid event</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">• governed batch file</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Capture downstream acknowledgement and</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">reconcile failures</tspan>
+<tspan x="1110" dy="20.48" font-weight="400"> </tspan>
+<tspan x="1110" dy="20.48" font-weight="700">EVERY STEP IS AUDITABLE</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Correlation ID + tenant + process + model +</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">policy + actor + time</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Operational state in MongoDB Atlas</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Source and evidence in Blob Storage</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Security/admin/model/review evidence in</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">immutable Blob WORM</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Telemetry in Azure Monitor and Sentinel</tspan>
+<tspan x="1110" dy="20.48" font-weight="400"> </tspan>
+<tspan x="1110" dy="20.48" font-weight="700">DELIVERY SEMANTICS</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">At-least-once messaging</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Idempotent consumers</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Replay by correlation ID</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">Back-pressure protects AI and downstream</tspan>
+<tspan x="1110" dy="20.48" font-weight="400">systems</tspan>
+</text>
+<rect x="40" y="1860" width="1515" height="180" rx="12" fill="#f0eee3" stroke="#36362f" stroke-width="2"/>
+<text x="70" y="1909" fill="#36362f" font-family="Arial, Helvetica, sans-serif" font-size="19" text-anchor="start">
+<tspan x="70" dy="0" font-weight="700">PLATFORM SCALE PRINCIPLE</tspan>
+<tspan x="70" dy="25.650000000000002" font-weight="400">The API tier stays responsive because document work is asynchronous. Service Bus absorbs enterprise bursts; independently scalable AKS</tspan>
+<tspan x="70" dy="25.650000000000002" font-weight="400">workers consume at the rate allowed by AI quotas and downstream capacity. Per-business-unit quotas, priorities, cost budgets and</tspan>
+<tspan x="70" dy="25.650000000000002" font-weight="400">dead-letter handling prevent one workload from starving the enterprise platform.</tspan>
+</text>
+<rect x="1700" y="1100" width="1600" height="1000" fill="#ffffff" stroke="#b08824" stroke-width="2"/>
+<text x="1740" y="1160" fill="#b08824" font-family="Arial, Helvetica, sans-serif" font-size="30" text-anchor="start">
+<tspan x="1740" dy="0" font-weight="700">Operate as an Enterprise Platform</tspan>
+</text>
+<rect x="1740" y="1210" width="360" height="560" rx="12" fill="#fff0f1" stroke="#79001a" stroke-width="2"/>
+<text x="1765" y="1250" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="1765" dy="0" font-weight="700">CENTRAL IT PLATFORM TEAM</tspan>
+<tspan x="1765" dy="18.75" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.75" font-weight="400">Owns landing zones, networking,</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">platform roadmap, SRE, incident</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">management, security patching,</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">connector catalogue, APIs and SLOs.</tspan>
+<tspan x="1765" dy="18.75" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.75" font-weight="400">Delegates by business unit:</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">process ownership</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">model building</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">review queues</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">quota consumption</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">data classification and retention</tspan>
+<tspan x="1765" dy="18.75" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.75" font-weight="400">Showback / chargeback by tenant,</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">pages, model and environment.</tspan>
+<tspan x="1765" dy="18.75" font-weight="400"> </tspan>
+<tspan x="1765" dy="18.75" font-weight="400">Runbooks, service catalogue, support</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">tiers and change windows are</tspan>
+<tspan x="1765" dy="18.75" font-weight="400">platform products.</tspan>
+</text>
+<rect x="2140" y="1210" width="360" height="560" rx="12" fill="#e6fcf5" stroke="#006a6a" stroke-width="2"/>
+<text x="2165" y="1250" fill="#004f4f" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="2165" dy="0" font-weight="700">GOVERNED MODEL LIFECYCLE</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="700">BUILD</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Curated samples, labeling and</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">analyzer configuration</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="700">EVALUATE</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Accuracy, confidence, bias, cost,</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">latency and security tests</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="700">APPROVE</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Model approver + process owner;</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">immutable evidence</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="700">PROMOTE</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Dev → Test → Prod with versioned</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">analyzer IDs</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="700">OPERATE</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Drift monitoring, canary, rollback</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">and retirement</tspan>
+<tspan x="2165" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2165" dy="18.75" font-weight="400">Every job records model and policy</tspan>
+<tspan x="2165" dy="18.75" font-weight="400">versions for reproducibility.</tspan>
+</text>
+<rect x="2540" y="1210" width="360" height="560" rx="12" fill="#fff9db" stroke="#b08824" stroke-width="2"/>
+<text x="2565" y="1250" fill="#674c00" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start">
+<tspan x="2565" dy="0" font-weight="700">RELIABILITY ENGINEERING</tspan>
+<tspan x="2565" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Within region</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Availability Zones</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Pod disruption budgets</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">HPA + cluster autoscaler</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Zone-redundant PaaS</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Queue back-pressure</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Circuit breakers and bulkheads</tspan>
+<tspan x="2565" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Regional DR</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Canada Central warm standby</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">RTO 4 hours</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">RPO 15 minutes</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Quarterly failover exercise</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Annual full continuity test</tspan>
+<tspan x="2565" dy="18.75" font-weight="400"> </tspan>
+<tspan x="2565" dy="18.75" font-weight="400">Backups are isolated, encrypted,</tspan>
+<tspan x="2565" dy="18.75" font-weight="400">immutable and restore-tested.</tspan>
+</text>
+<rect x="2940" y="1210" width="315" height="560" rx="12" fill="#eef7ff" stroke="#0078d4" stroke-width="2" stroke-dasharray="12 8"/>
+<text x="2965" y="1249" fill="#004578" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="start">
+<tspan x="2965" dy="0" font-weight="700">SIZING ASSUMPTIONS — VALIDATE</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">No volume target supplied.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Design uses elastic workers</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">driven by queue depth,</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">oldest-message age and AI quotas.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Separate interactive and batch</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">priorities.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Per-business-unit quotas and</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">budget alerts.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Back-pressure protects AI and</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">downstream systems.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Load test with real page mix and</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">peak arrival profile.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Reserve DR capacity.</tspan>
+<tspan x="2965" dy="17.5" font-weight="400"> </tspan>
+<tspan x="2965" dy="17.5" font-weight="400">Planning SLO: 99.95%, excluding</tspan>
+<tspan x="2965" dy="17.5" font-weight="400">declared AI service constraints.</tspan>
+</text>
+<rect x="1740" y="1815" width="1515" height="225" rx="12" fill="#f0eee3" stroke="#a20a29" stroke-width="3"/>
+<text x="1770" y="1863" fill="#79001a" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="start">
+<tspan x="1770" dy="0" font-weight="700">KEY DECISIONS</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">1. One shared platform, isolated logically by business unit; authorization, partition keys, storage paths, quotas and chargeback use the same</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">tenant ID.</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">2. Asynchronous document processing is the default; Service Bus absorbs bursts and independently scalable workers protect the API tier.</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">3. Human review is a first-class capability with LOB queues, skill/SLA routing and immutable reviewer attribution.</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">4. Persistent business data stays in Canadian regions. Production use of Content Understanding is gated on Canadian regional availability.</tspan>
+<tspan x="1770" dy="24.3" font-weight="400">5. Production, non-production, connectivity and security/management are separated into enterprise subscriptions.</tspan>
+</text>
+</svg>

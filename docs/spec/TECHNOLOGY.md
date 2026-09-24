@@ -16,7 +16,8 @@ see [Azure AI Content Understanding](#azure-ai-content-understanding) below.
   - `apps/api` — FastAPI backend
   - `packages/shared` — shared types/contracts (e.g., generated OpenAPI
     client, common TS/py models) where useful
-  - `infra/` — Bicep IaC (added when productionizing)
+  - `infra/` — Bicep IaC (deployed; see [Azure Production
+    Architecture](#azure-production-architecture))
   - `docs/spec/` — this spec
 
 ## Backend
@@ -88,9 +89,33 @@ implementation rather than trailing it.
 
 ## Data Storage
 
-- **Database**: **Azure Cosmos DB Emulator** locally → **Azure Cosmos DB** in
-  production. Stores business process configuration (name, description,
-  allowed analyzers, confidence threshold, owner email) and job/review records.
+- **Database**: **MongoDB `mongo:7` community image** locally → **Azure
+  Cosmos DB for MongoDB (RU-based API)** in production. Stores business
+  process configuration (name, description, allowed analyzers, confidence
+  threshold, owner email) and job/review records. Chosen over MongoDB Atlas
+  because Atlas is a third-party SaaS marketplace product outside ARM/Bicep
+  — it cannot be declared as IaC in this repo's `infra/` — while Cosmos DB
+  for MongoDB is a native Azure resource that is wire-compatible with the
+  **same `pymongo`/`mongodb://` code path** (`DB_BACKEND=mongo`) already
+  used against the local `mongo:7` container. Only the connection
+  string/TLS settings change between dev and prod; no application code
+  branches on "which Mongo".
+- **Backend abstraction**: a `DataStore` protocol (`app/db/base.py`)
+  decouples routers/worker from the concrete database, with `MongoService`
+  as the default implementation. **Azure Cosmos DB for NoSQL** remains
+  available as a config-selectable fallback (`CosmosService`, same
+  protocol) via the `DB_BACKEND=mongo|cosmos` setting, in case a deployment
+  specifically wants the NoSQL API instead — both implementations are
+  exercised by an identical backend-agnostic contract test suite
+  (`tests/test_datastore_contract.py`) so they stay behaviorally
+  equivalent.
+- **Auth caveat**: unlike the Cosmos NoSQL API, Cosmos DB for MongoDB (RU)
+  does not support Microsoft Entra ID data-plane authentication — access is
+  by connection string/primary key only. The connection string is written
+  to Key Vault as a secret at deployment time and read by the API/worker via
+  App Service/Function App Key Vault references (resolved using their
+  managed identity's `Key Vault Secrets User` role) — see [RBAC
+  Permissions](#rbac-permissions) below.
 - **File/blob storage**: **Azurite** (Azure Storage emulator) locally →
   **Azure Blob Storage** in production. Stores uploaded documents (PDF,
   PNG, JPG, TIFF).
@@ -100,7 +125,10 @@ implementation rather than trailing it.
 
 Using Azurite for both blob and queue storage means the backend talks to the
 same Azure Storage SDK/API in dev and prod — only the connection
-string/endpoint changes.
+string/endpoint changes. MongoDB uses the same driver (**pymongo**) and
+`mongodb://` connection string protocol against the local container and
+Atlas — only the connection string (and TLS/auth settings) changes between
+environments.
 
 ## Email Notifications
 
@@ -159,15 +187,16 @@ have no keyboard-equivalent story for the overlay interaction.
 
 ## Local Development Environment
 
-- **Docker Compose** — spins up local dependencies: Cosmos DB Emulator,
-  Azurite (blob + queue), Mailpit.
+- **Docker Compose** — spins up local dependencies: MongoDB (`mongo:7`),
+  Azurite (blob + queue), Mailpit. The Cosmos DB Emulator is also available
+  in the compose file for exercising the `DB_BACKEND=cosmos` fallback path.
 - **Azure AI Content Understanding is *not* containerizable** — a real Azure
   CU resource and credentials are a prerequisite for running the pipeline
   locally.
 - **`.env` files** — local configuration and connection strings/keys
   (never committed; `.env.example` provided as a template, covering storage
-  and Cosmos connection strings, SMTP settings, `WEB_ORIGIN`, and the CU
-  endpoint/credential settings).
+  and MongoDB/Cosmos connection strings, SMTP settings, `WEB_ORIGIN`, and
+  the CU endpoint/credential settings).
 - **`.devcontainer`** — VS Code/Codespaces devcontainer definition so a
   contributor can get a fully working environment (uv, Python, Node, Docker
   access) with a single "Reopen in Container."
@@ -234,33 +263,110 @@ There is no verbose payload-logging mode to accidentally leave enabled.
 
 ## Infrastructure as Code
 
-- **Bicep** — Azure-native IaC, added when standing up the production
-  environment. Deferred until the demo needs a real Azure deployment, but
-  the choice is fixed now so infra work follows Azure conventions
-  consistently.
+- **Bicep** — Azure-native IaC, in [`infra/`](../../infra/). Deployed as a
+  single **subscription-scope** template (`infra/main.bicep`) that creates
+  its own resource group and every resource inside it — see [Azure
+  Production Architecture](#azure-production-architecture) below.
 
 ## Deployment Target (Production)
 
-- **Azure Kubernetes Service (AKS)** — chosen as the eventual production
-  target for expandability (multiple services, scaling pipeline workers
-  independently from the API/web tiers). Local dev does not require
-  Kubernetes; Docker Compose is sufficient until a production deployment is
-  needed.
+- **Azure App Service (Linux) for both web and API tiers, Azure Functions
+  for the worker** — chosen over Azure Kubernetes Service for this scale of
+  system: three independently-scaling components (web, API, worker) map
+  cleanly onto two App Service plans plus one Function App, with no
+  cluster/control-plane to operate, patch, or pay for. AKS remains the right
+  choice if the system grows into many more independently-versioned
+  services; that migration is deferred until the demo needs it. Local dev
+  does not require any of this — Docker Compose is sufficient.
+- See [Azure Production Architecture](#azure-production-architecture) for
+  the full compute/API-hosting rationale.
+
+## Azure Production Architecture
+
+The system deploys as three independently-scaling compute tiers plus shared
+data/AI resources, all inside **one self-contained resource group**
+(`infra/main.bicep` is a subscription-scope template that creates the
+resource group itself — no dependency on any other resource group). See
+[`infra/README.md`](../../infra/README.md) for the deploy command and
+region/governance notes, and the [architecture
+diagram](../architecture/canada-life-idp-azure-production-topology.md)
+(rendered [SVG](../architecture/canada-life-idp-azure-production-topology.svg),
+editable
+[`.excalidraw`](../architecture/canada-life-idp-azure-production-topology.excalidraw))
+for the visual resource-group layout.
+
+### Compute topology
+
+| Tier | Azure service | Why |
+|---|---|---|
+| **web** (Next.js) | **App Service** (Linux, Node 20) | Requirement. Standard hosting for a Next.js SSR app; independent App Service plan so it scales separately from the API. |
+| **api** (FastAPI trigger/query API) | **App Service** (Linux, Python 3.12) | *This document's API hosting choice.* FastAPI's trigger endpoint and job-polling endpoints are long-lived HTTP request/response traffic with no natural per-message unit of work — a better fit for an always-on App Service than for a Functions HTTP trigger (which optimizes for short, bursty, per-invocation billing). App Service also gives the API the same hosting model and deployment mechanics (zip/container deploy, deployment slots, VNet integration path) as the web tier, keeping the two HTTP-facing components operationally uniform. Azure Container Apps was considered and rejected for now — it adds a revisions/ingress model this system doesn't yet need at this scale; it remains the natural next step if the API needs to scale to zero or run multiple container-based services. |
+| **worker** (pipeline worker) | **Function App** (Linux, Python 3.12, Consumption) | Requirement. The worker is a pure queue consumer (`apps/api/app/worker/main.py`'s loop becomes a queue-triggered function bound to the `jobs` Storage Queue) — exactly the event-driven, scale-with-queue-depth shape Azure Functions is built for. It scales independently of, and fails independently from, the API that enqueues work. |
+
+### Data / AI resources (shared by all three compute tiers)
+
+| Resource | Purpose |
+|---|---|
+| **Azure Cosmos DB for MongoDB (RU API)** | Production database — see [Data Storage](#data-storage). |
+| **Storage account** | `documents` blob container (uploaded files) + `jobs` queue (async job dispatch) + Function App content storage. |
+| **Azure AI Foundry** (`AIServices` account + project + `gpt-4.1-mini` deployment) | Content Understanding — see [Azure AI Content Understanding](#azure-ai-content-understanding). Provisioned inside this resource group so the whole stack is independently deployable. |
+| **Key Vault** (RBAC-authorized, no access policies) | Holds the Cosmos Mongo connection string; App Service/Function App read it via Key Vault references. |
+| **Log Analytics + Application Insights** | Centralized logs/traces/metrics for all three compute tiers — see [Observability](#observability). |
+
+### Region note
+
+App Service Plan and Function App Consumption Plan quota is not guaranteed
+in every region/subscription (this deployment's subscription had zero quota
+in `eastus2` and needed `canadaeast`). `infra/main.bicep` exposes `location`
+(data/AI resources) and `computeLocation` (App Service/Function App +
+their co-located storage) as separate parameters for exactly this reason —
+both still deploy into the one resource group.
+
+## RBAC Permissions
+
+Every compute identity is a **system-assigned managed identity** with the
+minimum Azure RBAC roles it needs — no shared credentials, no
+subscription-level Contributor grants, and (per [Data
+Storage](#data-storage)) the Content Understanding account has
+`disableLocalAuth: true`, so RBAC is the *only* way to call it (no API-key
+fallback in production).
+
+| From (identity) | Role | On (scope) | Why |
+|---|---|---|---|
+| **api** App Service | `Storage Blob Data Contributor` | Storage account | Writes uploaded documents to the `documents` container; the document-passthrough route reads them back. |
+| **api** App Service | `Storage Queue Data Contributor` | Storage account | Enqueues a message per triggered job onto the `jobs` queue. |
+| **api** App Service | `Key Vault Secrets User` | Key Vault | Resolves the Cosmos Mongo connection string via a Key Vault reference (`MONGO_URI` app setting). |
+| **api** App Service | `Cognitive Services User` | AI Foundry account | Calls Content Understanding to analyze documents synchronously where applicable and to list available analyzers. |
+| **worker** Function App | `Storage Blob Data Contributor` | Storage account | Reads the uploaded document from the `documents` container to submit for analysis. |
+| **worker** Function App | `Storage Queue Data Contributor` | Storage account | Consumes (dequeues/deletes) messages from the `jobs` queue — this is also the Function App's queue *trigger* binding. |
+| **worker** Function App | `Key Vault Secrets User` | Key Vault | Resolves the Cosmos Mongo connection string to persist job/review records. |
+| **worker** Function App | `Cognitive Services User` | AI Foundry account | Submits documents to Content Understanding and polls for results — the actual pipeline call. |
+| **web** App Service | `Key Vault Secrets User` | Key Vault | Reserved for future secrets (e.g. auth provider config) — the web tier has no direct Azure data-plane access today; it calls the API over HTTPS, never Azure resources directly. |
+| *(none)* | — | — | Nothing is granted `Contributor`/`Owner` on the resource group; all access is scoped to the single resource each identity needs, at the resource level. |
+
+Deployment-time role assignments (Bicep `modules/rbac-local.bicep` and
+`modules/rbac-cognitive-services.bicep`) are made by whichever principal
+runs `az deployment sub create` — that principal needs `Owner` or `User
+Access Administrator` at the subscription/resource-group scope for the
+duration of the deploy, but that is a one-time IaC-operator grant, not a
+permission any application component holds at runtime.
 
 ## Dev → Prod Mapping Summary
 
 | Concern            | Local Dev                          | Production                              |
 |---------------------|-------------------------------------|------------------------------------------|
-| Database            | Cosmos DB Emulator                  | Azure Cosmos DB                          |
+| Database            | MongoDB (`mongo:7`, Cosmos Emulator fallback) | Azure Cosmos DB for MongoDB (RU API)     |
 | File storage        | Azurite (Blob)                      | Azure Blob Storage                       |
 | Job queue           | Azurite (Queue)                     | Azure Storage Queue                      |
-| Content Understanding | **Real Azure CU (no emulator)**   | Real Azure CU                            |
-| CU credential       | `az login` / DefaultAzureCredential | Managed identity                         |
+| Content Understanding | **Real Azure CU (no emulator)**   | Real Azure CU (Foundry account in the same resource group) |
+| CU credential       | `az login` / DefaultAzureCredential | Managed identity + RBAC (`disableLocalAuth: true`, no API key) |
 | Email               | Mailpit (SMTP catcher)              | Azure Communication Services / SendGrid  |
 | Auth                | None (any user)                     | None (or Entra ID if introduced later)   |
-| Compute             | Docker Compose                      | Azure Kubernetes Service (AKS)           |
+| Web compute         | Docker Compose                      | Azure App Service (Linux, Node)          |
+| API compute         | Docker Compose                      | Azure App Service (Linux, Python)        |
+| Worker compute       | Docker Compose                      | Azure Function App (Linux, Python, queue-triggered) |
 | Observability       | OpenTelemetry → console             | OpenTelemetry → Azure Monitor            |
-| IaC                 | N/A                                  | Bicep                                    |
+| IaC                 | N/A                                  | Bicep (`infra/`)                         |
 
 ## Status
 

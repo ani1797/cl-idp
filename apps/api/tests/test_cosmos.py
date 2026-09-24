@@ -64,7 +64,7 @@ def test_should_downgrade_insecure_compose_dns_connection_string_to_http() -> No
 
 def test_cosmos_round_trip_process_and_job() -> None:
     service = CosmosService(get_settings())
-    service.ensure_containers()
+    service.ensure_schema()
 
     process_id = str(uuid4())
     job_id = str(uuid4())

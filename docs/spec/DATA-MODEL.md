@@ -10,8 +10,8 @@ contract in [`CONTENT-UNDERSTANDING.md`](./CONTENT-UNDERSTANDING.md).
 
 | Plane        | Concern                                              | Storage                          |
 |--------------|-------------------------------------------------------|-----------------------------------|
-| Control plane | Business process config, routing analyzer status    | Cosmos DB `processes` container   |
-| Data plane   | Pipeline jobs, extracted fields, review state         | Cosmos DB `jobs` container        |
+| Control plane | Business process config, routing analyzer status    | MongoDB `processes` collection    |
+| Data plane   | Pipeline jobs, extracted fields, review state         | MongoDB `jobs` collection         |
 | Data plane   | Uploaded source documents                             | Blob Storage (`documents` container) |
 | Data plane   | Trigger → worker handoff                              | Storage Queue (`jobs` queue)      |
 
@@ -23,20 +23,34 @@ the process at save time (see below).
 
 ## Concurrency
 
-**None.** There is no ETag/`If-Match` optimistic concurrency on any write.
-Two browser tabs editing the same process, or two people reviewing the same
-job, resolve as last-write-wins with no warning. Accepted as a demo
-limitation; a real deployment would use Cosmos DB's `_etag` on the process
-update and review endpoints.
+**None.** There is no optimistic-concurrency check (no version field /
+`findAndModify` compare-and-set) on any write. Two browser tabs editing the
+same process, or two people reviewing the same job, resolve as
+last-write-wins with no warning. Accepted as a demo limitation; a real
+deployment would add a monotonically increasing `version` field checked via
+`replace_one({"_id": ..., "version": expected}, ...)` on the process and
+review update paths.
 
-## Cosmos DB
+## MongoDB
 
-Two containers, both required for correct partitioning of the query
-patterns used by the API (list processes; list/get jobs per process).
+Two collections, both required for the query patterns used by the API (list
+processes; list/get jobs per process). The **`DataStore` protocol**
+(`app/db/base.py`) is the only interface routers/worker code depends on;
+`MongoService` (`app/db/mongo.py`, using **pymongo**) is the default
+implementation talking to the local `mongo:7` container in dev and
+**MongoDB Atlas** in production via the same `mongodb://`/`mongodb+srv://`
+connection-string protocol. `CosmosService` remains available as a
+config-selectable fallback (`DB_BACKEND=cosmos`) implementing the identical
+protocol against Azure Cosmos DB for NoSQL — see
+[`TECHNOLOGY.md`](./TECHNOLOGY.md#data-storage). Both implementations are
+exercised by the same backend-agnostic contract test suite, so the
+document shapes and query semantics described below hold for either
+backend.
 
-### `processes` container
+### `processes` collection
 
-- **Partition key**: `/id`
+- **Document `_id`**: the process's own `id` (UUID string) — reads,
+  updates, and deletes are simple `_id` lookups.
 - **Document = the control-plane `BusinessProcess` record.**
 
 ```json
@@ -66,7 +80,7 @@ patterns used by the API (list processes; list/get jobs per process).
   to classify documents and route them to the right extraction analyzer.
   **Internal only** — not returned by the public API (`BusinessProcess`
   exposes `routingAnalyzerStatus`/`routingAnalyzerError`); the worker reads
-  it directly from Cosmos DB to make inference calls. `derivedAnalyzerIds`
+  it directly from MongoDB to make inference calls. `derivedAnalyzerIds`
   is likewise internal, mapping only the user-selected analyzers that were
   successfully derivable to their app-owned derived analyzer IDs. A
   selected analyzer that is routed directly has no `derivedAnalyzerIds`
@@ -91,14 +105,20 @@ patterns used by the API (list processes; list/get jobs per process).
   email, or threshold leaves `routingAnalyzerStatus` untouched, so a typo
   fix does not take the process offline. When the analyzer set does change,
   status resets to `building` pending the new provisioning run.
-- `name` must be unique case-insensitively across the container. Since
-  partition key is `/id` (not `/name`), enforcing this requires a
-  cross-partition query (or a dedicated lookup) on create/update before
-  writing; a collision returns `409` per the OpenAPI contract. **This check
-  is not atomic**: two simultaneous creates of the same name can both pass
-  it and both succeed. Uniqueness is therefore enforced against existing
-  data, not against a concurrent racing request — accepted for a demo, where
-  the fix would be a reservation document keyed on the normalized name.
+- `name` must be unique case-insensitively across the collection. As with
+  Cosmos, uniqueness is enforced primarily via a **pre-write existence
+  check** (`find_process_by_name`) on create/update; a collision returns
+  `409` per the OpenAPI contract. **This check is not atomic**: two
+  simultaneous creates of the same name can both pass it and both succeed.
+  Uniqueness is therefore enforced against existing data, not against a
+  concurrent racing request — accepted for a demo. `MongoService` layers a
+  **unique index with a case-insensitive collation**
+  (`locale: "en", strength: 2`) on the `name` field as a backstop
+  (`ensure_schema()`), which the Cosmos backend has no equivalent for; a
+  genuine race that slips past the pre-check would still be rejected by
+  MongoDB at the storage layer, though today that rejection is **not**
+  translated to a `409` (it surfaces as an unhandled duplicate-key error) —
+  a known gap, not exercised by the current test suite.
 - Selections are validated on write: at least 1 and at most **199**
   analyzers (Content Understanding allows 200 categories and the injected
   `other` takes one), no duplicates, and no analyzer whose ID is the
@@ -110,8 +130,8 @@ patterns used by the API (list processes; list/get jobs per process).
 
 `DELETE /processes/{processId}` cascades:
 
-1. Delete every job document in the `jobs` container for that `processId`
-   (single-partition, so this is one bulk operation).
+1. Delete every job document in the `jobs` collection for that `processId`
+   (indexed by `processId`, so this is a single scoped bulk delete).
 2. Delete every blob under the `{processId}/` prefix.
 3. Delete the process document.
 
@@ -123,11 +143,13 @@ local delete or leave the system in a half-deleted state; the app's
 and a subsequent process reusing the same ID would overwrite them anyway.
 This is a documented trade-off, not an oversight.
 
-### `jobs` container
+### `jobs` collection
 
-- **Partition key**: `/processId` — all job queries (`listJobs`, `getJob`)
-  are scoped to a single process, so this keeps reads/writes single-
-  partition.
+- **Document `_id`**: the job's own `id` (UUID string). Indexed on
+  `(processId, submittedAt)` and `(status, submittedAt)` — created by
+  `MongoService.ensure_schema()` — so per-process listing/filtering and the
+  worker's startup-reconciliation scan (`list_running_jobs_before`) stay
+  efficient without a full collection scan.
 
 ```json
 {
@@ -339,12 +361,17 @@ server-side, without scanning every job's `fields` array client-side:
 - `?submittedFrom=` / `?submittedTo=` — `submittedAt` range bounds.
 - `?limit=` — result cap (default 100, max 500) instead of pagination.
 
-All filters are combined with AND, and all are **single-partition** queries
-(partition key `/processId`), so they stay cheap even without a dedicated
-index beyond Cosmos DB's default automatic indexing — `hasViolations` maps
-to `ARRAY_LENGTH(c.confidenceViolations) > 0`, `reviewed` to
-`IS_NULL(c.reviewedAt)`, and `fileName` to a `CONTAINS(LOWER(c.fileName),
-...)` predicate.
+All filters are combined with AND and scoped to `processId` (an indexed
+field), so they stay cheap without a full collection scan on either
+backend. In MongoDB, `hasViolations` maps to a
+`{"confidenceViolations.0": {"$exists": true|false}}` predicate, `reviewed`
+to `{"reviewedAt": {"$ne": null}}` / `{"reviewedAt": null}`, and `fileName`
+to a case-insensitive `$regex` match. The Cosmos fallback expresses the
+same predicates as `ARRAY_LENGTH(c.confidenceViolations) > 0`,
+`IS_NULL(c.reviewedAt)`, and `CONTAINS(LOWER(c.fileName), ...)`
+respectively — different query languages, identical filter semantics,
+verified by the shared contract test suite
+(`tests/test_datastore_contract.py`).
 
 List responses **project away** the `fields` array (the largest part of a
 job document) and return `fieldCount` instead, per the OpenAPI `Job` schema;
@@ -366,7 +393,15 @@ parameters** (except `limit`) and returns aggregate counts:
 This exists because the `process-jobs` header shows counts for the current
 filter, and those counts must not be capped by `limit` — counting the
 returned page would understate the backlog exactly when it matters most.
-Implemented as `COUNT` aggregate queries on the same single partition.
+Implemented as `count_documents`/`COUNT` aggregate queries scoped to the
+same `processId`. `needsReview`, `failed`, and `unclassified` each **AND**
+an additional required condition (has-violations / `status == failed` /
+`unclassified == true`) onto whatever filters the caller already supplied,
+so — for example — requesting `?status=succeeded` still reports how many of
+those succeeded jobs need review, and a caller who passes a value that
+directly contradicts the special count's own requirement (e.g.
+`hasViolations=false` while reading `needsReview`) gets `0` for that count
+rather than a value ignoring their filter.
 `needsReview` counts jobs whose persisted `confidenceViolations` list is
 currently non-empty, so it reflects the aggregate confidence gate plus any
 review work already completed.
@@ -398,9 +433,9 @@ review work already completed.
 
 - **Queue name**: `jobs`.
 - **Producer**: `POST /processes/{processId}/trigger` — after validating the
-  upload (see below) and writing the blob and creating the `jobs` Cosmos
-  document with `status: "queued"`, enqueues a **denormalized** message so
-  the worker can process without an extra Cosmos read for process config:
+  upload (see below) and writing the blob and creating the `jobs` document
+  with `status: "queued"`, enqueues a **denormalized** message so the
+  worker can process without an extra database read for process config:
 
 ```json
 {
@@ -417,7 +452,7 @@ review work already completed.
 ### Trigger-Time Validation
 
 All rejected synchronously with `400` and the shared `Error` schema, before
-any blob write, Cosmos document, or queue message:
+any blob write, job document, or queue message:
 
 - **File type** — content-type/extension must be PDF, PNG, JPG, or TIFF.
 - **Size** — at most **20 MB**.

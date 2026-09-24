@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Bell,
   CircleHelp,
@@ -11,6 +9,8 @@ import {
   UserCircle2,
   Workflow,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -21,23 +21,23 @@ function isJobsRoute(pathname: string) {
 
 function getTopbarTitle(pathname: string) {
   if (pathname === "/") {
-    return "Business Processes";
+    return "IT Admin";
   }
 
   if (pathname === "/processes/new") {
-    return "New Process";
+    return "IT Admin";
   }
 
   if (isJobsRoute(pathname)) {
-    return /\/jobs\/[^/]+$/.test(pathname) ? "Inference Review" : "Process Jobs";
+    return /\/jobs\/[^/]+$/.test(pathname) ? "Reviewer" : "Reviewer and IT Admin";
   }
 
   if (/^\/processes\/[^/]+\/edit$/.test(pathname)) {
-    return "Edit Process";
+    return "IT Admin";
   }
 
   if (/^\/processes\/[^/]+$/.test(pathname)) {
-    return "Process Overview";
+    return "End User";
   }
 
   return "CL-IDP";
@@ -101,9 +101,6 @@ function AppSidebar({ pathname }: { pathname: string }) {
         </div>
         <div>
           <p className="text-lg font-bold tracking-tight text-[#111827]">CL-IDP</p>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7a7d87]">
-            Admin Console
-          </p>
         </div>
       </div>
 
@@ -137,7 +134,6 @@ function AppTopbar({ pathname }: { pathname: string }) {
   return (
     <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-4 border-b border-[#e1e2ed] bg-white px-6 py-3 lg:px-8">
       <div className="min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7a7d87]">Shared shell</p>
         <h1 className="truncate text-lg font-semibold tracking-tight text-[#111827]">
           {getTopbarTitle(pathname)}
         </h1>

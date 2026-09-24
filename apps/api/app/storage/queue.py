@@ -8,7 +8,6 @@ from azure.storage.queue import QueueMessage, QueueServiceClient
 
 from app.config import Settings
 
-JOBS_QUEUE = "jobs"
 AZURITE_QUEUE_API_VERSION = "2023-11-03"
 
 
@@ -21,7 +20,7 @@ class QueueService:
             self.settings.azurite_queue_connection_string,
             api_version=AZURITE_QUEUE_API_VERSION,
         )
-        self._queue = self._service.get_queue_client(JOBS_QUEUE)
+        self._queue = self._service.get_queue_client(self.settings.queue_name)
 
     def ensure_queue(self) -> None:
         try:

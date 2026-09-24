@@ -13,7 +13,7 @@ from app.cu.descriptions import (
     derive_category_description,
 )
 from app.cu.ids import derived_analyzer_id, routing_analyzer_id
-from app.db import CosmosService
+from app.db import DataStore
 from app.models import Analyzer, BusinessProcessDocument, RoutingAnalyzerStatus
 
 logger = logging.getLogger(__name__)
@@ -30,25 +30,25 @@ class ResolvedRoutingTarget:
 def provision_process_routing_analyzer(
     *,
     settings: Settings,
-    cosmos: CosmosService,
+    data_store: DataStore,
     process_id: str,
 ) -> None:
     client = CuClient(settings)
     try:
-        _provision_process_routing_analyzer(cosmos=cosmos, client=client, process_id=process_id)
+        _provision_process_routing_analyzer(data_store=data_store, client=client, process_id=process_id)
     finally:
         client.close()
 
 
 def _provision_process_routing_analyzer(
     *,
-    cosmos: CosmosService,
+    data_store: DataStore,
     client: CuClient,
     process_id: str,
 ) -> None:
-    process = cosmos.read_process(process_id)
+    process = data_store.read_process(process_id)
     update_routing_state(
-        cosmos,
+        data_store,
         process_id=process.id,
         status=RoutingAnalyzerStatus.BUILDING,
         routing_analyzer_id_value=None,
@@ -76,7 +76,7 @@ def _provision_process_routing_analyzer(
             raise RuntimeError(f"Routing analyzer {routing_id} finished with status {routing_record.status}.")
 
         update_routing_state(
-            cosmos,
+            data_store,
             process_id=process.id,
             status=RoutingAnalyzerStatus.READY,
             routing_analyzer_id_value=routing_id,
@@ -90,7 +90,7 @@ def _provision_process_routing_analyzer(
     except Exception as exc:  # pragma: no cover - terminal update path exercised in live tests
         logger.exception("Routing analyzer provisioning failed for process %s", process_id)
         update_routing_state(
-            cosmos,
+            data_store,
             process_id=process_id,
             status=RoutingAnalyzerStatus.FAILED,
             routing_analyzer_id_value=routing_analyzer_id(process_id),
@@ -200,7 +200,7 @@ def build_routing_analyzer_payload(
 
 
 def update_routing_state(
-    cosmos: CosmosService,
+    data_store: DataStore,
     *,
     process_id: str,
     status: RoutingAnalyzerStatus,
@@ -208,7 +208,7 @@ def update_routing_state(
     derived_analyzer_ids: dict[str, str],
     error: str | None,
 ) -> BusinessProcessDocument:
-    process = cosmos.read_process(process_id)
+    process = data_store.read_process(process_id)
     updated = process.model_copy(
         update={
             "routingAnalyzerStatus": status,
@@ -218,4 +218,4 @@ def update_routing_state(
             "updatedAt": datetime.now(UTC),
         }
     )
-    return cosmos.upsert_process(updated)
+    return data_store.upsert_process(updated)

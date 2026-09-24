@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -39,9 +39,9 @@ const processFormSchema = z.object({
     .refine((ids) => new Set(ids).size === ids.length, "Duplicate analyzers are not allowed.")
     .refine((ids) => !ids.includes("other"), "The reserved analyzer ID 'other' cannot be selected."),
   confidenceThresholdPercent: z
-    .number({ error: "Confidence threshold is required." })
-    .min(0, "Confidence threshold must be between 0 and 100.")
-    .max(100, "Confidence threshold must be between 0 and 100."),
+    .number({ error: "Average Confidence threshold is required." })
+    .min(0, "Average Confidence threshold must be between 0 and 100.")
+    .max(100, "Average Confidence threshold must be between 0 and 100."),
   ownerEmail: z
     .string()
     .trim()
@@ -53,13 +53,13 @@ type ProcessFormValues = z.infer<typeof processFormSchema>;
 
 type ProcessFormProps =
   | {
-      mode: "create";
-      processId?: never;
-    }
+    mode: "create";
+    processId?: never;
+  }
   | {
-      mode: "edit";
-      processId: string;
-    };
+    mode: "edit";
+    processId: string;
+  };
 
 function buildDefaultValues(): ProcessFormValues {
   return {
@@ -257,7 +257,7 @@ export function ProcessForm(props: ProcessFormProps) {
             {props.mode === "create" ? "New business process" : "Update business process"}
           </h1>
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-            Configure the analyzer set, confidence threshold, and business owner email for this
+            Configure the analyzer set, average confidence threshold, and business owner email for this
             Enterprise IDP workflow.
           </p>
         </div>
@@ -388,7 +388,7 @@ export function ProcessForm(props: ProcessFormProps) {
 
             <div className="space-y-2">
               <label htmlFor="confidenceThresholdPercent" className="text-sm font-medium">
-                Confidence threshold (%)
+                Average Confidence threshold (%)
               </label>
               <input
                 id="confidenceThresholdPercent"

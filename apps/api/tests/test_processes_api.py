@@ -4,11 +4,10 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
-from azure.cosmos.exceptions import CosmosResourceNotFoundError
 from fastapi.testclient import TestClient
 
 from app.config import get_settings
-from app.db import CosmosService
+from app.db import DataStore, DocumentNotFoundError
 from app.models import JobDocument, JobStatus, RoutingAnalyzerStatus
 from app.storage import BlobService
 
@@ -111,7 +110,7 @@ def test_create_process_rejects_unknown_analyzer_id(live_api_client: TestClient)
 @pytest.mark.live
 def test_update_description_only_keeps_routing_status(
     live_api_client: TestClient,
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, _ = live_services
     created = live_api_client.post("/processes", json=process_payload()).json()
@@ -140,7 +139,7 @@ def test_update_description_only_keeps_routing_status(
 @pytest.mark.live
 def test_update_allowed_analyzers_resets_routing_status_to_building(
     live_api_client: TestClient,
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, _ = live_services
     created = live_api_client.post("/processes", json=process_payload()).json()
@@ -202,7 +201,7 @@ def test_process_endpoints_return_404_for_missing_process(
 @pytest.mark.live
 def test_delete_process_cascades_jobs_and_blobs(
     live_api_client: TestClient,
-    live_services: tuple[CosmosService, BlobService],
+    live_services: tuple[DataStore, BlobService],
 ) -> None:
     cosmos, blob = live_services
     created = live_api_client.post("/processes", json=process_payload()).json()
@@ -239,7 +238,7 @@ def test_delete_process_cascades_jobs_and_blobs(
 
     assert response.status_code == 204
     assert live_api_client.get(f"/processes/{process_id}").status_code == 404
-    with pytest.raises(CosmosResourceNotFoundError):
+    with pytest.raises(DocumentNotFoundError):
         cosmos.read_job(process_id, job_id)
     assert blob.list_blob_names(prefix=f"{process_id}/") == []
 

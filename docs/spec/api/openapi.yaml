@@ -34,7 +34,7 @@ paths:
       summary: Liveness and readiness probe
       description: >
         Reports whether the service is up and whether its dependencies
-        (Cosmos DB, Blob/Queue storage, Content Understanding) are
+        (MongoDB Atlas, Blob/Queue storage, Content Understanding) are
         reachable. Returns 503 when a required dependency is unavailable.
       operationId: getHealth
       responses:
@@ -684,7 +684,7 @@ components:
             type: string
             enum: [ok, unavailable]
           description: >
-            Per-dependency reachability, keyed by `cosmos`, `blob`, `queue`,
+            Per-dependency reachability, keyed by `database`, `blob`, `queue`,
             `contentUnderstanding`, `smtp`.
         version:
           type: string

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from contextlib import suppress
-from dataclasses import dataclass, field
+from dataclasses import replace
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -12,14 +12,13 @@ from typing import Annotated, cast
 from uuid import uuid4
 
 from azure.core.exceptions import ResourceNotFoundError
-from azure.cosmos.exceptions import CosmosHttpResponseError, CosmosResourceNotFoundError
 from fastapi import FastAPI, Query, Response
 from fastapi.responses import JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.metrics import Counter
 from PIL import Image, UnidentifiedImageError
 
-from app.db import CosmosService
+from app.db import DataStore, DataStoreError, DocumentNotFoundError, JobFilters
 from app.models import (
     ArrayField,
     BooleanField,
@@ -63,46 +62,6 @@ _jobs_reviewed_counter: Counter = _meter.create_counter(
 )
 
 
-@dataclass(slots=True)
-class JobFilters:
-    statuses: list[JobStatus] = field(default_factory=list)
-    detected_forms: list[str] = field(default_factory=list)
-    has_violations: bool | None = None
-    reviewed: bool | None = None
-    unclassified: bool | None = None
-    file_name: str | None = None
-    submitted_from: datetime | None = None
-    submitted_to: datetime | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class JobQuerySpec:
-    where_clauses: tuple[str, ...]
-    parameters: tuple[dict[str, object], ...]
-
-    def select_query(self, *, limit: int) -> str:
-        return (
-            f"SELECT TOP {limit} * FROM c "
-            f"WHERE {' AND '.join(self.where_clauses)} "
-            "ORDER BY c.submittedAt DESC"
-        )
-
-    def count_query(self, *, extra_clause: str | None = None) -> str:
-        where_clauses = list(self.where_clauses)
-        if extra_clause is not None:
-            where_clauses.append(extra_clause)
-        return f"SELECT VALUE COUNT(1) FROM c WHERE {' AND '.join(where_clauses)}"
-
-    def sum_pages_query(self, *, extra_clause: str | None = None) -> str:
-        where_clauses = list(self.where_clauses)
-        if extra_clause is not None:
-            where_clauses.append(extra_clause)
-        return (
-            "SELECT VALUE SUM(IS_ARRAY(c.pages) ? ARRAY_LENGTH(c.pages) : 0) "
-            f"FROM c WHERE {' AND '.join(where_clauses)}"
-        )
-
-
 def error_response(
     *,
     status_code: int,
@@ -116,8 +75,8 @@ def error_response(
     )
 
 
-def cosmos_service(application: FastAPI) -> CosmosService:
-    return cast(CosmosService, application.state.cosmos_service)
+def data_store(application: FastAPI) -> DataStore:
+    return cast(DataStore, application.state.data_store)
 
 
 def blob_service(application: FastAPI) -> BlobService:
@@ -126,6 +85,31 @@ def blob_service(application: FastAPI) -> BlobService:
 
 def queue_service(application: FastAPI) -> QueueService:
     return cast(QueueService, application.state.queue_service)
+
+
+def _narrow_statuses(filters: JobFilters, required_status: JobStatus) -> JobFilters | None:
+    """AND a required status onto the existing status filter.
+
+    Mirrors the old raw-SQL `extra_clause` behavior, which ANDed the extra
+    condition onto whatever the caller already requested. If the caller
+    already narrowed to a set of statuses that excludes `required_status`,
+    the combination is unsatisfiable, so this returns `None` (count is 0).
+    """
+    if filters.statuses and required_status not in filters.statuses:
+        return None
+    return replace(filters, statuses=[required_status])
+
+
+def _narrow_bool_filter(filters: JobFilters, field_name: str, value: bool = True) -> JobFilters | None:
+    """AND a required boolean filter onto the existing value for that field.
+
+    If the caller already requested a contradictory value for the same
+    field, the combination is unsatisfiable, so this returns `None`.
+    """
+    current = getattr(filters, field_name)
+    if current is not None and current != value:
+        return None
+    return replace(filters, **{field_name: value})
 
 
 def register_jobs_routes(application: FastAPI) -> None:
@@ -151,26 +135,19 @@ def register_jobs_routes(application: FastAPI) -> None:
         if not process_exists(application, processId):
             return process_not_found_response()
 
-        query_spec = build_job_query_spec(
-            processId=processId,
-            filters=JobFilters(
-                statuses=status or [],
-                detected_forms=detectedForm or [],
-                has_violations=hasViolations,
-                reviewed=reviewed,
-                unclassified=unclassified,
-                file_name=fileName,
-                submitted_from=submittedFrom,
-                submitted_to=submittedTo,
-            ),
+        filters = JobFilters(
+            statuses=status or [],
+            detected_forms=detectedForm or [],
+            has_violations=hasViolations,
+            reviewed=reviewed,
+            unclassified=unclassified,
+            file_name=fileName,
+            submitted_from=submittedFrom,
+            submitted_to=submittedTo,
         )
         jobs = [
-            with_computed_fields(JobDocument.model_validate(document))
-            for document in cosmos_service(application).query_jobs(
-                processId,
-                query=query_spec.select_query(limit=limit),
-                parameters=list(query_spec.parameters),
-            )
+            with_computed_fields(job)
+            for job in data_store(application).list_jobs(processId, filters=filters, limit=limit)
         ]
         return cast(list[Job], jobs)
 
@@ -194,31 +171,32 @@ def register_jobs_routes(application: FastAPI) -> None:
         if not process_exists(application, processId):
             return process_not_found_response()
 
-        query_spec = build_job_query_spec(
-            processId=processId,
-            filters=JobFilters(
-                statuses=status or [],
-                detected_forms=detectedForm or [],
-                has_violations=hasViolations,
-                reviewed=reviewed,
-                unclassified=unclassified,
-                file_name=fileName,
-                submitted_from=submittedFrom,
-                submitted_to=submittedTo,
-            ),
+        filters = JobFilters(
+            statuses=status or [],
+            detected_forms=detectedForm or [],
+            has_violations=hasViolations,
+            reviewed=reviewed,
+            unclassified=unclassified,
+            file_name=fileName,
+            submitted_from=submittedFrom,
+            submitted_to=submittedTo,
         )
-        cosmos = cosmos_service(application)
-        total_pages = query_job_total_pages(cosmos, processId, query_spec)
+        store = data_store(application)
+        total_pages = store.sum_pages(processId, filters=filters)
+
+        def count_with_status(required_status: JobStatus) -> int:
+            narrowed = _narrow_statuses(filters, required_status)
+            return store.count_jobs(processId, filters=narrowed) if narrowed is not None else 0
+
+        def count_with_bool(field_name: str) -> int:
+            narrowed = _narrow_bool_filter(filters, field_name)
+            return store.count_jobs(processId, filters=narrowed) if narrowed is not None else 0
+
         return JobsSummary(
-            total=query_job_count(cosmos, processId, query_spec),
-            needsReview=query_job_count(
-                cosmos,
-                processId,
-                query_spec,
-                extra_clause="IS_ARRAY(c.confidenceViolations) AND ARRAY_LENGTH(c.confidenceViolations) > 0",
-            ),
-            failed=query_job_count(cosmos, processId, query_spec, extra_clause="c.status = 'failed'"),
-            unclassified=query_job_count(cosmos, processId, query_spec, extra_clause="c.unclassified = true"),
+            total=store.count_jobs(processId, filters=filters),
+            needsReview=count_with_bool("has_violations"),
+            failed=count_with_status(JobStatus.FAILED),
+            unclassified=count_with_bool("unclassified"),
             totalEstimatedCostUsd=estimate_document_cost_usd(total_pages),
         )
 
@@ -230,8 +208,8 @@ def register_jobs_routes(application: FastAPI) -> None:
     )
     async def get_job_endpoint(processId: str, jobId: str) -> Job | JSONResponse:
         try:
-            job = cosmos_service(application).read_job(processId, jobId)
-        except CosmosResourceNotFoundError:
+            job = data_store(application).read_job(processId, jobId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="job_not_found",
@@ -247,8 +225,8 @@ def register_jobs_routes(application: FastAPI) -> None:
     )
     async def get_job_document_endpoint(processId: str, jobId: str) -> Response | JSONResponse:
         try:
-            job = cosmos_service(application).read_job(processId, jobId)
-        except CosmosResourceNotFoundError:
+            job = data_store(application).read_job(processId, jobId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="job_not_found",
@@ -285,8 +263,8 @@ def register_jobs_routes(application: FastAPI) -> None:
             return process_error
 
         try:
-            job = cosmos_service(application).read_job(processId, jobId)
-        except CosmosResourceNotFoundError:
+            job = data_store(application).read_job(processId, jobId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="job_not_found",
@@ -329,7 +307,7 @@ def register_jobs_routes(application: FastAPI) -> None:
                 job_id=job.id,
                 process_id=processId,
             )
-            updated_job = cosmos_service(application).upsert_job(
+            updated_job = data_store(application).upsert_job(
                 job.model_copy(
                     update={
                         "fields": job.fields,
@@ -363,13 +341,13 @@ def register_jobs_routes(application: FastAPI) -> None:
     )
     async def retry_job_endpoint(processId: str, jobId: str) -> JobRef | JSONResponse:
         try:
-            process = cosmos_service(application).read_process(processId)
-        except CosmosResourceNotFoundError:
+            process = data_store(application).read_process(processId)
+        except DocumentNotFoundError:
             return process_not_found_response()
 
         try:
-            job = cosmos_service(application).read_job(processId, jobId)
-        except CosmosResourceNotFoundError:
+            job = data_store(application).read_job(processId, jobId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="job_not_found",
@@ -434,7 +412,7 @@ def register_jobs_routes(application: FastAPI) -> None:
                         job_id=retried_job_id,
                         process_id=processId,
                     )
-                    cosmos_service(application).upsert_job(retry_job)
+                    data_store(application).upsert_job(retry_job)
                     logger.info(
                         "Persisted retry job %s for process %s status=%s retry_of=%s",
                         retried_job_id,
@@ -457,8 +435,8 @@ def register_jobs_routes(application: FastAPI) -> None:
                         queue_message.routingAnalyzerId,
                     )
             except Exception:
-                with suppress(CosmosHttpResponseError, CosmosResourceNotFoundError):
-                    cosmos_service(application).delete_job(processId, retried_job_id)
+                with suppress(DataStoreError):
+                    data_store(application).delete_job(processId, retried_job_id)
                 raise
 
         return JobRef(jobId=retried_job_id)
@@ -466,8 +444,8 @@ def register_jobs_routes(application: FastAPI) -> None:
 
 def process_exists(application: FastAPI, process_id: str) -> bool:
     try:
-        cosmos_service(application).read_process(process_id)
-    except CosmosResourceNotFoundError:
+        data_store(application).read_process(process_id)
+    except DocumentNotFoundError:
         return False
     return True
 
@@ -532,118 +510,6 @@ def resolve_reviewable_field(fields: Sequence[Field] | None, pointer: str) -> Le
 
 def decode_json_pointer(pointer: str) -> list[str]:
     return [token.replace("~1", "/").replace("~0", "~") for token in pointer.split("/")[1:]]
-
-
-def build_job_query_spec(*, processId: str, filters: JobFilters) -> JobQuerySpec:
-    where_clauses = ["c.processId = @processId"]
-    parameters: list[dict[str, object]] = [{"name": "@processId", "value": processId}]
-
-    if filters.statuses:
-        where_clauses.append(
-            "(" + " OR ".join(f"c.status = @status{index}" for index, _ in enumerate(filters.statuses)) + ")"
-        )
-        parameters.extend(
-            {"name": f"@status{index}", "value": status.value}
-            for index, status in enumerate(filters.statuses)
-        )
-
-    if filters.detected_forms:
-        where_clauses.append(
-            "("
-            + " OR ".join(
-                f"c.detectedForm = @detectedForm{index}"
-                for index, _ in enumerate(filters.detected_forms)
-            )
-            + ")"
-        )
-        parameters.extend(
-            {"name": f"@detectedForm{index}", "value": detected_form}
-            for index, detected_form in enumerate(filters.detected_forms)
-        )
-
-    if filters.has_violations is True:
-        where_clauses.append(
-            "IS_ARRAY(c.confidenceViolations) AND ARRAY_LENGTH(c.confidenceViolations) > 0"
-        )
-    elif filters.has_violations is False:
-        where_clauses.append(
-            "(NOT IS_ARRAY(c.confidenceViolations) OR ARRAY_LENGTH(c.confidenceViolations) = 0)"
-        )
-
-    if filters.reviewed is True:
-        where_clauses.append("NOT IS_NULL(c.reviewedAt)")
-    elif filters.reviewed is False:
-        where_clauses.append("IS_NULL(c.reviewedAt)")
-
-    if filters.unclassified is not None:
-        where_clauses.append("c.unclassified = @unclassified")
-        parameters.append({"name": "@unclassified", "value": filters.unclassified})
-
-    if filters.file_name:
-        where_clauses.append("CONTAINS(LOWER(c.fileName), @fileName)")
-        parameters.append({"name": "@fileName", "value": filters.file_name.lower()})
-
-    if filters.submitted_from is not None:
-        where_clauses.append(
-            "DateTimeToTimestamp(c.submittedAt) >= DateTimeToTimestamp(@submittedFrom)"
-        )
-        parameters.append(
-            {
-                "name": "@submittedFrom",
-                "value": cosmos_datetime(filters.submitted_from),
-            }
-        )
-
-    if filters.submitted_to is not None:
-        where_clauses.append(
-            "DateTimeToTimestamp(c.submittedAt) <= DateTimeToTimestamp(@submittedTo)"
-        )
-        parameters.append(
-            {
-                "name": "@submittedTo",
-                "value": cosmos_datetime(filters.submitted_to),
-            }
-        )
-
-    return JobQuerySpec(
-        where_clauses=tuple(where_clauses),
-        parameters=tuple(parameters),
-    )
-
-
-def cosmos_datetime(value: datetime) -> str:
-    normalized = value if value.tzinfo is not None else value.replace(tzinfo=UTC)
-    return normalized.astimezone(UTC).isoformat().replace("+00:00", "Z")
-
-
-def query_job_count(
-    cosmos: CosmosService,
-    process_id: str,
-    query_spec: JobQuerySpec,
-    *,
-    extra_clause: str | None = None,
-) -> int:
-    counts = cosmos.query_job_values(
-        process_id,
-        query=query_spec.count_query(extra_clause=extra_clause),
-        parameters=list(query_spec.parameters),
-    )
-    return int(counts[0]) if counts else 0
-
-
-def query_job_total_pages(
-    cosmos: CosmosService,
-    process_id: str,
-    query_spec: JobQuerySpec,
-    *,
-    extra_clause: str | None = None,
-) -> int:
-    sums = cosmos.query_job_values(
-        process_id,
-        query=query_spec.sum_pages_query(extra_clause=extra_clause),
-        parameters=list(query_spec.parameters),
-    )
-    return int(sums[0]) if sums and sums[0] is not None else 0
 
 
 def with_computed_fields(job: JobDocument) -> JobDocument:

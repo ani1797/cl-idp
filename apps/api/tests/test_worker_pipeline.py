@@ -71,7 +71,7 @@ def make_dependencies(
         settings = settings.model_copy(update={"smtp_port": smtp_port})
     return WorkerDependencies(
         settings=settings,
-        cosmos=app.state.cosmos_service,
+        data_store=app.state.data_store,
         blob=app.state.blob_service,
         queue=app.state.queue_service,
         cu_client=cu_client,
@@ -90,11 +90,11 @@ def enqueue_job(
     )
     assert response.status_code == 202
     app = cast(FastAPI, api_client.app)
-    return cast(JobDocument, app.state.cosmos_service.read_job(process.id, response.json()["jobId"]))
+    return cast(JobDocument, app.state.data_store.read_job(process.id, response.json()["jobId"]))
 
 
 def test_worker_retries_then_fails_after_third_dequeue(api_client: TestClient) -> None:
-    process = create_process(cast(FastAPI, api_client.app).state.cosmos_service)
+    process = create_process(cast(FastAPI, api_client.app).state.data_store)
     job = enqueue_job(api_client, process=process)
     dependencies = make_dependencies(
         api_client,
@@ -103,20 +103,20 @@ def test_worker_retries_then_fails_after_third_dequeue(api_client: TestClient) -
     config = WorkerConfig(visibility_timeout_seconds=1)
 
     assert process_next_message(dependencies, config=config) is True
-    first_attempt = dependencies.cosmos.read_job(process.id, job.id)
+    first_attempt = dependencies.data_store.read_job(process.id, job.id)
     assert first_attempt.status == JobStatus.QUEUED
     assert first_attempt.attempts == 1
     assert "simulated worker failure" in cast(str, first_attempt.error)
 
     time.sleep(1.1)
     assert process_next_message(dependencies, config=config) is True
-    second_attempt = dependencies.cosmos.read_job(process.id, job.id)
+    second_attempt = dependencies.data_store.read_job(process.id, job.id)
     assert second_attempt.status == JobStatus.QUEUED
     assert second_attempt.attempts == 2
 
     time.sleep(1.1)
     assert process_next_message(dependencies, config=config) is True
-    final_job = dependencies.cosmos.read_job(process.id, job.id)
+    final_job = dependencies.data_store.read_job(process.id, job.id)
     assert final_job.status == JobStatus.FAILED
     assert final_job.attempts == 3
     assert final_job.completedAt is not None
@@ -127,7 +127,7 @@ def test_worker_retries_then_fails_after_third_dequeue(api_client: TestClient) -
 
 def test_reconciliation_requeues_once_then_fails_on_recurrence(api_client: TestClient) -> None:
     app = cast(FastAPI, api_client.app)
-    cosmos = app.state.cosmos_service
+    cosmos = app.state.data_store
     process = create_process(cosmos)
     now = datetime.now(UTC)
     message = JobQueueMessage(
@@ -190,7 +190,7 @@ def test_reconciliation_requeues_once_then_fails_on_recurrence(api_client: TestC
 
 
 def test_worker_succeeds_even_when_smtp_notification_fails(api_client: TestClient) -> None:
-    process = create_process(cast(FastAPI, api_client.app).state.cosmos_service)
+    process = create_process(cast(FastAPI, api_client.app).state.data_store)
     job = enqueue_job(api_client, process=process)
     dependencies = make_dependencies(
         api_client,
@@ -199,7 +199,7 @@ def test_worker_succeeds_even_when_smtp_notification_fails(api_client: TestClien
     )
 
     assert process_next_message(dependencies) is True
-    completed = dependencies.cosmos.read_job(process.id, job.id)
+    completed = dependencies.data_store.read_job(process.id, job.id)
     assert completed.status == JobStatus.SUCCEEDED
     assert completed.detectedForm == "prebuilt-invoice"
     assert completed.notificationSent is False
@@ -214,8 +214,8 @@ def test_worker_persists_empty_violations_and_skips_notification_when_aggregate_
     api_client: TestClient,
 ) -> None:
     app = cast(FastAPI, api_client.app)
-    process = create_process(app.state.cosmos_service)
-    process = app.state.cosmos_service.upsert_process(
+    process = create_process(app.state.data_store)
+    process = app.state.data_store.upsert_process(
         process.model_copy(update={"confidenceThreshold": 0.75})
     )
     job = enqueue_job(api_client, process=process)
@@ -226,7 +226,7 @@ def test_worker_persists_empty_violations_and_skips_notification_when_aggregate_
     )
 
     assert process_next_message(dependencies) is True
-    completed = dependencies.cosmos.read_job(process.id, job.id)
+    completed = dependencies.data_store.read_job(process.id, job.id)
 
     assert completed.status == JobStatus.SUCCEEDED
     assert completed.detectedForm == "prebuilt-invoice"

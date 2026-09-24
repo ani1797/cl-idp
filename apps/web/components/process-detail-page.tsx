@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, Pencil, RefreshCcw, Trash2, Upload } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { api, type BusinessProcess, type Job } from "@/lib/api";
 import { getErrorMessage, showErrorToast } from "@/lib/errors";
 import { confidenceThresholdFloatToPercent } from "@/lib/process-threshold";
-import { pollingIntervals, getPollingInterval } from "@/lib/query";
+import { getPollingInterval, pollingIntervals } from "@/lib/query";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 
@@ -513,7 +513,7 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-5">
-              <p className="text-sm font-medium text-foreground">Confidence threshold</p>
+              <p className="text-sm font-medium text-foreground">Average Confidence threshold</p>
               <p className="mt-3 text-2xl font-semibold tracking-tight">
                 {confidenceThresholdFloatToPercent(process.confidenceThreshold)}%
               </p>

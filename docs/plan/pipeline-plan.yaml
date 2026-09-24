@@ -1,0 +1,84 @@
+---
+pipeline:
+  name: str
+  description: str
+  owners:
+    - group: str
+    - user: str
+    - email: str
+  inbound:
+    api:
+      enabled: true
+    blob:
+      enabled: false
+      config:
+        containerName: str
+        accountName: str
+        path: str
+    webhook:
+      enabled: false
+      config:
+        url: str
+        auth:
+          type: basic | bearer
+          credentials:
+            username: str
+            password: str
+          bearer:
+            token: str
+            header: str
+    email:
+      enabled: false
+      config:
+        address: str
+    servicebus:
+      enabled: false
+      config:
+        clientId: str
+        tenantId: str
+        subscriptionId: str
+        topicName: str
+  outbound:
+    api:
+      enabled: true
+    blob:
+      enabled: false
+      config:
+        containerName: str
+        accountName: str
+        path: str
+    webhook:
+      enabled: false
+      config:
+        url: str
+        auth:
+          type: basic | bearer
+          credentials:
+            username: str
+            password: str
+          bearer:
+            token: str
+            header: str
+    email:
+      enabled: false
+      config:
+        address: str
+    servicebus:
+      enabled: false
+      config:
+        clientId: str
+        tenantId: str
+        subscriptionId: str
+        topicName: str
+  analyzers:
+    - enabled: true
+      identifier: str
+      confidences:
+        mode: avg | field_spec
+        avg: float
+        fields:
+        - name: str
+          confidence: float
+      reviewers:
+      - group: str
+      - user: str

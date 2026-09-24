@@ -10,7 +10,6 @@ from typing import cast
 from uuid import uuid4
 
 from azure.core.exceptions import AzureError
-from azure.cosmos.exceptions import CosmosHttpResponseError, CosmosResourceNotFoundError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from opentelemetry import metrics, trace
@@ -19,7 +18,7 @@ from PIL import Image, UnidentifiedImageError
 from pypdf import PdfReader
 from starlette.datastructures import UploadFile
 
-from app.db import CosmosService
+from app.db import DataStore, DataStoreError, DocumentNotFoundError
 from app.models import (
     BusinessProcessDocument,
     Error,
@@ -79,8 +78,8 @@ def error_response(
     )
 
 
-def cosmos_service(application: FastAPI) -> CosmosService:
-    return cast(CosmosService, application.state.cosmos_service)
+def data_store(application: FastAPI) -> DataStore:
+    return cast(DataStore, application.state.data_store)
 
 
 def blob_service(application: FastAPI) -> BlobService:
@@ -193,8 +192,8 @@ def register_trigger_routes(application: FastAPI) -> None:
     )
     async def trigger_job_endpoint(processId: str, request: Request) -> JobRef | JSONResponse:
         try:
-            process = cosmos_service(application).read_process(processId)
-        except CosmosResourceNotFoundError:
+            process = data_store(application).read_process(processId)
+        except DocumentNotFoundError:
             return error_response(
                 status_code=404,
                 code="process_not_found",
@@ -295,7 +294,7 @@ def register_trigger_routes(application: FastAPI) -> None:
                         job_id=job_id,
                         process_id=processId,
                     )
-                    cosmos_service(application).upsert_job(job)
+                    data_store(application).upsert_job(job)
                     job_created = True
                     logger.info(
                         "Persisted job %s for process %s status=%s",
@@ -321,8 +320,8 @@ def register_trigger_routes(application: FastAPI) -> None:
                     )
             except Exception:
                 if job_created:
-                    with suppress(CosmosHttpResponseError, CosmosResourceNotFoundError):
-                        cosmos_service(application).delete_job(processId, job_id)
+                    with suppress(DataStoreError):
+                        data_store(application).delete_job(processId, job_id)
                 if blob_created:
                     with suppress(AzureError):
                         blob_service(application).delete_blob(blob_path)

@@ -49,9 +49,12 @@ and local Azure-compatible emulators for development.
    docker compose up -d
    ```
 
-   This default command intentionally starts only the three emulator services
-   (Cosmos DB Emulator, Azurite, Mailpit). It remains the recommended setup for
-   the existing host-process API/worker/web workflow below.
+   This default command intentionally starts only the local dependency
+   services (MongoDB, Cosmos DB Emulator, Azurite, Mailpit). MongoDB is the
+   default datastore (`DB_BACKEND=mongo`); the Cosmos DB Emulator is kept
+   running alongside it as a config-selectable fallback (`DB_BACKEND=cosmos`).
+   This remains the recommended setup for the existing host-process
+   API/worker/web workflow below.
 
 ## Run the API
 

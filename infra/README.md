@@ -39,7 +39,9 @@ infra/
 See [`docs/spec/TECHNOLOGY.md`](../docs/spec/TECHNOLOGY.md) ("Azure
 Production Architecture" and "RBAC Permissions") for the full narrative and
 the [architecture diagram](../docs/architecture/) for the resource-group
-visual.
+visual. For the full step-by-step process to stand up a live environment
+end-to-end (infra + app code + worker + demo data), see
+[`docs/DEPLOYMENT-GUIDE.md`](../docs/DEPLOYMENT-GUIDE.md).
 
 ## Deploy
 

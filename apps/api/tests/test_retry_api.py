@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.db import DataStore, DocumentNotFoundError
+from app.db import DataStore
 from app.models import JobDocument, JobQueueMessage, JobStatus
 from app.storage import BlobService, QueueService
 from app.worker.main import process_next_message

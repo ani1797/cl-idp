@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol
 
-from app.models import BusinessProcessDocument, JobDocument, JobStatus
+from app.models import BusinessProcessDocument, JobDocument, JobStatus, UserDocument
 
 
 @dataclass(slots=True)
@@ -43,6 +43,33 @@ class DataStore(Protocol):
     def check_health(self) -> bool:
         """Return whether the underlying store is reachable and ready."""
         ...
+
+    # -- Users ---------------------------------------------------------
+
+    def create_user(self, user: UserDocument) -> UserDocument:
+        """Create a user.
+
+        Raises `DuplicateDocumentError` if the email already exists.
+        """
+        ...
+
+    def read_user(self, user_id: str) -> UserDocument:
+        """Raises `DocumentNotFoundError` if the user does not exist."""
+        ...
+
+    def find_user_by_email(self, email: str) -> UserDocument | None:
+        """Case-insensitive exact email match, or `None` if no user matches."""
+        ...
+
+    def list_users(self) -> list[UserDocument]:
+        """Ordered by `createdAt` descending."""
+        ...
+
+    def update_user(self, user: UserDocument) -> UserDocument: ...
+
+    def deactivate_user(self, user_id: str) -> UserDocument: ...
+
+    def delete_user(self, user_id: str) -> None: ...
 
     # -- Processes -----------------------------------------------------
 

@@ -14,7 +14,7 @@ from app.cu import (
     provision_process_routing_analyzer,
     routing_analyzer_id,
 )
-from app.db import DataStore, DocumentNotFoundError
+from app.db import DataStore
 from app.models import AnalyzerRef, BusinessProcessDocument, RoutingAnalyzerStatus
 from app.storage import BlobService
 

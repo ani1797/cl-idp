@@ -172,6 +172,28 @@ progress, not this README.
 > `az login`-based credentials aren't available inside a fresh container.
 > See `docs/plan/26-full-stack-containerization.md`.
 
+> **Plan addendum (reskin, tasks 27+):** the user asked to reskin the whole
+> application to match a complete, brand-authentic design system —
+> "Canada Life IDP Platform" (Shiraz Maroon / Deep Teal / Gold, Public
+> Sans + Source Sans 3, 8px radius, Material Symbols) — designed in the
+> Stitch project **TEST** and exported as 18 screen mockups. The task
+> expanded through clarifying rounds into: a full token/shell/component
+> rewrite, a restyle of every existing screen, four new client-aggregated
+> screens (Dashboard, Review Queue, Form Models, API & Integrations —
+> **not** the Training Studio or the 4-stage onboarding wizard shown in
+> some mockups, both explicitly out of scope), and full DB-backed
+> authentication (login screen, httpOnly JWT session cookie, a
+> `SERVICE_API_TOKEN` for seed/worker/e2e, and a `/admin/users` screen) —
+> deliberately **not** Entra/OAuth, and with `roleLabel` kept
+> display-only (no RBAC enforcement). `docs/assets/references/` was
+> replaced wholesale with the new Stitch renders; the prior generic
+> indigo/navy mockups (including `custom-analyzers-list` and
+> `analyzer-training` from tasks 24/25 above) are preserved for history
+> in `docs/assets/references-old/`. See `docs/spec/design-system.md` for
+> the token/component reference. This work supersedes task **17**'s shell
+> (a placeholder-chrome baseline it correctly built at the time) with the
+> real branded shell.
+
 ## Parallel Tracks
 
 Once **00**, **01**, and **02** are done, two tracks can proceed
@@ -225,6 +247,8 @@ that file for how to sequence it without blocking the tracks above.
 | 24 | [Custom Analyzer Authoring: Backend API](./24-custom-analyzer-authoring-api.md) | backend | 04, 20 |
 | 25 | [Custom Analyzer Authoring: Frontend](./25-custom-analyzer-authoring-ui.md) | frontend | 13, 17, 24 |
 | 26 | [Full-Stack Containerization](./26-full-stack-containerization.md) | shared | 00, 02, 06, 09 |
+| 29 | [Enforce roleLabel-based RBAC & Fix Analyzer Picker](./29-rbac-enforcement-and-analyzer-picker-fix.md) | shared | 03, 08, 09, 10, 13, 17 |
+| 30 | [Fix Misconfigured CU_ENDPOINT](./30-fix-cu-endpoint-misconfiguration.md) | shared | 01, 04 — corrects a wrong "no network egress" assumption in 29 |
 
 ## Conventions Used In Every Task File
 

@@ -1,4 +1,4 @@
-from app.models.internal import BusinessProcessDocument, JobDocument, JobQueueMessage
+from app.models.internal import BusinessProcessDocument, JobDocument, JobQueueMessage, UserDocument
 from app.models.public import (
     Analyzer,
     AnalyzerKind,
@@ -18,6 +18,7 @@ from app.models.public import (
     JobRef,
     JobsSummary,
     JobStatus,
+    LoginRequest,
     NumberField,
     ObjectField,
     PageInfo,
@@ -27,6 +28,11 @@ from app.models.public import (
     RoutingAnalyzerStatus,
     StringField,
     TimeField,
+    User,
+    UserCreateRequest,
+    UserResetPasswordRequest,
+    UserRole,
+    UserUpdateRequest,
 )
 
 __all__ = [
@@ -51,6 +57,7 @@ __all__ = [
     "JobRef",
     "JobStatus",
     "JobsSummary",
+    "LoginRequest",
     "NumberField",
     "ObjectField",
     "PageInfo",
@@ -60,4 +67,10 @@ __all__ = [
     "RoutingAnalyzerStatus",
     "StringField",
     "TimeField",
+    "User",
+    "UserCreateRequest",
+    "UserDocument",
+    "UserResetPasswordRequest",
+    "UserRole",
+    "UserUpdateRequest",
 ]

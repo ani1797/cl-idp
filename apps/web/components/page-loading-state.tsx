@@ -1,3 +1,4 @@
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function PageLoadingState({
@@ -8,29 +9,64 @@ export function PageLoadingState({
   description: string;
 }) {
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="rounded-3xl border bg-background p-8 shadow-sm">
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-72" />
-            <Skeleton className="h-5 w-full max-w-2xl" />
-            <Skeleton className="h-5 w-full max-w-xl" />
+    <div className="grid w-full gap-6 lg:grid-cols-[minmax(0,1fr)_360px]" aria-busy="true">
+      <span className="sr-only">
+        {title}: {description}
+      </span>
+      <Card>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-8 w-72 max-w-full" />
+              <Skeleton className="h-5 w-full max-w-2xl" />
+              <Skeleton className="h-5 w-full max-w-xl" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card size="sm" className="bg-muted/30">
+                <CardContent>
+                  <Skeleton className="h-5 w-28" />
+                  <Skeleton className="mt-3 h-4 w-full" />
+                  <Skeleton className="mt-2 h-4 w-3/4" />
+                </CardContent>
+              </Card>
+              <Card size="sm" className="bg-muted/30">
+                <CardContent>
+                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="mt-3 h-4 w-full" />
+                  <Skeleton className="mt-2 h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            </div>
+            <Card className="border-dashed bg-muted/20">
+              <CardContent>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-36" />
+                    <Skeleton className="h-4 w-72 max-w-full" />
+                  </div>
+                  <Skeleton className="h-8 w-52" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Skeleton className="h-28 rounded-2xl" />
-            <Skeleton className="h-28 rounded-2xl" />
-          </div>
-          <div className="rounded-2xl border border-dashed p-6">
-            <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-          </div>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
       <aside className="space-y-6">
-        <Skeleton className="h-80 rounded-3xl" />
-        <Skeleton className="h-52 rounded-3xl" />
+        <Card>
+          <CardContent>
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="mt-4 h-32 w-full" />
+            <Skeleton className="mt-4 h-8 w-40" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="mt-4 h-20 w-full" />
+          </CardContent>
+        </Card>
       </aside>
     </div>
   );

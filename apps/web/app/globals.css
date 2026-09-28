@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-source-sans-3), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,82 +39,202 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-brand-maroon: var(--brand-maroon);
+  --color-brand-maroon-dark: var(--brand-maroon-dark);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-dark: var(--brand-teal-dark);
+  --color-brand-teal-light: var(--brand-teal-light);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-neutral: var(--brand-neutral);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-surface: var(--success-surface);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-surface: var(--warning-surface);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-surface: var(--info-surface);
+  --color-info-border: var(--info-border);
+  --color-confidence-pass: var(--confidence-pass);
+  --color-confidence-pass-surface: var(--confidence-pass-surface);
+  --color-confidence-pass-border: var(--confidence-pass-border);
+  --color-confidence-warn: var(--confidence-warn);
+  --color-confidence-warn-surface: var(--confidence-warn-surface);
+  --color-confidence-warn-border: var(--confidence-warn-border);
+  --color-confidence-critical: var(--confidence-critical);
+  --color-confidence-critical-surface: var(--confidence-critical-surface);
+  --color-confidence-critical-border: var(--confidence-critical-border);
+  /* 8px is the platform radius; shadcn's common `rounded-lg` maps onto it. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  --spacing-gutter: 1rem;
+  --spacing-margin: 1.5rem;
+  --container-app: 90rem;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Canada Life IDP — brand constants (canadalife.com production palette) */
+  --brand-maroon: #a20a29;
+  --brand-maroon-dark: #79001a;
+  --brand-teal: #007f7f;
+  --brand-teal-dark: #006565;
+  /* Legible teal on maroon surfaces (e.g. the production status dot). */
+  --brand-teal-light: #77d6d5;
+  --brand-gold: #b08824;
+  --brand-neutral: #36362f;
+
+  /* Surfaces: white cards on an off-white canvas (tonal layering, not shadow) */
+  --background: #fcf9ef;
+  --foreground: #1c1c16;
+  --card: #ffffff;
+  --card-foreground: #1c1c16;
+  --popover: #ffffff;
+  --popover-foreground: #1c1c16;
+
+  --primary: #a20a29;
+  --primary-foreground: #ffffff;
+  --secondary: #007f7f;
+  --secondary-foreground: #ffffff;
+
+  --muted: #f0eee3;
+  --muted-foreground: #5a5a50;
+  --accent: #ebe8de;
+  --accent-foreground: #1c1c16;
+
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+
+  /* Hairline borders in low-contrast warm neutrals */
+  --border: #e5e3d8;
+  --input: #e5e3d8;
+  --ring: #a20a29;
+
+  /* Semantic states */
+  --success: #1e7b4d;
+  --success-foreground: #ffffff;
+  --success-surface: #e8f3ed;
+  --success-border: #bfe0cf;
+  --warning: #b08824;
+  --warning-foreground: #ffffff;
+  --warning-surface: #fbf3e0;
+  --warning-border: #ecd9a8;
+  --info: #007f7f;
+  --info-foreground: #ffffff;
+  --info-surface: #e4f4f4;
+  --info-border: #b3dedd;
+
+  /* Confidence bands — pass >=95%, warn 70-94%, critical <70% */
+  --confidence-pass: #1e7b4d;
+  --confidence-pass-surface: #e8f3ed;
+  --confidence-pass-border: #bfe0cf;
+  --confidence-warn: #b08824;
+  --confidence-warn-surface: #fbf3e0;
+  --confidence-warn-border: #ecd9a8;
+  --confidence-critical: #a20a29;
+  --confidence-critical-surface: #fbe9ec;
+  --confidence-critical-border: #f0c2cb;
+
+  --chart-1: #a20a29;
+  --chart-2: #007f7f;
+  --chart-3: #b08824;
+  --chart-4: #1e7b4d;
+  --chart-5: #36362f;
+
+  --radius: 0.5rem;
+
+  --sidebar: #f6f4e9;
+  --sidebar-foreground: #1c1c16;
+  --sidebar-primary: #a20a29;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ebe8de;
+  --sidebar-accent-foreground: #1c1c16;
+  --sidebar-border: #e5e3d8;
+  --sidebar-ring: #a20a29;
 }
 
+/*
+ * Dark mode is derived, not designed: the Stitch design system is light-only
+ * (colorMode: LIGHT). Tones follow the Material 3 dark convention where the
+ * brand hue becomes the light tone and its "on" colour becomes dark.
+ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --brand-maroon: #ffb3b3;
+  --brand-maroon-dark: #ffdad9;
+  --brand-teal: #77d6d5;
+  --brand-teal-dark: #91efef;
+  --brand-teal-light: #91efef;
+  --brand-gold: #eec058;
+  --brand-neutral: #e5e3d8;
+
+  --background: #16160f;
+  --foreground: #f3f1e6;
+  --card: #22221b;
+  --card-foreground: #f3f1e6;
+  --popover: #22221b;
+  --popover-foreground: #f3f1e6;
+
+  --primary: #ffb3b3;
+  --primary-foreground: #400009;
+  --secondary: #77d6d5;
+  --secondary-foreground: #002020;
+
+  --muted: #2a2a22;
+  --muted-foreground: #c9c5b8;
+  --accent: #33332b;
+  --accent-foreground: #f3f1e6;
+
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+
+  --border: #3a3a31;
+  --input: #3a3a31;
+  --ring: #ffb3b3;
+
+  --success: #6fd79b;
+  --success-foreground: #00391f;
+  --success-surface: #1b3328;
+  --success-border: #2f5943;
+  --warning: #eec058;
+  --warning-foreground: #3d2f00;
+  --warning-surface: #332c14;
+  --warning-border: #5b4b22;
+  --info: #77d6d5;
+  --info-foreground: #002020;
+  --info-surface: #16302f;
+  --info-border: #2b504f;
+
+  --confidence-pass: #6fd79b;
+  --confidence-pass-surface: #1b3328;
+  --confidence-pass-border: #2f5943;
+  --confidence-warn: #eec058;
+  --confidence-warn-surface: #332c14;
+  --confidence-warn-border: #5b4b22;
+  --confidence-critical: #ffb3b3;
+  --confidence-critical-surface: #3a1a1f;
+  --confidence-critical-border: #5e2c34;
+
+  --chart-1: #ffb3b3;
+  --chart-2: #77d6d5;
+  --chart-3: #eec058;
+  --chart-4: #6fd79b;
+  --chart-5: #c9c5b8;
+
+  --sidebar: #1f1f18;
+  --sidebar-foreground: #f3f1e6;
+  --sidebar-primary: #ffb3b3;
+  --sidebar-primary-foreground: #400009;
+  --sidebar-accent: #33332b;
+  --sidebar-accent-foreground: #f3f1e6;
+  --sidebar-border: #3a3a31;
+  --sidebar-ring: #ffb3b3;
 }
 
 @layer base {
@@ -123,8 +243,71 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03";
   }
   html {
     @apply font-sans;
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+/* Material Symbols ligature icons, self-hosted via next/font/local. */
+.material-symbols-outlined {
+  font-family: var(--font-material-symbols), sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  overflow: hidden;
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography roles from the Canada Life IDP design system. */
+@utility text-headline-lg {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+@utility text-headline-md {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+@utility text-body-md {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+@utility text-label-caps {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Numeric columns align on tabular figures. */
+@utility tabular-figures {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }

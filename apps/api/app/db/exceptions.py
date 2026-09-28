@@ -12,3 +12,7 @@ class DataStoreError(Exception):
 
 class DocumentNotFoundError(DataStoreError):
     """Raised when a requested process or job document does not exist."""
+
+
+class DuplicateDocumentError(DataStoreError):
+    """Raised when a unique datastore constraint would be violated."""

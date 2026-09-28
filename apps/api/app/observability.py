@@ -150,7 +150,7 @@ def _otlp_signal_endpoint(settings: Settings, signal: str) -> str:
 
 def _load_azure_monitor_trace_exporter() -> AzureMonitorTraceExporterFactory:
     try:
-        from azure.monitor.opentelemetry.exporter import (  # type: ignore[import-untyped]
+        from azure.monitor.opentelemetry.exporter import (
             AzureMonitorTraceExporter,
         )
     except ModuleNotFoundError as exc:  # pragma: no cover - import failure path is configuration-only

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import re
-from statistics import fmean
 from dataclasses import dataclass
+from statistics import fmean
 from typing import Any
 
 from app.models import (

@@ -15,6 +15,8 @@ from app.cu import ContentUnderstandingError, CuClient
 from app.db import DataStore
 from app.storage import BlobService, QueueService
 
+TEST_SERVICE_TOKEN = "test-service-token"
+
 
 @pytest.fixture(autouse=True)
 def configure_test_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
@@ -54,6 +56,8 @@ def configure_test_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None
     monkeypatch.setenv("SMTP_PORT", "1025")
     monkeypatch.setenv("WEB_ORIGIN", "http://localhost:3000")
     monkeypatch.setenv("NEXT_PUBLIC_API_BASE_URL", "http://localhost:8000")
+    monkeypatch.setenv("JWT_SECRET", "test-jwt-secret-at-least-thirty-two-bytes")
+    monkeypatch.setenv("SERVICE_API_TOKEN", TEST_SERVICE_TOKEN)
     if "CU_ENDPOINT" not in os.environ:
         monkeypatch.setenv("CU_ENDPOINT", "https://example.services.ai.azure.com/")
     if "CU_API_KEY" not in os.environ:
@@ -70,6 +74,7 @@ def api_client() -> Iterator[TestClient]:
     get_settings.cache_clear()
     app = app_main.create_app()
     with TestClient(app) as client:
+        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
             fastapi_app.state.data_store,
@@ -111,6 +116,7 @@ def live_api_client(live_cu_env: dict[str, str]) -> Iterator[TestClient]:
     get_settings.cache_clear()
     app = app_main.create_app()
     with TestClient(app) as client:
+        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
             fastapi_app.state.data_store,
@@ -144,6 +150,9 @@ def clean_backend_state(data_store: DataStore, blob: BlobService, queue: QueueSe
         for job in data_store.list_jobs_for_process(process.id):
             data_store.delete_job(process.id, job.id)
         data_store.delete_process(process.id)
+
+    for user in data_store.list_users():
+        data_store.delete_user(user.id)
 
     for blob_name in blob.list_blob_names():
         blob.delete_blob(blob_name)

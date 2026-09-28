@@ -1,0 +1,628 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-tint": "#b61f35",
+        "surface-container-low": "#f6f4e9",
+        "inverse-surface": "#31312a",
+        "tertiary-container": "#674c00",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed": "#251a00",
+        "on-surface": "#1c1c16",
+        "surface": "#fcf9ef",
+        "tertiary-fixed": "#ffdf9d",
+        "on-background": "#1c1c16",
+        "on-primary-fixed-variant": "#920022",
+        "background": "#fcf9ef",
+        "surface-container-highest": "#e5e3d8",
+        "outline": "#8e706f",
+        "inverse-on-surface": "#f3f1e6",
+        "surface-bright": "#fcf9ef",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed": "#ffdad9",
+        "surface-variant": "#e5e3d8",
+        "tertiary-fixed-dim": "#eec058",
+        "on-primary": "#ffffff",
+        "on-secondary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary-fixed": "#400009",
+        "error": "#ba1a1a",
+        "on-secondary-fixed": "#002020",
+        "on-primary-container": "#ffaeae",
+        "primary-fixed-dim": "#ffb3b3",
+        "tertiary": "#4b3600",
+        "secondary-container": "#91efef",
+        "surface-container": "#f0eee3",
+        "on-error-container": "#93000a",
+        "surface-container-high": "#ebe8de",
+        "secondary-fixed": "#94f2f2",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "primary": "#79001a",
+        "outline-variant": "#e2bebd",
+        "on-secondary-container": "#006e6e",
+        "surface-dim": "#dcdad0",
+        "secondary": "#006a6a",
+        "on-error": "#ffffff",
+        "inverse-primary": "#ffb3b3",
+        "on-surface-variant": "#5a4040",
+        "secondary-fixed-dim": "#77d6d5"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "gutter": "16px",
+        "base": "4px",
+        "container-max-width": "1440px",
+        "margin": "24px"
+      },
+      "fontFamily": {
+        "tabular-nums": ["\"Source Sans 3\""],
+        "headline-md": ["Public Sans"],
+        "body-md": ["\"Source Sans 3\""],
+        "headline-lg": ["Public Sans"],
+        "label-caps": ["Public Sans"]
+      },
+      "fontSize": {
+        "tabular-nums": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+      }
+    }
+  }
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-base"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><span class="font-headline-md text-headline-md tracking-tight ml-base select-none whitespace-nowrap">Intelligent Document Processing</span><span class="ml-gutter inline-flex items-center px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase">PRODUCTION</span></div><div class="flex-1 max-w-lg mx-gutter"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-on-surface-variant pointer-events-none text-base">search</span><input class="w-full pl-9 pr-4 py-1.5 rounded-lg bg-surface text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-secondary" placeholder="Search by Document ID, Batch, or Policyholder..." type="search"></div></div><div class="flex items-center gap-gutter"><button class="font-label-caps text-label-caps tracking-wider px-base py-1 rounded hover:bg-primary transition-colors text-on-primary select-none" type="button">EN | FR</button><button class="p-1.5 rounded-full hover:bg-primary text-on-primary transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-xl">notifications</span></button><div class="flex items-center gap-base pl-base"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XaV9hK0paL3GVjPHY_80SPHkUOFd70wmWTMhnFZEEneTfeu9K67GhrK5B5Kf8rFNL0isEDDNWJphV1trTf04edaUyS0Lp9U08dOTWZ_LnD64eQIPFVd8rWrVUxNBdSfOBhVIP_1bvAW7f3s1-Zvytf8cs94KlXKLL-6N7QTer066FXyk-et0iHnWVwVI_5_8T9sFzDvGFT-33ey5ude8YW_dnBU2nMz5iNLhQMlNlRwhbtm5tWCAi7kYsr"><div class="flex flex-col text-left leading-none"><span class="font-headline-md text-body-md text-on-primary font-semibold">Marc-André Tremblay</span><span class="font-label-caps text-label-caps text-on-primary-container tracking-wider uppercase mt-0.5">IT Admin</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-40 flex flex-col justify-between py-margin shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><nav class="flex flex-col gap-1" data-active-classes="border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold"><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-headline-md text-body-md">Dashboard</span></a><a aria-current="page" class="flex items-center gap-gutter px-margin py-2.5 transition-colors border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold" data-path="processes" href="#"><span class="material-symbols-outlined">account_tree</span><span class="font-headline-md text-body-md">Processes</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="form-model" href="#"><span class="material-symbols-outlined">description</span><span class="font-headline-md text-body-md">Form Model</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="review-queue" href="#"><span class="material-symbols-outlined">rate_review</span><span class="font-headline-md text-body-md">Review Queue</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="api-and-integrations" href="#"><span class="material-symbols-outlined">integration_instructions</span><span class="font-headline-md text-body-md">API &amp; Integrations</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined">settings</span><span class="font-headline-md text-body-md">Settings</span></a></nav><div class="flex flex-col gap-1 px-margin pt-gutter"><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="font-body-md text-body-md">Docs</span></a><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#"><span class="material-symbols-outlined text-lg">help</span><span class="font-body-md text-body-md">Support</span></a></div></aside><div class="pl-64"><main class="relative pt-16 w-full min-h-screen bg-surface px-margin"><div class="flex flex-col w-full pb-28">
+<!-- BREADCRUMB & CONTROLS SUB-HEADER -->
+<div class="flex items-center justify-between py-base mb-base">
+<div class="flex items-center gap-gutter text-body-md text-on-surface-variant font-body-md">
+<a class="inline-flex items-center gap-base text-primary-container font-semibold hover:underline" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+        Back to Processes
+      </a>
+<span class="text-surface-dim select-none font-bold">/</span>
+<span class="text-on-surface font-semibold">Onboard New Process</span>
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container-high text-on-surface font-label-caps text-label-caps uppercase tracking-wider">
+        PIPELINE DRAFT #8820
+      </span>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="inline-flex items-center gap-base px-gutter py-1.5 rounded-lg bg-surface-container text-on-surface font-label-caps text-label-caps tracking-wider uppercase hover:bg-surface-container-high transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-base">save</span>
+        Save Draft
+      </button>
+<button class="inline-flex items-center gap-base px-gutter py-1.5 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-caps text-label-caps tracking-wider uppercase hover:bg-surface-container hover:text-on-surface transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-base">close</span>
+        Exit to Processes
+      </button>
+</div>
+</div>
+<!-- TITLE & DESCRIPTION -->
+<div class="mb-gutter">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Onboard New Process Pipeline</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl mt-0.5">
+      Review comprehensive pipeline configuration, verify attached extraction models and HITL routing policies, and trigger classifier training to activate process in production.
+    </p>
+</div>
+<!-- 4-STAGE PIPELINE STEPPER -->
+<div class="grid grid-cols-4 gap-gutter mb-gutter bg-surface-container-lowest p-gutter rounded-xl shadow-sm">
+<!-- Stage 01: Completed -->
+<div class="flex items-center gap-gutter">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold tracking-wider">Stage 01 • Done</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface truncate">The Basics</span>
+</div>
+</div>
+<!-- Stage 02: Completed -->
+<div class="flex items-center gap-gutter">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold tracking-wider">Stage 02 • Done</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface truncate">Attached Form Models</span>
+</div>
+</div>
+<!-- Stage 03: Completed -->
+<div class="flex items-center gap-gutter">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold tracking-wider">Stage 03 • Done</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface truncate">HITL Thresholds</span>
+</div>
+</div>
+<!-- Stage 04: Active -->
+<div class="flex items-center gap-gutter bg-primary-container px-gutter py-2 rounded-lg text-on-primary">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest text-primary-container font-headline-md font-bold text-body-md flex items-center justify-center shrink-0 shadow-sm">
+        4
+      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-primary-container uppercase font-bold tracking-wider">Stage 04 • Active</span>
+<span class="font-headline-md text-body-md font-semibold text-on-primary truncate">Confirm &amp; Deploy</span>
+</div>
+</div>
+</div>
+<!-- MAIN 2-COLUMN LAYOUT -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- LEFT COLUMN: Review Cards (8 Cols) -->
+<div class="col-span-8 flex flex-col gap-gutter">
+<!-- STAGE 01 CARD -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="px-base py-0.5 bg-surface-container-high text-on-surface font-label-caps text-label-caps rounded uppercase font-bold tracking-wider">Stage 01</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Process Identification &amp; Ingestion Channels</h2>
+</div>
+<button class="inline-flex items-center gap-base text-primary-container hover:text-primary font-headline-md text-body-md font-semibold" type="button">
+<span class="material-symbols-outlined text-base">edit</span>
+            Edit Stage 01
+          </button>
+</div>
+<div class="grid grid-cols-2 gap-gutter bg-surface-container-low p-gutter rounded-lg">
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Process Name</span>
+<span class="font-headline-md text-body-md text-on-surface font-semibold">Group Health &amp; Dental Claim Adjudication</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Process Key (Immutable)</span>
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-base text-secondary">lock</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface bg-surface-container-highest px-base py-0.5 rounded">PROC-GH-8820</span>
+<button class="text-on-surface-variant hover:text-on-surface" title="Copy Process Key" type="button">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Archetype</span>
+<span class="font-body-md text-body-md text-on-surface">Multi-Form Package (Forms + Itemized Receipts)</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Target SLA</span>
+<span class="inline-flex items-center gap-base text-on-secondary-fixed-variant font-semibold">
+<span class="material-symbols-outlined text-base">timer</span>
+              15m Expedited Turnaround
+            </span>
+</div>
+</div>
+<!-- Ingestion Gateways Details -->
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Ingestion Gateways Active</span>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="bg-surface-container-lowest p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary text-base">webhook</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">REST Webhook</span>
+</div>
+<span class="px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Ready</span>
+</div>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant">HTTPS / TLS 1.3 • mTLS Enabled</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface bg-surface-container px-base py-0.5 rounded truncate">/v3/ingest/portal</span>
+</div>
+<div class="bg-surface-container-lowest p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary text-base">cloud_sync</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Azure Blob &amp; SFTP</span>
+</div>
+<span class="px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Active Sync</span>
+</div>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant">Canadian Sovereign (Canada Central Toronto)</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface bg-surface-container px-base py-0.5 rounded truncate">azure-blob://adjud-inbound</span>
+</div>
+</div>
+</div>
+</div>
+<!-- STAGE 02 CARD -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="px-base py-0.5 bg-surface-container-high text-on-surface font-label-caps text-label-caps rounded uppercase font-bold tracking-wider">Stage 02</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Attached Model Ensemble &amp; Schema Definitions</h2>
+</div>
+<button class="inline-flex items-center gap-base text-primary-container hover:text-primary font-headline-md text-body-md font-semibold" type="button">
+<span class="material-symbols-outlined text-base">edit</span>
+            Edit Stage 02
+          </button>
+</div>
+<div class="flex flex-col gap-base">
+<!-- Model 1 -->
+<div class="p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-md text-body-md font-bold text-on-surface">CL-CLAIM-04 • Standard Group Health Claim</span>
+<span class="px-base py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Prebuilt (Certified) v2.4</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold">24 Structured Attributes</span>
+</div>
+<div class="flex items-center justify-between text-body-md text-on-surface-variant">
+<span class="">Engine: <strong class="text-on-surface">Hierarchical Tables &amp; Key-Value</strong></span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface">High-liability: Policyholder ID, Group Number, Claim Total</span>
+</div>
+</div>
+<!-- Model 2 -->
+<div class="p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-md text-body-md font-bold text-on-surface">CL-DENT-02 • Dental Service Claim &amp; Invoicing</span>
+<span class="px-base py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Prebuilt (Certified) v1.9</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold">18 Structured Attributes</span>
+</div>
+<div class="flex items-center justify-between text-body-md text-on-surface-variant">
+<span class="">Engine: <strong class="text-on-surface">Hierarchical Tables</strong></span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface">High-liability: Tooth Surface Nomenclature, ODA/CDA Codes</span>
+</div>
+</div>
+<!-- Model 3 -->
+<div class="p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-md text-body-md font-bold text-on-surface">CL-RECEIPT-08 • Standard Medical &amp; Pharmacy Receipt</span>
+<span class="px-base py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps uppercase font-bold">Custom (Trained) v3.1</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold">12 Structured Attributes</span>
+</div>
+<div class="flex items-center justify-between text-body-md text-on-surface-variant">
+<span class="">Engine: <strong class="text-on-surface">Line-Item Sequence</strong></span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface">High-liability: DIN Pharmacy Logs, Tax Subtotal, Total Incurred</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between px-gutter py-2 rounded-lg bg-surface-container">
+<div class="flex items-center gap-base text-on-surface font-body-md">
+<span class="material-symbols-outlined text-secondary text-base">view_carousel</span>
+<span class="">Total Extracted Fields: <strong class="font-headline-md">54 Structured Fields</strong> across 3 Model Pipelines</span>
+</div>
+<span class="font-label-caps text-label-caps bg-surface-container-lowest px-gutter py-1 rounded text-on-surface font-bold uppercase tracking-wider shadow-sm">
+            Multi-Doc Boundary Splitter v2.1 Activated
+          </span>
+</div>
+</div>
+<!-- STAGE 03 CARD -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="px-base py-0.5 bg-surface-container-high text-on-surface font-label-caps text-label-caps rounded uppercase font-bold tracking-wider">Stage 03</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">HITL Threshold Policies &amp; Specialist Triage</h2>
+</div>
+<button class="inline-flex items-center gap-base text-primary-container hover:text-primary font-headline-md text-body-md font-semibold" type="button">
+<span class="material-symbols-outlined text-base">edit</span>
+            Edit Stage 03
+          </button>
+</div>
+<div class="p-gutter rounded-lg bg-surface-container-low flex flex-col gap-base">
+<div class="flex items-center justify-between mb-base">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Selected Confidence Evaluation Mode</span>
+<span class="px-gutter py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold uppercase">
+              Overall Average (Standard Composite Cutoff)
+            </span>
+</div>
+<div class="space-y-base">
+<!-- Calibration Model 1 -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-gutter rounded-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">CL-CLAIM-04 (Group Health)</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Assigned Pool: <strong class="text-on-surface">Group Health Specialist Tier 1</strong></span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-surface-container font-tabular-nums text-tabular-nums text-on-surface font-semibold">
+                  STP ≥ 85%
+                </span>
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-semibold">
+                  HITL 70% - 84%
+                </span>
+</div>
+</div>
+<!-- Calibration Model 2 -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-gutter rounded-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">CL-DENT-02 (Dental Claims)</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Assigned Pool: <strong class="text-on-surface">Dental Claims Review Pool Tier 2</strong></span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-surface-container font-tabular-nums text-tabular-nums text-on-surface font-semibold">
+                  STP ≥ 88%
+                </span>
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-semibold">
+                  HITL 70% - 87%
+                </span>
+</div>
+</div>
+<!-- Calibration Model 3 -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-gutter rounded-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">CL-RECEIPT-08 (Medical Receipts)</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Assigned Pool: <strong class="text-on-surface">Expense &amp; Receipt Adjudication Pool</strong></span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-surface-container font-tabular-nums text-tabular-nums text-on-surface font-semibold">
+                  STP ≥ 80%
+                </span>
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-semibold">
+                  HITL 65% - 79%
+                </span>
+</div>
+</div>
+</div>
+<div class="mt-base flex items-center gap-base text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-base text-primary-container">info</span>
+<span class="">Fallback Policy: Automatic escalation to <strong>Senior Claims Supervisor Queue</strong> after 4h SLA breach.</span>
+</div>
+</div>
+</div>
+<!-- PRE-FLIGHT CLASSIFIER TRAINING BANNER -->
+<div class="bg-surface-container-low rounded-xl p-gutter shadow-sm flex flex-col gap-gutter">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-gutter">
+<div class="p-base bg-secondary text-on-secondary rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-2xl">model_training</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-base">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Ensemble Multi-Doc Classifier: Ready to Train</h3>
+<span class="px-base py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Auto-Synthesis</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+                Deploying will trigger automated classification training across the 3 selected form models to synthesize document boundary detection and routing rules.
+              </p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-gutter bg-surface-container-lowest p-gutter rounded-lg shadow-sm">
+<div class="flex items-center gap-gutter">
+<div class="p-base rounded-full bg-surface-container text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">schedule</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Estimated Training Duration</span>
+<span class="font-tabular-nums text-tabular-nums font-bold text-on-surface">~45 seconds on Canadian Sovereign Azure GPU cluster</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="p-base rounded-full bg-surface-container text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">verified</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Auto-Health Diagnostics</span>
+<span class="font-headline-md text-body-md font-bold text-secondary">4 / 4 Validation Checks Passed</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter"><div class="flex items-center justify-between"><div class="flex items-center gap-base"><span class="px-base py-0.5 bg-surface-container-high text-on-surface font-label-caps text-label-caps rounded uppercase font-bold tracking-wider">Stage 04</span><h2 class="font-headline-md text-headline-md text-on-surface">Downstream Dispatch &amp; Event Destinations</h2></div><button class="inline-flex items-center gap-base text-primary-container hover:text-primary font-headline-md text-body-md font-semibold" type="button"><span class="material-symbols-outlined text-base">tune</span>Configure Destinations</button></div><div class="flex flex-col gap-base"><div class="grid grid-cols-2 gap-gutter"><div class="bg-surface-container-low p-gutter rounded-lg flex flex-col gap-base"><div class="flex items-center justify-between"><div class="flex items-center gap-base"><span class="material-symbols-outlined text-secondary text-base">webhook</span><span class="font-headline-md text-body-md font-semibold text-on-surface">Outbound Webhook</span></div><span class="px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Ready</span></div><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">POST /v1/claims/dispatched • HMAC SHA-256</span><span class="font-tabular-nums text-tabular-nums text-on-surface bg-surface-container px-base py-0.5 rounded truncate">https://core-adjudication.canadalife.internal/v1/claims/dispatched</span></div><div class="bg-surface-container-low p-gutter rounded-lg flex flex-col gap-base"><div class="flex items-center justify-between"><div class="flex items-center gap-base"><span class="material-symbols-outlined text-secondary text-base">cloud_upload</span><span class="font-headline-md text-body-md font-semibold text-on-surface">Azure Blob Storage</span></div><span class="px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Active Sync</span></div><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">Normalized JSON Payloads &amp; OCR Metadata</span><span class="font-tabular-nums text-tabular-nums text-on-surface bg-surface-container px-base py-0.5 rounded truncate">azure-blob://claims-egress/adjudicated/</span></div></div><div class="p-gutter rounded-lg bg-surface-container-low flex items-center justify-between"><div class="flex items-center gap-gutter"><div class="w-8 h-8 rounded bg-surface-container-high text-on-surface flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-base text-secondary">swap_horiz</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-base"><span class="font-headline-md text-body-md font-bold text-on-surface">Azure Service Bus Queue</span><span class="px-base py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase font-bold">Event Stream</span></div><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">Topic Queue: <strong class="text-on-surface font-tabular-nums">sb-claims-adjudicated-events</strong></span></div></div><span class="font-label-caps text-label-caps bg-surface-container-lowest px-gutter py-1 rounded text-on-surface font-bold uppercase tracking-wider shadow-sm">FIFO Strict Ordering</span></div><div class="flex items-center gap-base px-gutter py-2 rounded-lg bg-surface-container text-body-md text-on-surface"><span class="material-symbols-outlined text-base text-secondary">verified</span><span class="">Dispatch Delivery Coverage: Both <strong class="font-semibold">STP Auto-Approved</strong> and <strong class="font-semibold">HITL Reviewed</strong> records are committed and dispatched to downstream targets.</span></div></div></div></div>
+<!-- RIGHT COLUMN: Topology, Pre-flight Checklist & Governance (4 Cols) -->
+<div class="col-span-4 flex flex-col gap-gutter">
+<!-- TOPOLOGY & ROUTING FLOW -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-body-md font-bold text-on-surface">Deployment Topology</h2>
+<span class="font-label-caps text-label-caps bg-surface-container-high px-base py-0.5 rounded text-on-surface uppercase">Live Blueprint</span>
+</div>
+<div class="flex flex-col gap-base bg-surface-container-low p-gutter rounded-lg">
+<!-- Step 1: Ingestion -->
+<div class="flex items-center gap-gutter bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="w-7 h-7 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">input</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface uppercase font-bold truncate">Dual Inbound Gateways</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant truncate">REST Webhook + Azure SFTP</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="flex justify-center -my-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">arrow_downward</span>
+</div>
+<!-- Step 2: Splitter -->
+<div class="flex items-center gap-gutter bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="w-7 h-7 rounded bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">call_split</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface uppercase font-bold truncate">Boundary Splitter</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant truncate">Multi-Doc Boundary v2.1</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="flex justify-center -my-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">arrow_downward</span>
+</div>
+<!-- Step 3: Classifier -->
+<div class="flex items-center gap-gutter bg-primary-container text-on-primary p-2 rounded-lg shadow-sm">
+<div class="w-7 h-7 rounded bg-surface-container-lowest text-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">hub</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps uppercase font-bold truncate">Document Classifier</span>
+<span class="font-tabular-nums text-tabular-nums text-on-primary-container truncate">Ensemble Train Triggered</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="flex justify-center -my-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">arrow_downward</span>
+</div>
+<!-- Step 4: Extraction Engine -->
+<div class="flex items-center gap-gutter bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="w-7 h-7 rounded bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">article</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface uppercase font-bold truncate">3-Model Extraction</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant truncate">Health, Dental, Receipt</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="flex justify-center -my-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">arrow_downward</span>
+</div>
+<!-- Step 5: HITL Routing Evaluation -->
+<div class="flex items-center gap-gutter bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="w-7 h-7 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-base">tune</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface uppercase font-bold truncate">Confidence Evaluation</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant truncate">STP Composite Thresholding</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="flex justify-center -my-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">arrow_downward</span>
+</div>
+<!-- Step 6: Terminal -->
+<div class="grid grid-cols-2 gap-base">
+<div class="p-2 rounded bg-surface-container-highest text-center">
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold block">STP Auto</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant">Core Sys</span>
+</div>
+<div class="p-2 rounded bg-surface-container-highest text-center">
+<span class="font-label-caps text-label-caps uppercase text-primary-container font-bold block">HITL Review</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant">Workbench</span>
+</div>
+</div><div class="flex justify-center -my-1 text-on-surface-variant"><span class="material-symbols-outlined text-base">arrow_downward</span></div><div class="flex items-center gap-gutter bg-surface-container-lowest p-2 rounded-lg shadow-sm"><div class="w-7 h-7 rounded bg-secondary text-on-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-base">outgoing_mail</span></div><div class="flex flex-col min-w-0"><span class="font-label-caps text-label-caps text-on-surface uppercase font-bold truncate">Outbound Dispatch</span><span class="font-tabular-nums text-tabular-nums text-on-surface-variant truncate">Webhook, Blob &amp; Service Bus</span></div></div>
+</div>
+</div>
+<!-- PRE-FLIGHT READINESS CHECKLIST -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<h2 class="font-headline-md text-body-md font-bold text-on-surface">Pre-Flight Readiness Check</h2>
+<div class="flex flex-col gap-gutter">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Schema compatibility validated across all 3 models</span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Inbound webhook endpoints listening</span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Data sovereignty compliance: Canada Central (Toronto)</span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Specialist reviewer triage pools mapped and verified</span>
+</div>
+</div>
+</div>
+<!-- GOVERNANCE SIGN-OFF -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-gutter flex flex-col gap-gutter">
+<h2 class="font-headline-md text-body-md font-bold text-on-surface">Governance &amp; Audit Trail</h2>
+<div class="flex flex-col gap-base bg-surface-container-low p-gutter rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Environment Target</span>
+<span class="px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase font-bold">PRODUCTION</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Authorized Sign-off</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Marc-André Tremblay</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Audit Operator ID</span>
+<span class="font-tabular-nums text-tabular-nums text-on-surface">IT Admin #44892</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Regulatory Spec</span>
+<span class="font-label-caps text-label-caps bg-surface-container-highest px-base py-0.5 rounded text-on-surface uppercase">CL-FIN-2024-Q3</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- STICKY BOTTOM REVIEWER ACTION BAR -->
+<div class="fixed bottom-0 left-64 right-0 z-40 bg-surface-container-lowest px-margin py-base shadow-xl flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-body-md text-body-md text-on-surface-variant">
+        Draft saved just now • Auto-sync enabled for <strong>PIPELINE DRAFT #8820</strong>
+</span>
+<div class="flex items-center gap-base ml-gutter">
+<button class="px-gutter py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-caps text-label-caps uppercase transition-colors" type="button">
+          Save Draft
+        </button>
+<button class="px-gutter py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-caps text-label-caps uppercase transition-colors" type="button">
+          Save as Template
+        </button>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<a class="inline-flex items-center gap-base px-gutter py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest font-headline-md text-body-md font-semibold transition-colors" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+        Back to Stage 03: HITL Thresholds
+      </a>
+<button class="inline-flex items-center gap-gutter px-margin py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-headline-md text-body-md font-bold transition-all shadow-md active:scale-95" id="deployButton" onclick="triggerDeployment()" type="button">
+<span class="material-symbols-outlined text-xl">rocket_launch</span>
+<span class="">Train Classifier &amp; Activate Process →</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  function triggerDeployment() {
+    const btn = document.getElementById('deployButton');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="material-symbols-outlined text-xl animate-spin">sync</span>
+      <span>Training Classifier &amp; Activating...</span>
+    `;
+    setTimeout(() => {
+      btn.className = "inline-flex items-center gap-gutter px-margin py-2 rounded-lg bg-secondary text-on-secondary font-headline-md text-body-md font-bold transition-all shadow-md";
+      btn.innerHTML = `
+        <span class="material-symbols-outlined text-xl">check_circle</span>
+        <span>Process Activated in Production</span>
+      `;
+    }, 2400);
+  }
+</script></main></div>
+
+</body></html>

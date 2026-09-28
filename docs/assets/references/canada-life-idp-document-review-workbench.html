@@ -1,0 +1,709 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "secondary-fixed": "#94f2f2",
+        "surface-container-high": "#ebe8de",
+        "surface-dim": "#dcdad0",
+        "surface": "#fcf9ef",
+        "on-surface-variant": "#5a4040",
+        "surface-container-low": "#f6f4e9",
+        "secondary-container": "#91efef",
+        "tertiary-fixed-dim": "#eec058",
+        "on-secondary-container": "#006e6e",
+        "on-error": "#ffffff",
+        "tertiary-fixed": "#ffdf9d",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-background": "#1c1c16",
+        "surface-tint": "#b61f35",
+        "on-secondary": "#ffffff",
+        "tertiary-container": "#674c00",
+        "outline": "#8e706f",
+        "surface-container": "#f0eee3",
+        "on-surface": "#1c1c16",
+        "primary-fixed-dim": "#ffb3b3",
+        "primary": "#79001a",
+        "surface-bright": "#fcf9ef",
+        "inverse-on-surface": "#f3f1e6",
+        "on-primary-fixed-variant": "#920022",
+        "on-secondary-fixed": "#002020",
+        "on-primary-fixed": "#400009",
+        "surface-container-lowest": "#ffffff",
+        "background": "#fcf9ef",
+        "primary-fixed": "#ffdad9",
+        "error": "#ba1a1a",
+        "surface-container-highest": "#e5e3d8",
+        "inverse-primary": "#ffb3b3",
+        "on-tertiary-fixed": "#251a00",
+        "on-primary-container": "#ffaeae",
+        "tertiary": "#4b3600",
+        "on-tertiary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary": "#ffffff",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "error-container": "#ffdad6",
+        "secondary": "#006a6a",
+        "on-error-container": "#93000a",
+        "inverse-surface": "#31312a",
+        "surface-variant": "#e5e3d8",
+        "secondary-fixed-dim": "#77d6d5",
+        "outline-variant": "#e2bebd"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "base": "4px",
+        "margin": "24px",
+        "gutter": "16px",
+        "container-max-width": "1440px"
+      },
+      "fontFamily": {
+        "tabular-nums": [
+          "\"Source Sans 3\""
+        ],
+        "headline-lg": [
+          "Public Sans"
+        ],
+        "label-caps": [
+          "Public Sans"
+        ],
+        "headline-md": [
+          "Public Sans"
+        ],
+        "body-md": [
+          "\"Source Sans 3\""
+        ]
+      },
+      "fontSize": {
+        "tabular-nums": [
+          "14px",
+          {
+            "lineHeight": "20px",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-lg": [
+          "24px",
+          {
+            "lineHeight": "32px",
+            "fontWeight": "600"
+          }
+        ],
+        "label-caps": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "0.05em",
+            "fontWeight": "700"
+          }
+        ],
+        "headline-md": [
+          "20px",
+          {
+            "lineHeight": "28px",
+            "fontWeight": "600"
+          }
+        ],
+        "body-md": [
+          "14px",
+          {
+            "lineHeight": "20px",
+            "fontWeight": "400"
+          }
+        ]
+      }
+    },
+  },
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-gutter"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><div class="flex items-center gap-base"><span class="font-headline-md text-headline-md tracking-tight font-bold text-on-primary">Intelligent Document Processing</span><span class="px-base py-0.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded tracking-wider shadow-sm">PRODUCTION</span></div></div><div class="flex-1 max-w-xl mx-margin"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-base text-on-primary-container text-lg pointer-events-none pl-2">search</span><input class="w-full pl-10 pr-margin py-1.5 bg-primary text-on-primary placeholder:text-on-primary-container rounded-lg font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-on-primary transition-all" placeholder="Search flagged documents, claim IDs..." type="text"></div></div><div class="flex items-center gap-gutter"><div class="flex items-center bg-primary rounded px-base py-0.5 text-on-primary-container"><button class="font-label-caps text-label-caps px-base py-0.5 text-on-primary font-bold" type="button">EN</button><span class="opacity-40">|</span><button class="font-label-caps text-label-caps px-base py-0.5 hover:text-on-primary transition-colors" type="button">FR</button></div><button aria-label="Notifications" class="relative p-1.5 rounded-lg text-on-primary hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1 right-1 w-4 h-4 bg-secondary text-on-secondary font-tabular-nums text-[10px] leading-tight flex items-center justify-center rounded-full font-bold">4</span></button><div class="flex items-center gap-base pl-base"><div class="text-right hidden xl:block"><div class="font-headline-md text-body-md font-bold text-on-primary leading-none">Elena Rostova</div><div class="font-label-caps text-[10px] text-on-primary-container tracking-wider uppercase leading-tight mt-1">REVIEWER / ADJUDICATION TEAM</div></div><img alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XQ9AC8u4CoHLh4LJwRm6nsEiVUgIbJIznSGbuJsHFnGzfd2Xzi7rwlgDTRR_waRDLsJSer6B8OwzycLR1xvbMHLwI_rj_GQcNXR0cl5uion_w_3xujA4oSygxRsX9S-PYGHOPDwtCVdOO3NfpM2coSG6Pq4h4PQ2pjhXGXZt-beAdqAzQtiwjJpfpjNrFtGK_1fsRfEp9xEkQXUYJPzVN6wEIcuGxBdYCN3NKF7VISWmXFvuJ7M6glzwk"></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-72 bg-surface-container-low z-40 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="flex flex-col py-margin"><div class="px-margin pb-base"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Adjudication Console</span></div><nav class="flex flex-col gap-1 px-base" data-active-classes="bg-surface-container-high text-primary font-bold border-l-4 border-primary rounded-r-lg"><a aria-current="page" class="flex items-center justify-between px-base py-2.5 transition-all bg-surface-container-high text-primary font-bold border-l-4 border-primary rounded-r-lg" data-path="review-queue" href="#"><div class="flex items-center gap-base"><span class="material-symbols-outlined text-xl">assignment_late</span><span class="font-body-md text-body-md">Review Queue</span></div><span class="px-base py-0.5 bg-error-container text-on-error-container font-tabular-nums text-tabular-nums font-bold rounded-full">14 Pending</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="completed-reviews" href="#"><span class="material-symbols-outlined text-xl">verified</span><span class="font-body-md text-body-md">Completed Reviews</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="review-guidelines" href="#"><span class="material-symbols-outlined text-xl">policy</span><span class="font-body-md text-body-md">Review Guidelines &amp; Policy</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="system-help-and-hotkeys" href="#"><span class="material-symbols-outlined text-xl">keyboard</span><span class="font-body-md text-body-md">System Help &amp; Hotkeys</span></a></nav></div><div class="flex flex-col p-margin gap-gutter bg-surface-container"><nav class="flex flex-col gap-1"><a class="flex items-center gap-base py-1 text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="docs-and-guides" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="">Docs &amp; Guides</span></a><a class="flex items-center gap-base py-1 text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="support-and-feedback" href="#"><span class="material-symbols-outlined text-lg">headset_mic</span><span class="">Support &amp; Feedback</span></a></nav><div class="flex items-center justify-between text-on-surface-variant"><span class="font-label-caps text-label-caps uppercase">v2.4.1 (Canada Life CA)</span><span class="w-2 h-2 rounded-full bg-secondary" title="Engine Connected"></span></div></div></aside><div class="pl-72"><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Breadcrumbs & Meta Bar -->
+<div class="bg-surface-container-low px-margin py-base flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-base text-on-surface-variant font-label-caps text-label-caps">
+<span class="hover:text-primary cursor-pointer transition-colors">Canada Life IDP</span>
+<span class="opacity-40">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Adjudication Workspace</span>
+<span class="opacity-40">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Review Queue</span>
+<span class="opacity-40">/</span>
+<span class="text-on-surface font-bold">JOB-99204 (Standard_Health_Claim_Receipt_749.pdf)</span>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+        LIVE SESSION #4819
+      </span>
+<span class="text-on-surface-variant font-tabular-nums text-tabular-nums">Document MD5: 9a2f7c0...</span>
+</div>
+</div>
+<!-- Top Action & Inspection Control Bar -->
+<div class="bg-surface-container-high px-margin py-2.5 flex flex-wrap items-center justify-between gap-gutter shadow-sm z-20 sticky top-16">
+<!-- Left Job Metadata -->
+<div class="flex items-center gap-base">
+<span class="font-headline-md text-headline-md text-primary font-bold tracking-tight">#JOB-99204</span>
+<span class="text-on-surface-variant font-headline-md opacity-30">•</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Group Health &amp; Dental Claims</span>
+<div class="flex items-center gap-2 font-tabular-nums text-[11px] text-on-surface-variant">
+<span class="">Staged: 14 mins ago</span>
+<span class="">•</span>
+<span class="text-error font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">schedule</span> SLA: 28 mins remaining
+          </span>
+</div>
+</div>
+</div>
+<!-- Center Canvas Switcher & Zoom Controls -->
+<div class="flex items-center gap-1 bg-surface-container-lowest rounded-lg p-1 shadow-sm">
+<button class="p-1 rounded text-on-surface hover:bg-surface-container transition-colors" title="Previous Page" type="button">
+<span class="material-symbols-outlined text-base">arrow_back_ios_new</span>
+</button>
+<span class="px-base font-tabular-nums text-tabular-nums font-semibold text-on-surface">Page 1 of 2</span>
+<button class="p-1 rounded text-on-surface hover:bg-surface-container transition-colors" title="Next Page" type="button">
+<span class="material-symbols-outlined text-base">arrow_forward_ios</span>
+</button>
+<div class="w-px h-4 bg-surface-container mx-1"></div>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="btn-zoom-out" title="Zoom Out" type="button">
+<span class="material-symbols-outlined text-lg">zoom_out</span>
+</button>
+<span class="px-base font-tabular-nums text-tabular-nums text-on-surface-variant text-center w-12" id="zoom-label">100%</span>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="btn-zoom-in" title="Zoom In" type="button">
+<span class="material-symbols-outlined text-lg">zoom_in</span>
+</button>
+<div class="w-px h-4 bg-surface-container mx-1"></div>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Rotate Clockwise" type="button">
+<span class="material-symbols-outlined text-lg">rotate_right</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Fit to Width" type="button">
+<span class="material-symbols-outlined text-lg">fit_screen</span>
+</button>
+</div>
+<!-- Right Queue Controls & Hotkeys -->
+<div class="flex items-center gap-base">
+<button class="flex items-center gap-1 px-base py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-body-md text-body-md transition-colors" type="button">
+<span class="material-symbols-outlined text-base">navigate_before</span>
+<span class="">Previous Job</span>
+</button>
+<button class="flex items-center gap-1 px-base py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-body-md text-body-md transition-colors" type="button">
+<span class="">Next Job</span>
+<span class="material-symbols-outlined text-base">navigate_next</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center" title="Keyboard Shortcuts (⌘/)" type="button">
+<span class="material-symbols-outlined text-lg">keyboard</span>
+</button>
+</div>
+</div>
+<!-- 2-Column Split Workbench Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-0 pb-28 min-h-[calc(100vh-176px)]">
+<!-- LEFT PANEL: Document View with OCR Bounding Boxes (Desktop 6/12 or 50%) -->
+<div class="lg:col-span-6 bg-surface-container-lowest flex flex-col shadow-sm">
+<!-- Document Toolbar Header -->
+<div class="px-margin py-base bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">description</span>
+<span class="font-headline-md text-body-md font-bold text-on-surface">Scanned Source Document</span>
+</div>
+<span class="px-base py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] uppercase">Original 300 DPI</span>
+</div>
+<div class="flex items-center gap-gutter">
+<label class="inline-flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="sr-only peer" id="ocr-toggle" type="checkbox">
+<div class="w-8 h-4 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface peer-checked:bg-secondary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-3 after:w-3 after:transition-all"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant peer-checked:text-on-surface font-semibold">OCR Highlights</span>
+</label>
+<div class="flex items-center gap-1.5 pl-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-tabular-nums text-[11px] text-on-surface-variant">High ≥85%</span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim ml-1"></span>
+<span class="font-tabular-nums text-[11px] text-on-surface-variant">Flagged &lt;85%</span>
+</div>
+</div>
+</div>
+<!-- Document Preview Canvas Area -->
+<div class="relative flex-1 p-margin bg-surface-dim overflow-auto flex items-start justify-center" id="canvas-container">
+<!-- Paper Canvas Representation -->
+<div class="relative w-full max-w-xl bg-surface-container-lowest rounded-lg shadow-md p-8 transition-transform duration-150 origin-top" id="document-sheet">
+<!-- Document Header -->
+<div class="flex justify-between items-start pb-4">
+<div>
+<div class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">QUEEN'S PHARMACY &amp; WELLNESS</div>
+<div class="font-body-md text-body-md text-on-surface-variant leading-snug">
+                482 University Avenue, Suite 110<br>
+                Toronto, ON M5G 1V2 • Tel: (416) 555-0198
+              </div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">OFFICIAL PRESCRIPTION RECEIPT</span>
+<div class="font-tabular-nums text-headline-md font-bold text-on-surface">REC-2025-09884</div>
+<div class="font-tabular-nums text-tabular-nums text-on-surface-variant">Dispensed: 2025-05-12 14:22 EST</div>
+</div>
+</div>
+<!-- Document Body Details -->
+<div class="space-y-4 pt-4 text-on-surface font-body-md text-body-md">
+<!-- Patient Section -->
+<div class="bg-surface-container-low p-3 rounded-lg flex justify-between">
+<div>
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase block">Patient / Policyholder</span>
+<span class="font-bold text-on-surface">Marc Bouchard</span>
+<div class="text-[12px] text-on-surface-variant">DOB: 1982-11-04 • OHIP: 8943-221-091</div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase block">Carrier / Policy Reference</span>
+<span class="font-tabular-nums font-bold text-primary">Canada Life: CL-984421</span>
+<div class="font-tabular-nums text-[12px] text-on-surface-variant">Plan ID: GRP-4402-A</div>
+</div>
+</div>
+<!-- Rx Line Items Table -->
+<div class="mt-4">
+<div class="grid grid-cols-12 font-label-caps text-[11px] text-on-surface-variant py-1 uppercase font-semibold">
+<span class="col-span-6">Description / Medication</span>
+<span class="col-span-2 text-center">DIN</span>
+<span class="col-span-2 text-center">Qty</span>
+<span class="col-span-2 text-right">Price</span>
+</div>
+<div class="py-2.5 grid grid-cols-12 items-center font-tabular-nums text-body-md">
+<div class="col-span-6">
+<div class="font-bold">AMOXICILLIN 500MG CAPSULES</div>
+<div class="text-on-surface-variant text-[12px]">30 Caps • Refill: 0 of 2</div>
+</div>
+<div class="col-span-2 text-center font-bold">02241845</div>
+<div class="col-span-2 text-center">30</div>
+<div class="col-span-2 text-right font-semibold">$38.50</div>
+</div>
+<div class="py-2.5 grid grid-cols-12 items-center font-tabular-nums text-body-md">
+<div class="col-span-6">
+<div class="font-bold">METFORMIN HCL 850MG</div>
+<div class="text-on-surface-variant text-[12px]">60 Tabs • Refill: 1 of 3</div>
+</div>
+<div class="col-span-2 text-center font-bold">02099238</div>
+<div class="col-span-2 text-center">60</div>
+<div class="col-span-2 text-right font-semibold">$44.00</div>
+</div>
+<div class="py-2.5 grid grid-cols-12 items-center font-tabular-nums text-body-md">
+<div class="col-span-6">
+<div class="font-bold">PROFESSIONAL DISPENSING FEE</div>
+<div class="text-on-surface-variant text-[12px]">Standard Compounding &amp; Adjudication</div>
+</div>
+<div class="col-span-2 text-center text-on-surface-variant">--</div>
+<div class="col-span-2 text-center">2</div>
+<div class="col-span-2 text-right font-semibold">$60.00</div>
+</div>
+</div>
+<!-- Receipt Calculation & Total -->
+<div class="flex justify-end pt-4">
+<div class="w-64 space-y-1.5 font-tabular-nums text-body-md">
+<div class="flex justify-between text-on-surface-variant">
+<span class="">Subtotal:</span>
+<span class="">$142.50</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="">Provincial Tax (Exempt):</span>
+<span class="">$0.00</span>
+</div>
+<div class="flex justify-between font-headline-md text-headline-md font-bold text-on-surface pt-1">
+<span class="">Total Due:</span>
+<span class="text-primary">$142.50</span>
+</div>
+</div>
+</div>
+<!-- Provider Signoff Section -->
+<div class="mt-6 pt-4 grid grid-cols-2 gap-gutter">
+<div class="p-3 bg-surface-container-low rounded-lg">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase block">Prescribing Practitioner</span>
+<span class="font-bold text-on-surface">Dr. Alan MacIntyre, MD</span>
+<div class="font-tabular-nums text-[12px] text-on-surface-variant">Licence: PRV-ON-88319</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg flex flex-col justify-between">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">Authorized Signature</span>
+<div class="h-8 flex items-end">
+<span class="font-headline-md italic font-bold text-on-surface text-lg font-serif">Alan MacIntyre MD</span>
+</div>
+</div>
+</div>
+<!-- Regulatory Watermark Footer on Document -->
+<div class="pt-6 text-center text-[10px] text-on-surface-variant font-label-caps tracking-wider uppercase opacity-60">
+              Form Approved Under Canadian Health Claims Standard ISO-88219 • Ingestion Engine OCR v4.12
+            </div>
+</div>
+<!-- ============================================== -->
+<!-- OCR OVERLAYS LAYER (Absolute Bounding Boxes) -->
+<!-- ============================================== -->
+<div class="absolute inset-0 pointer-events-auto" id="ocr-overlays">
+<!-- HIGH CONFIDENCE 1: Policyholder Name (98%) -->
+<div class="ocr-box absolute top-[118px] left-[38px] w-[130px] h-[28px] rounded cursor-pointer bg-secondary-container/40 shadow-sm transition-all hover:ring-2 hover:ring-secondary group" data-target="member-name" style="outline: 2px solid #006a6a;">
+<span class="absolute -top-5 left-0 px-1 py-0.2 bg-secondary text-on-secondary rounded text-[9px] font-tabular-nums font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity">
+                98% Name
+              </span>
+</div>
+<!-- HIGH CONFIDENCE 2: Policy Number (96%) -->
+<div class="ocr-box absolute top-[118px] right-[40px] w-[145px] h-[26px] rounded cursor-pointer bg-secondary-container/40 shadow-sm transition-all hover:ring-2 hover:ring-secondary group" data-target="policy-number" style="outline: 2px solid #006a6a;">
+<span class="absolute -top-5 right-0 px-1 py-0.2 bg-secondary text-on-secondary rounded text-[9px] font-tabular-nums font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity">
+                96% Policy
+              </span>
+</div>
+<!-- HIGH CONFIDENCE 3: Date of Service (95%) -->
+<div class="ocr-box absolute top-[58px] right-[32px] w-[140px] h-[20px] rounded cursor-pointer bg-secondary-container/40 shadow-sm transition-all hover:ring-2 hover:ring-secondary group" data-target="date-service" style="outline: 2px solid #006a6a;">
+<span class="absolute -top-5 right-0 px-1 py-0.2 bg-secondary text-on-secondary rounded text-[9px] font-tabular-nums font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity">
+                95% Date
+              </span>
+</div>
+<!-- FLAGGED LOW CONFIDENCE 1: Total Claim Amount ($142.50) - 68% (Below 85%) -->
+<div class="ocr-box active-flag absolute top-[345px] right-[30px] w-[100px] h-[34px] rounded cursor-pointer bg-tertiary-fixed/40 transition-all group animate-pulse" data-target="claim-amount" style="outline: 2px solid #B08824;">
+<span class="absolute -top-6 right-0 px-1.5 py-0.5 bg-tertiary-container text-on-tertiary rounded font-label-caps text-[10px] font-bold flex items-center gap-1 shadow">
+<span class="material-symbols-outlined text-[12px] text-tertiary-fixed">warning</span>
+                68% &lt; 85%
+              </span>
+</div>
+<!-- FLAGGED LOW CONFIDENCE 2: Drug Identification Number (02241845) - 71% (Below 85%) -->
+<div class="ocr-box absolute top-[204px] left-[260px] w-[86px] h-[28px] rounded cursor-pointer bg-tertiary-fixed/40 transition-all group" data-target="din-number" style="outline: 2px solid #B08824;">
+<span class="absolute -top-6 left-0 px-1.5 py-0.5 bg-tertiary-container text-on-tertiary rounded font-label-caps text-[10px] font-bold flex items-center gap-1 shadow">
+<span class="material-symbols-outlined text-[12px] text-tertiary-fixed">warning</span>
+                71% Flag
+              </span>
+</div>
+<!-- FLAGGED LOW CONFIDENCE 3: Provider Signature / License - 62% (Below 80%) -->
+<div class="ocr-box absolute top-[405px] left-[32px] w-[190px] h-[48px] rounded cursor-pointer bg-tertiary-fixed/40 transition-all group" data-target="provider-license" style="outline: 2px solid #B08824;">
+<span class="absolute -top-6 left-0 px-1.5 py-0.5 bg-tertiary-container text-on-tertiary rounded font-label-caps text-[10px] font-bold flex items-center gap-1 shadow">
+<span class="material-symbols-outlined text-[12px] text-tertiary-fixed">warning</span>
+                62% Flag
+              </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Extracted Fields & HITL Validation (Desktop 6/12 or 50%) -->
+<div class="lg:col-span-6 bg-surface-container-low flex flex-col p-margin gap-gutter overflow-y-auto">
+<!-- Panel Header -->
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold tracking-wider">Human-In-The-Loop Validation</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface">Extracted Fields &amp; Adjudication</h2>
+</div>
+<span class="px-base py-1 bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps rounded-full font-bold">
+          Model: HealthOCR-v4
+        </span>
+</div>
+<!-- Prominent Notification Banner -->
+<div class="p-3.5 bg-tertiary-fixed/30 rounded-lg shadow-sm flex items-start gap-gutter">
+<span class="material-symbols-outlined text-tertiary text-2xl mt-0.5">report_problem</span>
+<div class="flex-1">
+<div class="font-headline-md text-body-md font-bold text-on-surface">
+            3 of 8 extracted fields require manual adjudication
+          </div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            Fields highlighted in warm yellow fell below Canada Life’s required 85% confidence baseline. Please review each against the source scan and correct any character disparities.
+          </div>
+</div>
+</div>
+<!-- GROUP 1: Claimant & Policy Identification (High Confidence) -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm space-y-margin">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg">verified_user</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">1. Claimant &amp; Policy Identification</h3>
+</div>
+<span class="px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-[11px] font-bold">
+            All Above Baseline
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Policy Number -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-caps text-label-caps font-semibold text-on-surface-variant uppercase">Policy Number</label>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-[#1E7B4D]/15 text-[#1E7B4D] font-tabular-nums text-[11px] font-bold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> 96% Match
+              </span>
+</div>
+<input class="w-full px-3 py-2 bg-surface rounded-lg font-tabular-nums text-tabular-nums text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="text" value="CL-984421">
+</div>
+<!-- Group / Plan ID -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-caps text-label-caps font-semibold text-on-surface-variant uppercase">Group / Plan ID</label>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-[#1E7B4D]/15 text-[#1E7B4D] font-tabular-nums text-[11px] font-bold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> 94% Match
+              </span>
+</div>
+<input class="w-full px-3 py-2 bg-surface rounded-lg font-tabular-nums text-tabular-nums text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="text" value="GRP-4402-A">
+</div>
+<!-- Member Name (Spans 2 cols) -->
+<div class="md:col-span-2 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-caps text-label-caps font-semibold text-on-surface-variant uppercase">Member Full Name</label>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-[#1E7B4D]/15 text-[#1E7B4D] font-tabular-nums text-[11px] font-bold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> 98% Match
+              </span>
+</div>
+<input class="w-full px-3 py-2 bg-surface rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all font-semibold" type="text" value="Marc Bouchard">
+</div>
+</div>
+</div>
+<!-- GROUP 2: Claim & Financial Specifics (Contains Flagged Yellow Items) -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm space-y-margin">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-lg">receipt_long</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">2. Claim &amp; Financial Specifics</h3>
+</div>
+<span class="px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] font-bold">
+            3 Flagged For Review
+          </span>
+</div>
+<div class="space-y-margin">
+<!-- FLAGGED FIELD 1: Total Claim Amount ($ CAD) -->
+<div class="p-4 rounded-xl bg-tertiary-fixed/20 shadow-sm space-y-2.5 transition-all" id="field-claim-amount">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps font-bold text-tertiary uppercase">Total Claim Amount ($ CAD)</span>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+</div>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-bold">
+<span class="material-symbols-outlined text-[13px]">priority_high</span> 68% Confidence (Below 85% Threshold)
+              </span>
+</div>
+<div class="relative">
+<input class="w-full px-3 py-2.5 bg-surface-container-lowest rounded-lg font-tabular-nums text-headline-md font-bold text-primary focus:outline-none shadow-sm transition-all" id="input-amount" type="text" value="$142.50">
+<span class="absolute right-3 top-2.5 font-label-caps text-[11px] text-on-surface-variant uppercase font-semibold">CAD $</span>
+</div>
+<!-- Context Note & Alternative Buttons -->
+<div class="bg-surface-container-lowest/80 p-2.5 rounded-lg text-body-md text-on-surface-variant flex flex-col gap-2">
+<div class="flex items-start gap-1.5 text-[12px]">
+<span class="material-symbols-outlined text-sm text-tertiary mt-0.5">info</span>
+<span class="">OCR detected ambiguous decimal point glyph on the receipt image. Please verify against receipt amount.</span>
+</div>
+<div class="flex items-center gap-2 pt-1">
+<span class="font-label-caps text-[11px] text-on-surface font-semibold">Suggested Alternatives:</span>
+<button class="btn-alt-val px-2.5 py-1 rounded bg-surface-container text-on-surface hover:bg-primary hover:text-on-primary font-tabular-nums text-[12px] font-bold transition-colors" type="button">
+                  $142.50
+                </button>
+<button class="btn-alt-val px-2.5 py-1 rounded bg-surface-container text-on-surface hover:bg-primary hover:text-on-primary font-tabular-nums text-[12px] font-bold transition-colors" type="button">
+                  $142.00
+                </button>
+</div>
+</div>
+</div>
+<!-- FLAGGED FIELD 2: Drug Identification Number (DIN) -->
+<div class="p-4 rounded-xl bg-tertiary-fixed/20 shadow-sm space-y-2.5 transition-all" id="field-din">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<label class="font-label-caps text-label-caps font-bold text-tertiary uppercase">Drug Identification Number (DIN)</label>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+</div>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-bold">
+<span class="material-symbols-outlined text-[13px]">priority_high</span> 71% Confidence (Below 85% Threshold)
+              </span>
+</div>
+<input class="w-full px-3 py-2.5 bg-surface-container-lowest rounded-lg font-tabular-nums text-headline-md font-bold text-on-surface focus:outline-none shadow-sm transition-all" id="input-din" type="text" value="02241845">
+<!-- DIN Validation Check Note -->
+<div class="flex items-center justify-between bg-surface-container-lowest/80 p-2.5 rounded-lg">
+<div class="flex items-center gap-2 text-secondary font-tabular-nums text-[12px] font-bold">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span class="">Health Canada DIN Registry Match: AMOXICILLIN 500MG (Oral Capsule)</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">ACTIVE MONOGRAPH</span>
+</div>
+</div>
+<!-- UNFLAGGED FIELD: Date of Expense -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-caps text-label-caps font-semibold text-on-surface-variant uppercase">Date of Expense / Service</label>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-[#1E7B4D]/15 text-[#1E7B4D] font-tabular-nums text-[11px] font-bold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> 95% Match
+              </span>
+</div>
+<input class="w-full px-3 py-2 bg-surface rounded-lg font-tabular-nums text-tabular-nums text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="date" value="2025-05-12">
+</div>
+<!-- FLAGGED FIELD 3: Provider Billing Number / License -->
+<div class="p-4 rounded-xl bg-tertiary-fixed/20 shadow-sm space-y-2.5 transition-all" id="field-provider">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<label class="font-label-caps text-label-caps font-bold text-tertiary uppercase">Provider Billing Number / License</label>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+</div>
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-tabular-nums text-tabular-nums font-bold">
+<span class="material-symbols-outlined text-[13px]">priority_high</span> 62% Confidence (Below 80% Baseline)
+              </span>
+</div>
+<input class="w-full px-3 py-2 bg-surface-container-lowest rounded-lg font-tabular-nums text-tabular-nums font-bold text-on-surface focus:outline-none shadow-sm transition-all" id="input-provider" type="text" value="PRV-ON-88319">
+<div class="text-[12px] text-on-surface-variant">
+              Cross-referenced with CPSO Registry: Dr. Alan MacIntyre (Active Medical Licence, ON)
+            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- STICKY FOOTER / ACTION BAR -->
+<div class="fixed bottom-0 left-72 right-0 bg-surface-container-lowest p-margin shadow-xl z-50 flex flex-wrap items-center justify-between gap-gutter">
+<!-- Audit Note on Left -->
+<div class="flex items-center gap-gutter">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-semibold">
+          Reviewed by <span class="text-primary font-bold">David Tremblay</span> (Senior Adjudicator)
+        </span>
+<span class="font-label-caps text-[11px] text-on-surface-variant">
+          All corrections logged to Canada Life tamper-evident audit ledger (SOC-2 Type II Certified)
+        </span>
+</div>
+</div>
+<!-- Right Operations Buttons -->
+<div class="flex items-center gap-gutter">
+<!-- Reject / Return Link -->
+<button class="text-error hover:text-primary font-body-md text-body-md font-semibold px-base py-2 transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-base">undo</span>
+<span class="">Reject / Return to Ingestion</span>
+</button>
+<!-- Reset All Button -->
+<button class="flex items-center gap-1.5 px-margin py-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest font-headline-md text-body-md font-semibold transition-colors shadow-sm" id="btn-reset-all" type="button">
+<span class="material-symbols-outlined text-lg">refresh</span>
+<span class="">Reset All</span>
+</button>
+<!-- Apply & Approve Primary Button (Canada Life Shiraz Maroon) -->
+<button class="flex items-center gap-2 px-margin py-2.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-headline-md text-body-md font-bold shadow-md hover:shadow-lg transition-all" id="btn-apply-approve" type="button">
+<span class="material-symbols-outlined text-xl">verified</span>
+<span class="">Apply &amp; Approve</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Zoom Controls Implementation
+    let zoomLevel = 100;
+    const zoomLabel = document.getElementById('zoom-label');
+    const docSheet = document.getElementById('document-sheet');
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    const btnZoomOut = document.getElementById('btn-zoom-out');
+
+    if (btnZoomIn && btnZoomOut && docSheet && zoomLabel) {
+      btnZoomIn.addEventListener('click', () => {
+        if (zoomLevel < 160) {
+          zoomLevel += 10;
+          docSheet.style.transform = `scale(${zoomLevel / 100})`;
+          zoomLabel.textContent = `${zoomLevel}%`;
+        }
+      });
+
+      btnZoomOut.addEventListener('click', () => {
+        if (zoomLevel > 70) {
+          zoomLevel -= 10;
+          docSheet.style.transform = `scale(${zoomLevel / 100})`;
+          zoomLabel.textContent = `${zoomLevel}%`;
+        }
+      });
+    }
+
+    // OCR Highlights Toggle
+    const ocrToggle = document.getElementById('ocr-toggle');
+    const ocrOverlays = document.getElementById('ocr-overlays');
+    if (ocrToggle && ocrOverlays) {
+      ocrToggle.addEventListener('change', (e) => {
+        ocrOverlays.style.display = e.target.checked ? 'block' : 'none';
+      });
+    }
+
+    // Interactive sync between OCR bounding boxes and form fields
+    const ocrBoxes = document.querySelectorAll('.ocr-box');
+    ocrBoxes.forEach(box => {
+      box.addEventListener('click', () => {
+        const targetKey = box.getAttribute('data-target');
+        if (targetKey === 'claim-amount') {
+          const el = document.getElementById('input-amount');
+          el?.focus();
+          el?.select();
+        } else if (targetKey === 'din-number') {
+          const el = document.getElementById('input-din');
+          el?.focus();
+          el?.select();
+        } else if (targetKey === 'provider-license') {
+          const el = document.getElementById('input-provider');
+          el?.focus();
+          el?.select();
+        }
+      });
+    });
+
+    // Quick Alternative Value Buttons
+    const altBtns = document.querySelectorAll('.btn-alt-val');
+    const inputAmount = document.getElementById('input-amount');
+    altBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (inputAmount) {
+          inputAmount.value = btn.textContent.trim();
+          inputAmount.classList.add('bg-secondary-container/30');
+          setTimeout(() => inputAmount.classList.remove('bg-secondary-container/30'), 600);
+        }
+      });
+    });
+
+    // Reset All Operation
+    const resetBtn = document.getElementById('btn-reset-all');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (inputAmount) inputAmount.value = '$142.50';
+        const inputDin = document.getElementById('input-din');
+        if (inputDin) inputDin.value = '02241845';
+        const inputProvider = document.getElementById('input-provider');
+        if (inputProvider) inputProvider.value = 'PRV-ON-88319';
+      });
+    }
+
+    // Apply & Approve Notification Flow
+    const approveBtn = document.getElementById('btn-apply-approve');
+    if (approveBtn) {
+      approveBtn.addEventListener('click', () => {
+        approveBtn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">sync</span><span>Validating & Routing...</span>';
+        setTimeout(() => {
+          approveBtn.className = 'flex items-center gap-2 px-margin py-2.5 rounded-lg bg-secondary text-on-secondary font-headline-md text-body-md font-bold shadow-md';
+          approveBtn.innerHTML = '<span class="material-symbols-outlined text-xl">check_circle</span><span>Claim Approved</span>';
+        }, 800);
+      });
+    }
+  })();
+</script></main></div>
+
+</body></html>

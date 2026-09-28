@@ -6,7 +6,7 @@ from typing import cast
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.db import DataStore, DocumentNotFoundError
+from app.db import DataStore
 from app.models import (
     ArrayField,
     Field,

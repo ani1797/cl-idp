@@ -120,6 +120,8 @@ services:
       SMTP_PORT: "1025"
       WEB_ORIGIN: "http://localhost:3000"
       NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+      JWT_SECRET: "${JWT_SECRET:-}"
+      SERVICE_API_TOKEN: "${SERVICE_API_TOKEN:-}"
       COSMOS_TLS_INSECURE: "true"
       AZURE_CONFIG_DIR: /root/.azure
       CL_IDP_AZURE_HOST_CONFIG_DIR: /azure-host/.azure
@@ -183,6 +185,8 @@ services:
       SMTP_PORT: "1025"
       WEB_ORIGIN: "http://localhost:3000"
       NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+      JWT_SECRET: "${JWT_SECRET:-}"
+      SERVICE_API_TOKEN: "${SERVICE_API_TOKEN:-}"
       COSMOS_TLS_INSECURE: "true"
       AZURE_CONFIG_DIR: /root/.azure
       CL_IDP_AZURE_HOST_CONFIG_DIR: /azure-host/.azure
@@ -238,6 +242,13 @@ services:
       dockerfile: Dockerfile
     environment:
       CL_IDP_API_BASE_URL: "http://api:8000"
+      SERVICE_API_TOKEN: "${SERVICE_API_TOKEN:-}"
+      DEMO_IT_ADMIN_EMAIL: "${DEMO_IT_ADMIN_EMAIL:-}"
+      DEMO_IT_ADMIN_PASSWORD: "${DEMO_IT_ADMIN_PASSWORD:-}"
+      DEMO_REVIEWER_EMAIL: "${DEMO_REVIEWER_EMAIL:-}"
+      DEMO_REVIEWER_PASSWORD: "${DEMO_REVIEWER_PASSWORD:-}"
+      DEMO_END_USER_EMAIL: "${DEMO_END_USER_EMAIL:-}"
+      DEMO_END_USER_PASSWORD: "${DEMO_END_USER_PASSWORD:-}"
     env_file:
       - path: ./apps/api/.env
         required: false
@@ -291,4 +302,3 @@ volumes:
   mongo-data:
   azurite-data:
   mailpit-data:
-

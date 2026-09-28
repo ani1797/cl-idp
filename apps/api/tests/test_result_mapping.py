@@ -7,7 +7,6 @@ from typing import Any, cast
 from app.models import (
     AnalyzerRef,
     ArrayField,
-    Field,
     IntegerField,
     NumberField,
     ObjectField,

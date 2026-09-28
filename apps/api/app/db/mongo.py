@@ -8,16 +8,17 @@ from typing import Any
 
 from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.collation import Collation
-from pymongo.errors import OperationFailure, PyMongoError
+from pymongo.errors import DuplicateKeyError, OperationFailure, PyMongoError
 
 from app.config import Settings
 from app.db.base import JobFilters
-from app.db.exceptions import DocumentNotFoundError
-from app.models import BusinessProcessDocument, JobDocument
+from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
+from app.models import BusinessProcessDocument, JobDocument, UserDocument
 
 DATABASE_NAME = "enterprise-idp"
 PROCESSES_COLLECTION = "processes"
 JOBS_COLLECTION = "jobs"
+USERS_COLLECTION = "users"
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +47,14 @@ class MongoService:
         self._database = self._client[self.settings.mongo_database_name]
         self._processes = self._database[PROCESSES_COLLECTION]
         self._jobs = self._database[JOBS_COLLECTION]
+        self._users = self._database[USERS_COLLECTION]
 
     def ensure_schema(self) -> None:
+        self._create_users_email_index()
+        self._users.create_index(
+            [("createdAt", DESCENDING)],
+            name="ix_users_createdAt",
+        )
         self._create_processes_name_index()
         self._processes.create_index(
             [("createdAt", DESCENDING)],
@@ -81,9 +88,27 @@ class MongoService:
             logger.warning(
                 "Case-insensitive collation index unsupported by this Mongo "
                 "backend (%s); falling back to a case-sensitive unique index.",
-                exc.details.get("errmsg", exc),
+                (exc.details or {}).get("errmsg", exc),
             )
             self._processes.create_index("name", name="uq_processes_name", unique=True)
+
+    def _create_users_email_index(self) -> None:
+        try:
+            self._users.create_index(
+                "email",
+                name="uq_users_email_ci",
+                unique=True,
+                collation=_CASE_INSENSITIVE_COLLATION,
+            )
+        except OperationFailure as exc:
+            if exc.code != 197:
+                raise
+            logger.warning(
+                "Case-insensitive collation index unsupported by this Mongo "
+                "backend (%s); falling back to a case-sensitive unique index.",
+                (exc.details or {}).get("errmsg", exc),
+            )
+            self._users.create_index("email", name="uq_users_email", unique=True)
 
     def check_health(self) -> bool:
         try:
@@ -91,6 +116,53 @@ class MongoService:
         except PyMongoError:
             return False
         return True
+
+    # -- Users -------------------------------------------------------------
+
+    def create_user(self, user: UserDocument) -> UserDocument:
+        document = user.model_dump(mode="python")
+        document["_id"] = user.id
+        try:
+            self._users.insert_one(document)
+        except DuplicateKeyError as exc:
+            raise DuplicateDocumentError(f"User email {user.email} already exists.") from exc
+        return self.read_user(user.id)
+
+    def read_user(self, user_id: str) -> UserDocument:
+        raw = self._users.find_one({"_id": user_id})
+        if raw is None:
+            raise DocumentNotFoundError(f"User {user_id} was not found.")
+        return UserDocument.model_validate(self._strip_system_fields(raw))
+
+    def find_user_by_email(self, email: str) -> UserDocument | None:
+        raw = self._users.find_one({"email": email.lower()}, collation=_CASE_INSENSITIVE_COLLATION)
+        if raw is None:
+            return None
+        return UserDocument.model_validate(self._strip_system_fields(raw))
+
+    def list_users(self) -> list[UserDocument]:
+        cursor = self._users.find().sort("createdAt", DESCENDING)
+        return [UserDocument.model_validate(self._strip_system_fields(document)) for document in cursor]
+
+    def update_user(self, user: UserDocument) -> UserDocument:
+        document = user.model_dump(mode="python")
+        document["_id"] = user.id
+        try:
+            result = self._users.replace_one({"_id": user.id}, document)
+        except DuplicateKeyError as exc:
+            raise DuplicateDocumentError(f"User email {user.email} already exists.") from exc
+        if result.matched_count == 0:
+            raise DocumentNotFoundError(f"User {user.id} was not found.")
+        return self.read_user(user.id)
+
+    def deactivate_user(self, user_id: str) -> UserDocument:
+        user = self.read_user(user_id)
+        return self.update_user(user.model_copy(update={"isActive": False, "updatedAt": datetime.now(UTC)}))
+
+    def delete_user(self, user_id: str) -> None:
+        result = self._users.delete_one({"_id": user_id})
+        if result.deleted_count == 0:
+            raise DocumentNotFoundError(f"User {user_id} was not found.")
 
     # -- Processes ---------------------------------------------------------
 

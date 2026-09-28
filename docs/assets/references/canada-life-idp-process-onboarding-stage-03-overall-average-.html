@@ -1,0 +1,614 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-tint": "#b61f35",
+        "surface-container-low": "#f6f4e9",
+        "inverse-surface": "#31312a",
+        "tertiary-container": "#674c00",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed": "#251a00",
+        "on-surface": "#1c1c16",
+        "surface": "#fcf9ef",
+        "tertiary-fixed": "#ffdf9d",
+        "on-background": "#1c1c16",
+        "on-primary-fixed-variant": "#920022",
+        "background": "#fcf9ef",
+        "surface-container-highest": "#e5e3d8",
+        "outline": "#8e706f",
+        "inverse-on-surface": "#f3f1e6",
+        "surface-bright": "#fcf9ef",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed": "#ffdad9",
+        "surface-variant": "#e5e3d8",
+        "tertiary-fixed-dim": "#eec058",
+        "on-primary": "#ffffff",
+        "on-secondary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary-fixed": "#400009",
+        "error": "#ba1a1a",
+        "on-secondary-fixed": "#002020",
+        "on-primary-container": "#ffaeae",
+        "primary-fixed-dim": "#ffb3b3",
+        "tertiary": "#4b3600",
+        "secondary-container": "#91efef",
+        "surface-container": "#f0eee3",
+        "on-error-container": "#93000a",
+        "surface-container-high": "#ebe8de",
+        "secondary-fixed": "#94f2f2",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "primary": "#79001a",
+        "outline-variant": "#e2bebd",
+        "on-secondary-container": "#006e6e",
+        "surface-dim": "#dcdad0",
+        "secondary": "#006a6a",
+        "on-error": "#ffffff",
+        "inverse-primary": "#ffb3b3",
+        "on-surface-variant": "#5a4040",
+        "secondary-fixed-dim": "#77d6d5"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "gutter": "16px",
+        "base": "4px",
+        "container-max-width": "1440px",
+        "margin": "24px"
+      },
+      "fontFamily": {
+        "tabular-nums": ["\"Source Sans 3\""],
+        "headline-md": ["Public Sans"],
+        "body-md": ["\"Source Sans 3\""],
+        "headline-lg": ["Public Sans"],
+        "label-caps": ["Public Sans"]
+      },
+      "fontSize": {
+        "tabular-nums": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+      }
+    }
+  }
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-base"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><span class="font-headline-md text-headline-md tracking-tight ml-base select-none whitespace-nowrap">Intelligent Document Processing</span><span class="ml-gutter inline-flex items-center px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase">PRODUCTION</span></div><div class="flex-1 max-w-lg mx-gutter"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-on-surface-variant pointer-events-none text-base">search</span><input class="w-full pl-9 pr-4 py-1.5 rounded-lg bg-surface text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-secondary" placeholder="Search by Document ID, Batch, or Policyholder..." type="search"></div></div><div class="flex items-center gap-gutter"><button class="font-label-caps text-label-caps tracking-wider px-base py-1 rounded hover:bg-primary transition-colors text-on-primary select-none" type="button">EN | FR</button><button class="p-1.5 rounded-full hover:bg-primary text-on-primary transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-xl">notifications</span></button><div class="flex items-center gap-base pl-base"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XaV9hK0paL3GVjPHY_80SPHkUOFd70wmWTMhnFZEEneTfeu9K67GhrK5B5Kf8rFNL0isEDDNWJphV1trTf04edaUyS0Lp9U08dOTWZ_LnD64eQIPFVd8rWrVUxNBdSfOBhVIP_1bvAW7f3s1-Zvytf8cs94KlXKLL-6N7QTer066FXyk-et0iHnWVwVI_5_8T9sFzDvGFT-33ey5ude8YW_dnBU2nMz5iNLhQMlNlRwhbtm5tWCAi7kYsr"><div class="flex flex-col text-left leading-none"><span class="font-headline-md text-body-md text-on-primary font-semibold">Marc-André Tremblay</span><span class="font-label-caps text-label-caps text-on-primary-container tracking-wider uppercase mt-0.5">IT Admin</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-40 flex flex-col justify-between py-margin shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><nav class="flex flex-col gap-1" data-active-classes="border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold"><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-headline-md text-body-md">Dashboard</span></a><a aria-current="page" class="flex items-center gap-gutter px-margin py-2.5 transition-colors border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold" data-path="processes" href="#"><span class="material-symbols-outlined">account_tree</span><span class="font-headline-md text-body-md">Processes</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="form-model" href="#"><span class="material-symbols-outlined">description</span><span class="font-headline-md text-body-md">Form Model</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="review-queue" href="#"><span class="material-symbols-outlined">rate_review</span><span class="font-headline-md text-body-md">Review Queue</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="api-and-integrations" href="#"><span class="material-symbols-outlined">integration_instructions</span><span class="font-headline-md text-body-md">API &amp; Integrations</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined">settings</span><span class="font-headline-md text-body-md">Settings</span></a></nav><div class="flex flex-col gap-1 px-margin pt-gutter"><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="font-body-md text-body-md">Docs</span></a><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#"><span class="material-symbols-outlined text-lg">help</span><span class="font-body-md text-body-md">Support</span></a></div></aside><div class="pl-64"><main class="relative pt-16 w-full min-h-screen bg-surface px-margin"><div class="flex flex-col w-full">
+<!-- BREADCRUMB & CONTEXT ROW -->
+<div class="flex items-center justify-between py-base mb-gutter">
+<div class="flex items-center gap-base">
+<a class="flex items-center gap-1 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+        Back to Processes
+      </a>
+<span class="text-on-surface-variant/40 font-body-md text-body-md">/</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">Onboard New Process</span>
+<span class="px-base py-0.5 rounded bg-surface-container-highest text-on-surface font-label-caps text-label-caps tracking-wider uppercase ml-1">PIPELINE DRAFT #8820</span>
+</div>
+<div class="flex items-center gap-base">
+<button class="px-gutter py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-md text-body-md transition-colors shadow-sm" type="button">
+        Save Draft
+      </button>
+<button class="px-gutter py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-headline-md text-body-md transition-colors" type="button">
+        Exit to Processes
+      </button>
+</div>
+</div>
+<!-- TITLE & DESCRIPTION -->
+<div class="flex flex-col gap-1 mb-gutter">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Onboard New Process Pipeline</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl">
+      Configure automated extraction confidence limits and Human-In-The-Loop (HITL) review routing for attached models and critical fields. Documents failing these thresholds bypass straight-through processing.
+    </p>
+</div>
+<!-- 4-STAGE STEPPER -->
+<div class="grid grid-cols-4 gap-base p-1.5 bg-surface-container-low rounded-xl mb-margin shadow-sm">
+<!-- Stage 01 -->
+<div class="flex items-center gap-gutter px-gutter py-2.5 rounded-lg bg-surface-container-lowest shadow-sm">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-xs font-semibold">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div class="flex flex-col leading-tight min-w-0">
+<span class="font-label-caps text-label-caps text-secondary font-bold uppercase tracking-wider">Stage 01 • Completed</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface truncate">The Basics</span>
+</div>
+</div>
+<!-- Stage 02 -->
+<div class="flex items-center gap-gutter px-gutter py-2.5 rounded-lg bg-surface-container-lowest shadow-sm">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-xs font-semibold">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div class="flex flex-col leading-tight min-w-0">
+<span class="font-label-caps text-label-caps text-secondary font-bold uppercase tracking-wider">Stage 02 • Completed</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface truncate">Attached Form Models</span>
+</div>
+</div>
+<!-- Stage 03 (Active) -->
+<div class="flex items-center gap-gutter px-gutter py-2.5 rounded-lg bg-primary-container text-on-primary shadow-md">
+<div class="w-6 h-6 rounded-full bg-on-primary text-primary-container flex items-center justify-center font-tabular-nums text-xs font-bold">
+        3
+      </div>
+<div class="flex flex-col leading-tight min-w-0">
+<span class="font-label-caps text-label-caps text-on-primary-container font-bold uppercase tracking-wider">Stage 03 • Active</span>
+<span class="font-headline-md text-body-md font-bold text-on-primary truncate">HITL Thresholds</span>
+</div>
+</div>
+<!-- Stage 04 -->
+<div class="flex items-center gap-gutter px-gutter py-2.5 rounded-lg opacity-60">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-tabular-nums text-xs font-semibold">
+        4
+      </div>
+<div class="flex flex-col leading-tight min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Stage 04</span>
+<span class="font-headline-md text-body-md font-medium text-on-surface-variant truncate">Confirm &amp; Deploy</span>
+</div>
+</div>
+</div>
+<!-- MAIN DUAL-COLUMN LAYOUT -->
+<div class="grid grid-cols-12 gap-gutter mb-28">
+<!-- LEFT 8 COLUMNS: DETAILED CONFIGURATION -->
+<div class="col-span-8 flex flex-col gap-margin"><!-- STRATEGY SELECTION SECTION -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm flex flex-col gap-gutter border border-surface-container-highest">
+<div>
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-secondary font-bold">Routing Architecture</span>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Confidence Evaluation Mode</h2>
+</div>
+<span class="px-base py-1 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Live Configuration
+      </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+      Choose how extraction accuracy is judged before routing claims for Straight-Through Processing (STP) or Human-In-The-Loop (HITL) review.
+    </p>
+</div>
+<!-- Two Prominent Selection Cards -->
+<div class="grid grid-cols-2 gap-gutter"><!-- Card A: Overall Average (Active) -->
+<div class="p-gutter rounded-xl border-2 border-primary bg-primary/10 transition-colors cursor-pointer flex flex-col justify-between gap-gutter relative shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-base">
+<input checked="" class="accent-primary cursor-pointer mt-0.5" id="mode-aggregate" name="routing-mode" type="radio">
+<div class="flex flex-col">
+<label class="font-headline-md text-body-md font-bold text-on-surface cursor-pointer" for="mode-aggregate">Overall Average (Standard)</label>
+<span class="font-label-caps text-label-caps text-primary font-bold uppercase tracking-wider">Single Composite Cutoff</span>
+</div>
+</div>
+<span class="px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-xs font-bold uppercase">Active Strategy</span>
+</div>
+<p class="font-body-md text-xs text-on-surface leading-relaxed font-medium">
+    Scores incoming documents against a single aggregate document confidence mark (85%). Streamlined, consistent, and ideal for standardized high-throughput claims.
+  </p>
+<div class="flex items-center gap-base pt-base border-t border-primary/20 text-xs text-primary font-headline-md font-semibold">
+<span class="material-symbols-outlined text-sm font-bold">speed</span> Uniform scoring active • Fast STP validation
+  </div>
+</div>
+<!-- Card B: Per-Field Selection (Inactive) -->
+<div class="p-gutter rounded-xl border border-surface-container-highest bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer flex flex-col justify-between gap-gutter relative group">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-base">
+<input class="accent-secondary cursor-pointer mt-0.5" id="mode-granular" name="routing-mode" type="radio">
+<div class="flex flex-col">
+<label class="font-headline-md text-body-md font-bold text-on-surface cursor-pointer" for="mode-granular">Per-Field Selection (Granular)</label>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Field SLA Overrides</span>
+</div>
+</div>
+<span class="px-base py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-xs font-semibold">Granular</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+    Sets explicit confidence thresholds per critical field. Any high-risk token (Policy ID, Total Incurred, PII) scoring below its target triggers HITL review.
+  </p>
+<div class="flex items-center gap-base pt-base border-t border-surface-container-highest text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary font-bold">tune</span> Granular thresholds disabled
+  </div>
+</div></div>
+</div>
+<!-- ACTIVE CONFIGURATION PANEL -->
+<!-- ACTIVE CONFIGURATION PANEL: OVERALL AVERAGE -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm flex flex-col gap-gutter border border-surface-container-highest">
+  <!-- Header with Model Overview -->
+  <div class="flex items-center justify-between pb-base border-b border-surface-container-highest">
+    <div class="flex items-center gap-gutter">
+      <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-xl">tune</span>
+      </div>
+      <div class="flex flex-col">
+        <div class="flex items-center gap-base">
+          <span class="font-headline-md text-body-md font-bold text-on-surface">Model-Specific Confidence &amp; Adjudication Routing</span>
+          <span class="px-base py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-xs font-bold uppercase">3 Models Configured</span>
+        </div>
+        <span class="font-body-md text-xs text-on-surface-variant">Configure unique STP confidence pass marks and dedicated adjudication pools per attached form model.</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-base">
+      <button class="px-base py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase flex items-center gap-1 transition-colors" type="button">
+        <span class="material-symbols-outlined text-sm">replay</span> Reset All Baselines
+      </button>
+    </div>
+  </div>
+
+  <!-- Per-Model Cards List -->
+  <div class="flex flex-col gap-gutter">
+    <!-- MODEL 1: CL-CLAIM-04 -->
+    <div class="rounded-xl border border-surface-container-highest bg-surface-container-low p-gutter flex flex-col gap-gutter">
+      <div class="flex items-center justify-between flex-wrap gap-base pb-base border-b border-surface-container-highest">
+        <div class="flex items-center gap-gutter">
+          <span class="px-base py-0.5 rounded bg-primary text-on-primary font-tabular-nums text-xs font-bold">CL-CLAIM-04</span>
+          <div>
+            <h3 class="font-headline-md text-body-md font-bold text-on-surface">Standard Group Health Claim</h3>
+            <span class="font-body-md text-xs text-on-surface-variant">Primary intake form • Inpatient &amp; Outpatient claims</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-base">
+          <span class="font-label-caps text-label-caps uppercase text-on-surface-variant">STP Cutoff:</span>
+          <span class="px-base py-0.5 rounded bg-surface-container-lowest font-tabular-nums text-body-md font-bold text-primary border border-surface-container-highest shadow-xs" id="val-cl-claim">85%</span>
+        </div>
+      </div>
+      <!-- Slider & Tiers -->
+      <div class="flex flex-col gap-2">
+        <input class="w-full accent-primary cursor-pointer h-2 bg-surface-container-high rounded-lg appearance-none" id="slider-cl-claim" max="98" min="60" oninput="document.getElementById('val-cl-claim').innerText = this.value + '%'; document.getElementById('tier-cl-claim').innerText = '≥ ' + this.value + '%';" type="range" value="85">
+        <div class="flex items-center justify-between text-xs font-tabular-nums text-on-surface-variant">
+          <span class="">60% (Permissive)</span>
+          <span class="font-bold text-primary">85% (Recommended Baseline)</span>
+          <span class="">98% (Strict)</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-base">
+        <div class="p-base rounded bg-surface-container-lowest border border-secondary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-secondary font-bold">STP DIRECT</span>
+            <span class="font-tabular-nums text-xs font-bold text-secondary" id="tier-cl-claim">≥ 85%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Auto-clear straight to claims core</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-surface-container-highest flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-on-surface-variant font-bold">STANDARD HITL</span>
+            <span class="font-tabular-nums text-xs font-semibold text-on-surface-variant">70% – 84%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Assigned adjudication pool triage</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-primary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-primary font-bold">PRIORITY HITL</span>
+            <span class="font-tabular-nums text-xs font-bold text-primary">&lt; 70%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Urgent validation / scan defects</span>
+        </div>
+      </div>
+      <!-- Adjudication Pool Selector for Model 1 -->
+      <div class="flex items-center justify-between pt-base border-t border-surface-container-highest flex-wrap gap-base">
+        <div class="flex items-center gap-base">
+          <span class="material-symbols-outlined text-secondary text-base">group_work</span>
+          <span class="font-headline-md text-xs font-semibold text-on-surface">Assigned Adjudication Pool:</span>
+        </div>
+        <div class="relative min-w-0 flex-1 max-w-sm">
+          <select class="w-full appearance-none pl-base pr-8 py-1 rounded-lg bg-surface font-body-md text-xs text-on-surface border border-surface-container-highest outline-none focus:ring-2 focus:ring-secondary cursor-pointer">
+            <option selected="">Group Health Specialist Tier 1</option>
+            <option>Senior Forensic Adjudication Team</option>
+            <option>Bilingual Health Claims Stream</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1 pointer-events-none text-on-surface-variant text-base">unfold_more</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODEL 2: CL-DENT-02 -->
+    <div class="rounded-xl border border-surface-container-highest bg-surface-container-low p-gutter flex flex-col gap-gutter">
+      <div class="flex items-center justify-between flex-wrap gap-base pb-base border-b border-surface-container-highest">
+        <div class="flex items-center gap-gutter">
+          <span class="px-base py-0.5 rounded bg-primary text-on-primary font-tabular-nums text-xs font-bold">CL-DENT-02</span>
+          <div>
+            <h3 class="font-headline-md text-body-md font-bold text-on-surface">Standard Dental Claim</h3>
+            <span class="font-body-md text-xs text-on-surface-variant">Standard CDA / ADA claim form • High procedure code density</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-base">
+          <span class="font-label-caps text-label-caps uppercase text-on-surface-variant">STP Cutoff:</span>
+          <span class="px-base py-0.5 rounded bg-surface-container-lowest font-tabular-nums text-body-md font-bold text-primary border border-surface-container-highest shadow-xs" id="val-cl-dent">88%</span>
+        </div>
+      </div>
+      <!-- Slider & Tiers -->
+      <div class="flex flex-col gap-2">
+        <input class="w-full accent-primary cursor-pointer h-2 bg-surface-container-high rounded-lg appearance-none" id="slider-cl-dent" max="98" min="60" oninput="document.getElementById('val-cl-dent').innerText = this.value + '%'; document.getElementById('tier-cl-dent').innerText = '≥ ' + this.value + '%';" type="range" value="88">
+        <div class="flex items-center justify-between text-xs font-tabular-nums text-on-surface-variant">
+          <span class="">60% (Permissive)</span>
+          <span class="font-bold text-primary">88% (Baseline for Dental Matrices)</span>
+          <span class="">98% (Strict)</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-base">
+        <div class="p-base rounded bg-surface-container-lowest border border-secondary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-secondary font-bold">STP DIRECT</span>
+            <span class="font-tabular-nums text-xs font-bold text-secondary" id="tier-cl-dent">≥ 88%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Direct EDI settlement clearance</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-surface-container-highest flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-on-surface-variant font-bold">STANDARD HITL</span>
+            <span class="font-tabular-nums text-xs font-semibold text-on-surface-variant">75% – 87%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Dental specialist review queue</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-primary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-primary font-bold">PRIORITY HITL</span>
+            <span class="font-tabular-nums text-xs font-bold text-primary">&lt; 75%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Tooth chart / fee mismatch queue</span>
+        </div>
+      </div>
+      <!-- Adjudication Pool Selector for Model 2 -->
+      <div class="flex items-center justify-between pt-base border-t border-surface-container-highest flex-wrap gap-base">
+        <div class="flex items-center gap-base">
+          <span class="material-symbols-outlined text-secondary text-base">group_work</span>
+          <span class="font-headline-md text-xs font-semibold text-on-surface">Assigned Adjudication Pool:</span>
+        </div>
+        <div class="relative min-w-0 flex-1 max-w-sm">
+          <select class="w-full appearance-none pl-base pr-8 py-1 rounded-lg bg-surface font-body-md text-xs text-on-surface border border-surface-container-highest outline-none focus:ring-2 focus:ring-secondary cursor-pointer">
+            <option selected="">Dental Claims Review Pool Tier 2</option>
+            <option>Orthodontic &amp; Major Dental Audit Team</option>
+            <option>General Benefits Triage Group</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1 pointer-events-none text-on-surface-variant text-base">unfold_more</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODEL 3: CL-RECEIPT-08 -->
+    <div class="rounded-xl border border-surface-container-highest bg-surface-container-low p-gutter flex flex-col gap-gutter">
+      <div class="flex items-center justify-between flex-wrap gap-base pb-base border-b border-surface-container-highest">
+        <div class="flex items-center gap-gutter">
+          <span class="px-base py-0.5 rounded bg-primary text-on-primary font-tabular-nums text-xs font-bold">CL-RECEIPT-08</span>
+          <div>
+            <h3 class="font-headline-md text-body-md font-bold text-on-surface">Itemized Medical Expense Receipt</h3>
+            <span class="font-body-md text-xs text-on-surface-variant">Pharmacy, optical &amp; clinic receipts • Variable format layouts</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-base">
+          <span class="font-label-caps text-label-caps uppercase text-on-surface-variant">STP Cutoff:</span>
+          <span class="px-base py-0.5 rounded bg-surface-container-lowest font-tabular-nums text-body-md font-bold text-primary border border-surface-container-highest shadow-xs" id="val-cl-receipt">80%</span>
+        </div>
+      </div>
+      <!-- Slider & Tiers -->
+      <div class="flex flex-col gap-2">
+        <input class="w-full accent-primary cursor-pointer h-2 bg-surface-container-high rounded-lg appearance-none" id="slider-cl-receipt" max="98" min="60" oninput="document.getElementById('val-cl-receipt').innerText = this.value + '%'; document.getElementById('tier-cl-receipt').innerText = '≥ ' + this.value + '%';" type="range" value="80">
+        <div class="flex items-center justify-between text-xs font-tabular-nums text-on-surface-variant">
+          <span class="">60% (Permissive)</span>
+          <span class="font-bold text-primary">80% (Receipt Standard Baseline)</span>
+          <span class="">98% (Strict)</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-base">
+        <div class="p-base rounded bg-surface-container-lowest border border-secondary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-secondary font-bold">STP DIRECT</span>
+            <span class="font-tabular-nums text-xs font-bold text-secondary" id="tier-cl-receipt">≥ 80%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Automatic reimbursement post</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-surface-container-highest flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-on-surface-variant font-bold">STANDARD HITL</span>
+            <span class="font-tabular-nums text-xs font-semibold text-on-surface-variant">65% – 79%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Receipt validation team review</span>
+        </div>
+        <div class="p-base rounded bg-surface-container-lowest border border-primary/20 flex flex-col">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-xs text-primary font-bold">PRIORITY HITL</span>
+            <span class="font-tabular-nums text-xs font-bold text-primary">&lt; 65%</span>
+          </div>
+          <span class="text-xs text-on-surface-variant mt-0.5">Unmatched vendor / tax OCR failure</span>
+        </div>
+      </div>
+      <!-- Adjudication Pool Selector for Model 3 -->
+      <div class="flex items-center justify-between pt-base border-t border-surface-container-highest flex-wrap gap-base">
+        <div class="flex items-center gap-base">
+          <span class="material-symbols-outlined text-secondary text-base">group_work</span>
+          <span class="font-headline-md text-xs font-semibold text-on-surface">Assigned Adjudication Pool:</span>
+        </div>
+        <div class="relative min-w-0 flex-1 max-w-sm">
+          <select class="w-full appearance-none pl-base pr-8 py-1 rounded-lg bg-surface font-body-md text-xs text-on-surface border border-surface-container-highest outline-none focus:ring-2 focus:ring-secondary cursor-pointer">
+            <option selected="">Expense &amp; Receipt Adjudication Pool</option>
+            <option>Group Health Specialist Tier 1</option>
+            <option>Senior Forensic Adjudication Team</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-2.5 top-1 pointer-events-none text-on-surface-variant text-base">unfold_more</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Information Notice -->
+  <div class="p-gutter rounded-lg bg-surface-container-lowest border-l-4 border-secondary border-t border-r border-b border-surface-container-highest flex items-start gap-gutter">
+    <span class="material-symbols-outlined text-secondary shrink-0 mt-0.5 text-base">info</span>
+    <p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+      Each attached form model operates its own independent STP cutoff and dedicated adjudication reviewer pool. Documents scoring at or above their respective model threshold bypass manual triage; failing claims route automatically to the specialized team assigned to that form type.
+    </p>
+  </div>
+</div></div>
+<!-- RIGHT 4 COLUMNS: TOPOLOGY & SUMMARY -->
+<div class="col-span-4 flex flex-col gap-gutter"><!-- STAGE 03 TOPOLOGY CARD -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm flex flex-col gap-gutter border border-surface-container-highest"><div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary">account_tree</span>
+<span class="font-headline-md text-body-md font-bold text-on-surface">Pipeline Routing Logic</span>
+</div>
+<span class="font-label-caps text-label-caps uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">Overall Average</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+  Visual flow of document evaluation before straight-through approval or human triage.
+</p>
+<!-- Simplified Flow Tree for Overall Average -->
+<div class="p-gutter rounded-xl bg-surface-container-low flex flex-col gap-base border border-surface-container-highest">
+<!-- Step 1: Input -->
+<div class="flex items-center gap-gutter p-base rounded bg-surface-container-lowest shadow-xs">
+<div class="w-7 h-7 rounded-md bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-sm">document_scanner</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-xs font-bold text-on-surface">1. Document Ingestion &amp; OCR</span>
+<span class="font-body-md text-xs text-on-surface-variant">All field token confidences extracted</span>
+</div>
+</div>
+<!-- Connector Down -->
+<div class="flex justify-center -my-1 text-on-surface-variant/40">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+</div>
+<!-- Step 2: Selected Strategy Node (Overall Average) -->
+<div class="p-gutter rounded-lg bg-surface-container-high border-l-4 border-primary"><div class="flex items-center justify-between">
+  <span class="font-label-caps text-label-caps uppercase text-primary font-bold">2. Model-Specific Cutoff</span>
+  <span class="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-label-caps text-xs font-bold">Per-Model</span>
+</div>
+<p class="font-body-md text-xs text-on-surface mt-1">
+  Document confidence checked against respective model threshold (<strong>85%</strong> Health, <strong>88%</strong> Dental, <strong>80%</strong> Receipts).
+</p></div>
+<!-- Connector Down Split -->
+<div class="grid grid-cols-2 gap-base pt-1">
+<!-- Outcome: Pass -->
+<div class="p-gutter rounded-lg bg-secondary-container/40 flex flex-col gap-1 border border-secondary/20">
+<span class="font-label-caps text-label-caps uppercase text-on-secondary-container font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">check_circle</span> Pass (≥ 85%)
+      </span>
+<span class="font-headline-md text-xs font-bold text-on-surface">STP Direct</span>
+<span class="font-body-md text-xs text-on-surface-variant">Auto-approved</span>
+</div>
+<!-- Outcome: Fail -->
+<div class="p-gutter rounded-lg bg-primary-fixed/30 flex flex-col gap-1 border border-primary/20">
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">error</span> Flagged (&lt; 85%)
+      </span>
+<span class="font-headline-md text-xs font-bold text-on-surface">HITL Queue</span>
+<span class="font-body-md text-xs text-on-surface-variant">Reviewer triage</span>
+</div>
+</div>
+</div>
+<!-- Manifest Metrics -->
+<div class="flex flex-col gap-base pt-base border-t border-surface-container-highest"><span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-semibold">Pipeline Summary</span>
+<div class="flex items-center justify-between py-0.5">
+  <span class="font-body-md text-xs text-on-surface-variant">Active Mode</span>
+  <span class="font-tabular-nums text-xs font-bold text-primary">Overall Average (Per-Model)</span>
+</div>
+<div class="flex items-center justify-between py-0.5">
+  <span class="font-body-md text-xs text-on-surface-variant">Attached Models</span>
+  <span class="font-tabular-nums text-xs font-bold text-on-surface">3 Models (Configured)</span>
+</div>
+<div class="flex items-center justify-between py-0.5">
+  <span class="font-body-md text-xs text-on-surface-variant">STP Thresholds</span>
+  <span class="font-tabular-nums text-xs font-semibold text-on-surface">85% / 88% / 80%</span>
+</div>
+<div class="flex items-center justify-between py-0.5">
+  <span class="font-body-md text-xs text-on-surface-variant">Adjudication Pools</span>
+  <span class="font-tabular-nums text-xs font-bold text-secondary">3 Dedicated Pools</span>
+</div></div></div>
+<!-- AUDIT REVISION CARD -->
+<div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm flex items-center justify-between text-xs border border-surface-container-highest">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary text-base">verified_user</span>
+<span class="font-body-md text-on-surface-variant">Governance: <strong>CL-FIN-2024-Q3</strong></span>
+</div>
+<span class="text-secondary font-label-caps uppercase font-bold">Compliant</span>
+</div></div>
+</div>
+<!-- STICKY BOTTOM ACTION BAR -->
+<div class="fixed bottom-0 left-64 right-0 bg-surface-container-lowest border-t border-surface-container-highest px-margin py-gutter z-30 shadow-xl flex items-center justify-between">
+<!-- Left: Status Indicator -->
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-body-md text-xs text-on-surface-variant">
+        Draft saved just now • Auto-sync enabled for <strong>PIPELINE DRAFT #8820</strong>
+</span>
+</div>
+<!-- Middle: Quick Save Actions -->
+<div class="flex items-center gap-gutter">
+<button class="px-gutter py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-md text-body-md transition-colors" type="button">
+        Save Draft
+      </button>
+<button class="px-gutter py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-md text-body-md transition-colors" type="button">
+        Save as Template
+      </button>
+</div>
+<!-- Right: Navigation Stepper Buttons -->
+<div class="flex items-center gap-gutter">
+<button class="flex items-center gap-1 px-gutter py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-headline-md text-body-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+        Back to Stage 02: Form Models
+      </button>
+<button class="flex items-center gap-1 px-margin py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-headline-md text-body-md font-bold shadow-md transition-colors" type="button">
+<span class="">Continue to Stage 04: Confirm &amp; Deploy</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  function setPreset(val, label) {
+    const slider = document.getElementById('global-threshold-slider');
+    const displayVal = document.getElementById('display-threshold-val');
+    const pill = document.getElementById('slider-pill');
+    if (slider && displayVal && pill) {
+      slider.value = val;
+      displayVal.innerText = val;
+      pill.innerText = val + '% Pass Mark (' + label + ')';
+    }
+  }
+
+  const slider = document.getElementById('global-threshold-slider');
+  if (slider) {
+    slider.addEventListener('input', function(e) {
+      const v = e.target.value;
+      const displayVal = document.getElementById('display-threshold-val');
+      const pill = document.getElementById('slider-pill');
+      if (displayVal) displayVal.innerText = v;
+      if (pill) pill.innerText = v + '% Pass Mark';
+    });
+  }
+</script></main></div>
+
+
+</body></html>

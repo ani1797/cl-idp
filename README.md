@@ -1,7 +1,9 @@
-# Enterprise IDP
+# Canada Life IDP
 
-Enterprise IDP is a monorepo with a FastAPI backend, a Next.js frontend,
-and local Azure-compatible emulators for development.
+Canada Life IDP (Intelligent Document Processing) is a monorepo with a
+FastAPI backend, a Next.js frontend, and local Azure-compatible emulators
+for development. The frontend implements the "Canada Life IDP Platform"
+design system — see `docs/spec/design-system.md`.
 
 ## Repository layout
 

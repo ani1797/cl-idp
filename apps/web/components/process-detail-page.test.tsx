@@ -4,7 +4,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProcessDetailPage } from "@/components/process-detail-page";
-import { renderWithQueryClient } from "@/components/test-utils";
+import { renderWithSession } from "@/components/test-utils";
 import { api, type BusinessProcess, type Job } from "@/lib/api";
 
 const { pushMock, toastErrorMock } = vi.hoisted(() => ({
@@ -107,7 +107,7 @@ describe("ProcessDetailPage", () => {
       .mockResolvedValueOnce(baseProcess)
       .mockResolvedValue(baseProcess);
 
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     expect(await screen.findByText("Building")).toBeInTheDocument();
 
@@ -124,7 +124,7 @@ describe("ProcessDetailPage", () => {
       routingAnalyzerError: "Analyzer provisioning failed in Content Understanding.",
     });
 
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     expect(
       await screen.findByText("Analyzer provisioning failed in Content Understanding."),
@@ -132,7 +132,7 @@ describe("ProcessDetailPage", () => {
   });
 
   it("rejects oversized and unsupported uploads client-side without calling the API", async () => {
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     await screen.findByText("Invoice Intake");
     const fileInput = screen.getByLabelText("Choose document");
@@ -167,7 +167,7 @@ describe("ProcessDetailPage", () => {
         unclassified: false,
       });
 
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Choose document"), {
@@ -201,7 +201,7 @@ describe("ProcessDetailPage", () => {
         detectedForm: null,
       });
 
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Choose document"), {
@@ -231,7 +231,7 @@ describe("ProcessDetailPage", () => {
       status: "queued",
     });
 
-    renderWithQueryClient(<ProcessDetailPage processId="process-1" />);
+    renderWithSession(<ProcessDetailPage processId="process-1" />);
 
     expect(await screen.findByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(screen.getByText("Content Understanding timed out.")).toBeInTheDocument();

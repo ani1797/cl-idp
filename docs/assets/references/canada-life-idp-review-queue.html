@@ -1,0 +1,701 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "secondary-fixed": "#94f2f2",
+        "surface-container-high": "#ebe8de",
+        "surface-dim": "#dcdad0",
+        "surface": "#fcf9ef",
+        "on-surface-variant": "#5a4040",
+        "surface-container-low": "#f6f4e9",
+        "secondary-container": "#91efef",
+        "tertiary-fixed-dim": "#eec058",
+        "on-secondary-container": "#006e6e",
+        "on-error": "#ffffff",
+        "tertiary-fixed": "#ffdf9d",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-background": "#1c1c16",
+        "surface-tint": "#b61f35",
+        "on-secondary": "#ffffff",
+        "tertiary-container": "#674c00",
+        "outline": "#8e706f",
+        "surface-container": "#f0eee3",
+        "on-surface": "#1c1c16",
+        "primary-fixed-dim": "#ffb3b3",
+        "primary": "#79001a",
+        "surface-bright": "#fcf9ef",
+        "inverse-on-surface": "#f3f1e6",
+        "on-primary-fixed-variant": "#920022",
+        "on-secondary-fixed": "#002020",
+        "on-primary-fixed": "#400009",
+        "surface-container-lowest": "#ffffff",
+        "background": "#fcf9ef",
+        "primary-fixed": "#ffdad9",
+        "error": "#ba1a1a",
+        "surface-container-highest": "#e5e3d8",
+        "inverse-primary": "#ffb3b3",
+        "on-tertiary-fixed": "#251a00",
+        "on-primary-container": "#ffaeae",
+        "tertiary": "#4b3600",
+        "on-tertiary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary": "#ffffff",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "error-container": "#ffdad6",
+        "secondary": "#006a6a",
+        "on-error-container": "#93000a",
+        "inverse-surface": "#31312a",
+        "surface-variant": "#e5e3d8",
+        "secondary-fixed-dim": "#77d6d5",
+        "outline-variant": "#e2bebd"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "base": "4px",
+        "margin": "24px",
+        "gutter": "16px",
+        "container-max-width": "1440px"
+      },
+      "fontFamily": {
+        "tabular-nums": [
+          "\"Source Sans 3\""
+        ],
+        "headline-lg": [
+          "Public Sans"
+        ],
+        "label-caps": [
+          "Public Sans"
+        ],
+        "headline-md": [
+          "Public Sans"
+        ],
+        "body-md": [
+          "\"Source Sans 3\""
+        ]
+      },
+      "fontSize": {
+        "tabular-nums": [
+          "14px",
+          {
+            "lineHeight": "20px",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-lg": [
+          "24px",
+          {
+            "lineHeight": "32px",
+            "fontWeight": "600"
+          }
+        ],
+        "label-caps": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "0.05em",
+            "fontWeight": "700"
+          }
+        ],
+        "headline-md": [
+          "20px",
+          {
+            "lineHeight": "28px",
+            "fontWeight": "600"
+          }
+        ],
+        "body-md": [
+          "14px",
+          {
+            "lineHeight": "20px",
+            "fontWeight": "400"
+          }
+        ]
+      }
+    },
+  },
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-gutter"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><div class="flex items-center gap-base"><span class="font-headline-md text-headline-md tracking-tight font-bold text-on-primary">Intelligent Document Processing</span><span class="px-base py-0.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded tracking-wider shadow-sm">PRODUCTION</span></div></div><div class="flex-1 max-w-xl mx-margin"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-base text-on-primary-container text-lg pointer-events-none pl-2">search</span><input class="w-full pl-10 pr-margin py-1.5 bg-primary text-on-primary placeholder:text-on-primary-container rounded-lg font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-on-primary transition-all" placeholder="Search flagged documents, claim IDs..." type="text"></div></div><div class="flex items-center gap-gutter"><div class="flex items-center bg-primary rounded px-base py-0.5 text-on-primary-container"><button class="font-label-caps text-label-caps px-base py-0.5 text-on-primary font-bold" type="button">EN</button><span class="opacity-40">|</span><button class="font-label-caps text-label-caps px-base py-0.5 hover:text-on-primary transition-colors" type="button">FR</button></div><button aria-label="Notifications" class="relative p-1.5 rounded-lg text-on-primary hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1 right-1 w-4 h-4 bg-secondary text-on-secondary font-tabular-nums text-[10px] leading-tight flex items-center justify-center rounded-full font-bold">4</span></button><div class="flex items-center gap-base pl-base"><div class="text-right hidden xl:block"><div class="font-headline-md text-body-md font-bold text-on-primary leading-none">Elena Rostova</div><div class="font-label-caps text-[10px] text-on-primary-container tracking-wider uppercase leading-tight mt-1">REVIEWER / ADJUDICATION TEAM</div></div><img alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XQ9AC8u4CoHLh4LJwRm6nsEiVUgIbJIznSGbuJsHFnGzfd2Xzi7rwlgDTRR_waRDLsJSer6B8OwzycLR1xvbMHLwI_rj_GQcNXR0cl5uion_w_3xujA4oSygxRsX9S-PYGHOPDwtCVdOO3NfpM2coSG6Pq4h4PQ2pjhXGXZt-beAdqAzQtiwjJpfpjNrFtGK_1fsRfEp9xEkQXUYJPzVN6wEIcuGxBdYCN3NKF7VISWmXFvuJ7M6glzwk"></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-72 bg-surface-container-low z-40 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="flex flex-col py-margin"><div class="px-margin pb-base"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Adjudication Console</span></div><nav class="flex flex-col gap-1 px-base" data-active-classes="bg-surface-container-high text-primary font-bold border-l-4 border-primary rounded-r-lg"><a aria-current="page" class="flex items-center justify-between px-base py-2.5 transition-all bg-surface-container-high text-primary font-bold border-l-4 border-primary rounded-r-lg" data-path="review-queue" href="#"><div class="flex items-center gap-base"><span class="material-symbols-outlined text-xl">assignment_late</span><span class="font-body-md text-body-md">Review Queue</span></div><span class="px-base py-0.5 bg-error-container text-on-error-container font-tabular-nums text-tabular-nums font-bold rounded-full">14 Pending</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="completed-reviews" href="#"><span class="material-symbols-outlined text-xl">verified</span><span class="font-body-md text-body-md">Completed Reviews</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="review-guidelines" href="#"><span class="material-symbols-outlined text-xl">policy</span><span class="font-body-md text-body-md">Review Guidelines &amp; Policy</span></a><a class="flex items-center gap-base px-base py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="system-help-and-hotkeys" href="#"><span class="material-symbols-outlined text-xl">keyboard</span><span class="font-body-md text-body-md">System Help &amp; Hotkeys</span></a></nav></div><div class="flex flex-col p-margin gap-gutter bg-surface-container"><nav class="flex flex-col gap-1"><a class="flex items-center gap-base py-1 text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="docs-and-guides" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="">Docs &amp; Guides</span></a><a class="flex items-center gap-base py-1 text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" data-path="support-and-feedback" href="#"><span class="material-symbols-outlined text-lg">headset_mic</span><span class="">Support &amp; Feedback</span></a></nav><div class="flex items-center justify-between text-on-surface-variant"><span class="font-label-caps text-label-caps uppercase">v2.4.1 (Canada Life CA)</span><span class="w-2 h-2 rounded-full bg-secondary" title="Engine Connected"></span></div></div></aside><div class="pl-72"><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Adjudication Workspace Shell -->
+<div class="px-margin py-6 flex flex-col gap-6 max-w-container-max-width mx-auto w-full">
+<!-- Top Utility & Breadcrumbs Navigation -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<span class="hover:text-primary transition-colors cursor-pointer">Canada Life IDP</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Adjudication Workspace</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary font-bold">Review Queue</span>
+</nav>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full text-on-surface text-label-caps font-label-caps">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="">AUTOSYNC: ACTIVE</span>
+<span class="text-on-surface-variant font-normal">| 14s ago</span>
+</div>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors" title="Force Refresh" type="button">
+<span class="material-symbols-outlined text-base">sync</span>
+</button>
+</div>
+</div>
+<!-- Page Header Title Area -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Document Review Queue</h1>
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps uppercase tracking-wider">HITL Adjudication</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl">
+        Triage and adjudicate document extraction exceptions requiring human-in-the-loop (HITL) verification before downstream financial ledger processing and automated payout reconciliation.
+      </p>
+</div>
+<!-- Quick Stats Metric Band -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Stat 1 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Pending Review</span>
+<span class="material-symbols-outlined text-primary text-xl">pending_actions</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">14</span>
+<span class="font-body-md text-body-md text-on-surface-variant">documents</span>
+</div>
+<div class="mt-2 text-label-caps font-label-caps text-on-surface-variant flex items-center gap-1">
+<span class="text-error font-bold">+3</span> new since 09:00 AM
+        </div>
+</div>
+<!-- Stat 2 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-error uppercase tracking-wider font-bold">High Priority SLA</span>
+<span class="material-symbols-outlined text-error text-xl">alarm_on</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg font-bold text-error">4</span>
+<span class="font-body-md text-body-md text-on-surface-variant">cases &lt; 30m</span>
+</div>
+<div class="mt-2 text-label-caps font-label-caps text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">warning</span> Escalation imminent
+        </div>
+</div>
+<!-- Stat 3 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Batch Quality Score</span>
+<span class="material-symbols-outlined text-secondary text-xl">verified</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg font-bold text-secondary">94.2%</span>
+<span class="font-body-md text-body-md text-on-surface-variant">overall pass</span>
+</div>
+<div class="mt-2 flex items-center gap-2">
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 94.2%;"></div>
+</div>
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant text-xs">Target: 92%</span>
+</div>
+</div>
+<!-- Stat 4 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Avg. Handling Time</span>
+<span class="material-symbols-outlined text-tertiary text-xl">timer</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">1m 45s</span>
+<span class="font-body-md text-body-md text-secondary">(-18s shift avg)</span>
+</div>
+<div class="mt-2 text-label-caps font-label-caps text-on-surface-variant">
+          Across Canada Life adjudicators
+        </div>
+</div>
+</div>
+<!-- Filter Toolbar Section -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-3">
+<div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+<!-- Search Input -->
+<div class="relative flex-1 max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-lg pointer-events-none">search</span>
+<input class="w-full pl-9 pr-4 py-2 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Search Job ID, Document Name, Policyholder..." type="text">
+</div>
+<!-- Filter Dropdowns & Selects -->
+<div class="flex flex-wrap items-center gap-2">
+<!-- Process Filter -->
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+<option value="all">Business Process: All</option>
+<option value="ghd">Group Health &amp; Dental Claims</option>
+<option value="dnc">Disability Notice of Claim</option>
+<option value="ddv">Direct Deposit &amp; Void Cheques</option>
+<option value="uap">Underwriting Attending Physician</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-on-surface-variant text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Urgency SLA Filter -->
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+<option value="all">SLA Status: All</option>
+<option value="urgent">Urgent &lt; 1hr</option>
+<option value="normal">Normal Priority</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-on-surface-variant text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Confidence Threshold Filter -->
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+<option value="all">Confidence: All Bands</option>
+<option value="low">Low (&lt; 80%)</option>
+<option value="critical">Critical (&lt; 60%)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-on-surface-variant text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Reset Filter Button -->
+<button class="px-3 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps uppercase flex items-center gap-1 rounded-lg hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-base">filter_alt_off</span>
+<span class="">Reset</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Active Flagged Documents Data Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-3 px-4 w-12 text-center" scope="col">
+<input aria-label="Select all jobs" class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</th>
+<th class="py-3 px-4" scope="col">Priority &amp; Job ID</th>
+<th class="py-3 px-4" scope="col">Process Name</th>
+<th class="py-3 px-4" scope="col">Document Details</th>
+<th class="py-3 px-4" scope="col">Flagged Reason &amp; Low Confidence</th>
+<th class="py-3 px-4" scope="col">Overall Score</th>
+<th class="py-3 px-4" scope="col">SLA Remaining</th>
+<th class="py-3 px-4 text-right" scope="col">Adjudication</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-body-md font-body-md">
+<!-- Row 1: Urgent - Group Health & Dental -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-caps text-label-caps font-bold uppercase">URGENT</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99204</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Group Health &amp; Dental</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: Mobile Portal</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="Standard_Health_Claim_Receipt_749.pdf">Standard_Health_Claim_Receipt_749.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">2 pages • 1.8 MB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-error">
+<span class="material-symbols-outlined text-base">error</span>
+<span class="font-semibold text-xs">3 fields below baseline</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Total Amount (68%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">DIN/NPN (71%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Provider Signature</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#fcedd2] text-[#674c00] font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">warning</span>
+<span class="">74%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-error font-tabular-nums text-tabular-nums font-semibold">
+<span class="material-symbols-outlined text-base">timelapse</span>
+<span class="">22m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Urgent - Void Cheque -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-caps text-label-caps font-bold uppercase">URGENT</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99201</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Direct Deposit &amp; Void Cheques</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: EFT Enrollment</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="Scanned_Cheque_Direct_Deposit_Form_029.pdf">Scanned_Cheque_Direct_Deposit_Form_029.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">1 page • 840 KB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-error">
+<span class="material-symbols-outlined text-base">emergency</span>
+<span class="font-semibold text-xs">MICR Read Failure</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Transit Number (48%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Financial Institution ID (52%)</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">block</span>
+<span class="">58%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-error font-tabular-nums text-tabular-nums font-semibold">
+<span class="material-symbols-outlined text-base">timelapse</span>
+<span class="">28m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Normal - Disability Notice of Claim -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase">NORMAL</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99184</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Disability Notice of Claim</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: Mail Intake / Fax</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="LTD_Employee_Statement_WPG_4981.pdf">LTD_Employee_Statement_WPG_4981.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">6 pages • 4.2 MB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">help</span>
+<span class="font-semibold text-xs">Date of Disability Discrepancy</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Last Day Worked (79%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Employer Sig Date (77%)</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#fcedd2] text-[#674c00] font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">warning</span>
+<span class="">78%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-tabular-nums text-tabular-nums">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span class="">1h 45m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Normal - Underwriting Attending Physician -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase">NORMAL</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99177</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Underwriting Attending Physician</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: Clinical Direct</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="APS_Cardiology_Summary_DrChen.pdf">APS_Cardiology_Summary_DrChen.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">4 pages • 3.1 MB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">rule</span>
+<span class="font-semibold text-xs">CPSO License Verification</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Medical Lic# (76%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Clinic Stamp (Unverified)</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#fcedd2] text-[#674c00] font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">warning</span>
+<span class="">76%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-tabular-nums text-tabular-nums">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span class="">2h 15m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Urgent - Group Health & Dental -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-caps text-label-caps font-bold uppercase">URGENT</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99162</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Group Health &amp; Dental</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: Advisor Secure Upload</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="Orthodontic_Estimate_TreatmentPlan.pdf">Orthodontic_Estimate_TreatmentPlan.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">3 pages • 2.6 MB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-error">
+<span class="material-symbols-outlined text-base">error</span>
+<span class="font-semibold text-xs">Multi-table Split Extraction</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Procedure Code 01103 (64%)</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Lab Fee Split (61%)</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">block</span>
+<span class="">62%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-error font-tabular-nums text-tabular-nums font-semibold">
+<span class="material-symbols-outlined text-base">timelapse</span>
+<span class="">19m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 6: Normal - Direct Deposit -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3.5 px-4 text-center">
+<input class="rounded text-primary focus:ring-primary cursor-pointer" type="checkbox">
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase">NORMAL</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold text-on-surface">#JOB-99150</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-headline-md text-body-md font-semibold text-on-surface block">Direct Deposit &amp; Void Cheques</span>
+<span class="text-xs text-on-surface-variant">Sub-channel: Employee Benefits Portal</span>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-start gap-2 max-w-xs">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">description</span>
+<div class="truncate">
+<p class="font-medium text-on-surface truncate" title="Direct_Deposit_Authorization_Quebec.pdf">Direct_Deposit_Authorization_Quebec.pdf</p>
+<span class="text-xs text-on-surface-variant font-tabular-nums">1 page • 620 KB</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col gap-1 max-w-sm">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-base">tune</span>
+<span class="font-semibold text-xs">Name Matching Fuzzy Low Score</span>
+</div>
+<div class="flex flex-wrap gap-1 text-[11px] font-tabular-nums text-on-surface-variant">
+<span class="bg-surface-container px-1.5 py-0.5 rounded">Account Holder Name (79%)</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#fcedd2] text-[#674c00] font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">warning</span>
+<span class="">79%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-tabular-nums text-tabular-nums">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span class="">3h 10m left</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">
+<span class="">Review Document</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination & Action Footer -->
+<div class="p-4 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-4">
+<!-- Batch Action Controls -->
+<div class="flex items-center gap-3">
+<button class="px-3 py-1.5 bg-surface-container-highest hover:bg-surface-container text-on-surface rounded-lg font-label-caps text-label-caps uppercase flex items-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-base">assignment_ind</span>
+<span class="">Batch Assign To Me</span>
+</button>
+<button class="px-3 py-1.5 bg-surface-container-highest hover:bg-surface-container text-on-surface rounded-lg font-label-caps text-label-caps uppercase flex items-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-base">forward_to_inbox</span>
+<span class="">Route to Senior Lead</span>
+</button>
+</div>
+<!-- Pagination Counter & Nav -->
+<div class="flex items-center gap-4">
+<span class="font-tabular-nums text-tabular-nums text-on-surface-variant">
+            Showing <strong class="text-on-surface">1–6</strong> of <strong class="text-on-surface">14</strong> flagged items
+          </span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded bg-surface-container text-on-surface-variant disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<button class="px-2.5 py-0.5 rounded bg-primary text-on-primary font-tabular-nums text-tabular-nums font-bold" type="button">1</button>
+<button class="px-2.5 py-0.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-tabular-nums text-tabular-nums" type="button">2</button>
+<button class="px-2.5 py-0.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-tabular-nums text-tabular-nums" type="button">3</button>
+<button class="p-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high" type="button">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Reviewer Contextual Support Banner -->
+<div class="p-4 rounded-xl bg-surface-container flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">help_center</span>
+<div>
+<h4 class="font-headline-md text-body-md font-bold text-on-surface">Need help with field overrides?</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Review Canada Life Underwriting &amp; Adjudication Standard Operating Procedure (SOP-IDP-09).</p>
+</div>
+</div>
+<a class="px-3 py-1.5 bg-surface-container-highest text-on-surface hover:text-primary font-label-caps text-label-caps uppercase rounded-lg transition-colors whitespace-nowrap" href="#">
+        View Guideline Docs
+      </a>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

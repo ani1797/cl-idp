@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlparse
 
 from azure.core.exceptions import AzureError
@@ -11,12 +11,13 @@ from azure.cosmos.exceptions import CosmosResourceNotFoundError
 
 from app.config import Settings
 from app.db.base import JobFilters
-from app.db.exceptions import DocumentNotFoundError
-from app.models import BusinessProcessDocument, JobDocument
+from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
+from app.models import BusinessProcessDocument, JobDocument, UserDocument
 
 DATABASE_NAME = "enterprise-idp"
 PROCESSES_CONTAINER = "processes"
 JOBS_CONTAINER = "jobs"
+USERS_CONTAINER = "users"
 
 
 def _cosmos_datetime(value: datetime) -> str:
@@ -45,15 +46,14 @@ class CosmosService:
         self._database = self._client.get_database_client(DATABASE_NAME)
         self._processes = self._database.get_container_client(PROCESSES_CONTAINER)
         self._jobs = self._database.get_container_client(JOBS_CONTAINER)
+        self._users = self._database.get_container_client(USERS_CONTAINER)
 
     def _should_verify_connection(self) -> bool:
         endpoint = self._parse_connection_string(self._connection_string).get("AccountEndpoint", "")
         hostname = urlparse(endpoint).hostname or ""
         if hostname in {"localhost", "127.0.0.1"}:
             return False
-        if self.settings.cosmos_tls_insecure:
-            return False
-        return True
+        return not self.settings.cosmos_tls_insecure
 
     def _parse_connection_string(self, connection_string: str) -> dict[str, str]:
         parts: dict[str, str] = {}
@@ -86,15 +86,84 @@ class CosmosService:
             id=JOBS_CONTAINER,
             partition_key=PartitionKey(path="/processId"),
         )
+        self._users = self._database.create_container_if_not_exists(
+            id=USERS_CONTAINER,
+            partition_key=PartitionKey(path="/id"),
+        )
 
     def check_health(self) -> bool:
         try:
             self._database.read()
             self._processes.read()
             self._jobs.read()
+            self._users.read()
         except AzureError:
             return False
         return True
+
+    # -- Users -------------------------------------------------------------
+
+    def create_user(self, user: UserDocument) -> UserDocument:
+        # Cosmos DB SQL API unique key policies must be declared when a
+        # container is created and cannot be added to an existing container.
+        # This app keeps the config-selectable Cosmos fallback schema
+        # migration-safe by enforcing unique email in application code before
+        # insert. Mongo remains the production default with a true unique index.
+        if self.find_user_by_email(user.email) is not None:
+            raise DuplicateDocumentError(f"User email {user.email} already exists.")
+        raw = self._users.create_item(user.model_dump(mode="json"))
+        return UserDocument.model_validate(self._strip_system_fields(raw))
+
+    def read_user(self, user_id: str) -> UserDocument:
+        try:
+            raw = self._users.read_item(item=user_id, partition_key=user_id)
+        except CosmosResourceNotFoundError as exc:
+            raise DocumentNotFoundError(f"User {user_id} was not found.") from exc
+        return UserDocument.model_validate(self._strip_system_fields(raw))
+
+    def find_user_by_email(self, email: str) -> UserDocument | None:
+        query = "SELECT TOP 1 * FROM c WHERE LOWER(c.email) = @normalizedEmail"
+        parameters: list[dict[str, object]] = [{"name": "@normalizedEmail", "value": email.lower()}]
+        results = list(
+            self._users.query_items(
+                query=query,
+                parameters=parameters,
+                enable_cross_partition_query=True,
+            )
+        )
+        if not results:
+            return None
+        return UserDocument.model_validate(self._strip_system_fields(results[0]))
+
+    def list_users(self) -> list[UserDocument]:
+        query = "SELECT * FROM c ORDER BY c.createdAt DESC"
+        return [
+            UserDocument.model_validate(self._strip_system_fields(document))
+            for document in self._users.query_items(
+                query=query,
+                enable_cross_partition_query=True,
+            )
+        ]
+
+    def update_user(self, user: UserDocument) -> UserDocument:
+        existing_email = self.find_user_by_email(user.email)
+        if existing_email is not None and existing_email.id != user.id:
+            raise DuplicateDocumentError(f"User email {user.email} already exists.")
+        try:
+            raw = self._users.replace_item(item=user.id, body=user.model_dump(mode="json"))
+        except CosmosResourceNotFoundError as exc:
+            raise DocumentNotFoundError(f"User {user.id} was not found.") from exc
+        return UserDocument.model_validate(self._strip_system_fields(raw))
+
+    def deactivate_user(self, user_id: str) -> UserDocument:
+        user = self.read_user(user_id)
+        return self.update_user(user.model_copy(update={"isActive": False, "updatedAt": datetime.now(UTC)}))
+
+    def delete_user(self, user_id: str) -> None:
+        try:
+            self._users.delete_item(item=user_id, partition_key=user_id)
+        except CosmosResourceNotFoundError as exc:
+            raise DocumentNotFoundError(f"User {user_id} was not found.") from exc
 
     # -- Processes ---------------------------------------------------------
 
@@ -213,7 +282,7 @@ class CosmosService:
         results = list(
             self._jobs.query_items(query=query, parameters=parameters, partition_key=process_id)
         )
-        return int(results[0]) if results else 0
+        return int(cast(int | float | str, results[0])) if results else 0
 
     def sum_pages(self, process_id: str, *, filters: JobFilters) -> int:
         where_clauses, parameters = self._build_where_clauses(process_id, filters)
@@ -224,7 +293,7 @@ class CosmosService:
         results = list(
             self._jobs.query_items(query=query, parameters=parameters, partition_key=process_id)
         )
-        return int(results[0]) if results and results[0] is not None else 0
+        return int(cast(int | float | str, results[0])) if results and results[0] is not None else 0
 
     @staticmethod
     def _build_where_clauses(

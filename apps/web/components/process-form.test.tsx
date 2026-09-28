@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 
 import { fireEvent, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildProcessInput,
@@ -62,6 +62,21 @@ vi.mock("@/lib/api", async () => {
 
 const mockedApi = vi.mocked(api);
 
+beforeAll(() => {
+  vi.stubGlobal(
+    "ResizeObserver",
+    class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
+
 const analyzers: Analyzer[] = [
   {
     id: "prebuilt-invoice",
@@ -110,7 +125,7 @@ describe("ProcessForm", () => {
       target: { value: "invalid-email" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Save process" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Name is required.")).toBeInTheDocument();
     expect(screen.getByText("Description is required.")).toBeInTheDocument();
@@ -128,7 +143,7 @@ describe("ProcessForm", () => {
       target: { value: "101" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Save process" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect(
       await screen.findByText("Average Confidence threshold must be between 0 and 100."),
@@ -166,7 +181,7 @@ describe("ProcessForm", () => {
     fireEvent.change(screen.getByLabelText("Business owner email"), {
       target: { value: "owner@example.com" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save process" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Name already in use.")).toBeInTheDocument();
     expect(pushMock).not.toHaveBeenCalled();
@@ -213,7 +228,7 @@ describe("ProcessForm", () => {
     fireEvent.change(screen.getByLabelText("Business owner email"), {
       target: { value: "claims@example.com" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save process" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => {
       expect(mockedApi.createProcess.mock.calls[0]?.[0]).toEqual(
@@ -235,7 +250,9 @@ describe("ProcessForm", () => {
 
     renderWithQueryClient(<ProcessForm mode="edit" processId="process-1" />);
 
-    expect(await screen.findByDisplayValue("42")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByLabelText("Average Confidence threshold (%)")).toHaveDisplayValue("42");
+    });
   });
 
   it("builds API input from validated form values", () => {

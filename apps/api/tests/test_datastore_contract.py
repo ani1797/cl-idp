@@ -19,7 +19,7 @@ from pymongo import MongoClient
 from app.config import AZURITE_ACCOUNT_KEY, COSMOS_EMULATOR_KEY, Settings
 from app.db.base import DataStore, JobFilters
 from app.db.cosmos import CosmosService
-from app.db.exceptions import DocumentNotFoundError
+from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
 from app.db.mongo import MongoService
 from app.models import (
     AnalyzerRef,
@@ -27,6 +27,7 @@ from app.models import (
     JobDocument,
     JobStatus,
     RoutingAnalyzerStatus,
+    UserDocument,
 )
 
 
@@ -57,6 +58,8 @@ def _clear_cosmos(service: CosmosService) -> None:
         for job in service.list_jobs_for_process(process.id):
             service.delete_job(process.id, job.id)
         service.delete_process(process.id)
+    for user in service.list_users():
+        service.delete_user(user.id)
 
 
 @pytest.fixture
@@ -90,21 +93,21 @@ def data_store(request: pytest.FixtureRequest) -> DataStore:
 def make_process(**overrides: object) -> BusinessProcessDocument:
     process_id = overrides.pop("id", str(uuid4()))
     now = datetime.now(UTC).replace(microsecond=0)
-    defaults: dict[str, object] = dict(
-        id=process_id,
-        name=f"Process {process_id}",
-        description="Contract test process",
-        allowedAnalyzerIds=["prebuilt-invoice"],
-        allowedAnalyzers=[AnalyzerRef(id="prebuilt-invoice", name="Invoice")],
-        confidenceThreshold=0.8,
-        ownerEmail="owner@example.com",
-        routingAnalyzerStatus=RoutingAnalyzerStatus.READY,
-        routingAnalyzerId=f"idp-route-{process_id}",
-        derivedAnalyzerIds={"prebuilt-invoice": f"idp-derived-{process_id}"},
-        routingAnalyzerError=None,
-        createdAt=now,
-        updatedAt=now,
-    )
+    defaults: dict[str, object] = {
+        "id": process_id,
+        "name": f"Process {process_id}",
+        "description": "Contract test process",
+        "allowedAnalyzerIds": ["prebuilt-invoice"],
+        "allowedAnalyzers": [AnalyzerRef(id="prebuilt-invoice", name="Invoice")],
+        "confidenceThreshold": 0.8,
+        "ownerEmail": "owner@example.com",
+        "routingAnalyzerStatus": RoutingAnalyzerStatus.READY,
+        "routingAnalyzerId": f"idp-route-{process_id}",
+        "derivedAnalyzerIds": {"prebuilt-invoice": f"idp-derived-{process_id}"},
+        "routingAnalyzerError": None,
+        "createdAt": now,
+        "updatedAt": now,
+    }
     defaults.update(overrides)
     return BusinessProcessDocument.model_validate(defaults)
 
@@ -112,25 +115,96 @@ def make_process(**overrides: object) -> BusinessProcessDocument:
 def make_job(process_id: str, **overrides: object) -> JobDocument:
     job_id = overrides.pop("id", str(uuid4()))
     now = datetime.now(UTC).replace(microsecond=0)
-    defaults: dict[str, object] = dict(
-        id=job_id,
-        processId=process_id,
-        correlationId=str(uuid4()),
-        fileName="invoice-0042.pdf",
-        contentType="application/pdf",
-        blobPath=f"{process_id}/{job_id}/invoice-0042.pdf",
-        status=JobStatus.SUCCEEDED,
-        submittedAt=now,
-        completedAt=now,
-        detectedForm="prebuilt-invoice",
-        detectedFormName="Invoice",
-        unclassified=False,
-        retryOfJobId=None,
-        attempts=1,
-        pages=[{"page": 1, "width": 8.5, "height": 11.0, "unit": "inch", "angle": 0.0}],
-    )
+    defaults: dict[str, object] = {
+        "id": job_id,
+        "processId": process_id,
+        "correlationId": str(uuid4()),
+        "fileName": "invoice-0042.pdf",
+        "contentType": "application/pdf",
+        "blobPath": f"{process_id}/{job_id}/invoice-0042.pdf",
+        "status": JobStatus.SUCCEEDED,
+        "submittedAt": now,
+        "completedAt": now,
+        "detectedForm": "prebuilt-invoice",
+        "detectedFormName": "Invoice",
+        "unclassified": False,
+        "retryOfJobId": None,
+        "attempts": 1,
+        "pages": [{"page": 1, "width": 8.5, "height": 11.0, "unit": "inch", "angle": 0.0}],
+    }
     defaults.update(overrides)
     return JobDocument.model_validate(defaults)
+
+
+def make_user(**overrides: object) -> UserDocument:
+    user_id = overrides.pop("id", str(uuid4()))
+    now = datetime.now(UTC).replace(microsecond=0)
+    defaults: dict[str, object] = {
+        "id": user_id,
+        "email": f"{user_id}@example.com",
+        "displayName": "Demo User",
+        "roleLabel": "Reviewer",
+        "passwordHash": "$argon2id$v=19$m=65536,t=3,p=4$hash",
+        "isActive": True,
+        "createdAt": now,
+        "updatedAt": now,
+    }
+    defaults.update(overrides)
+    return UserDocument.model_validate(defaults)
+
+
+class TestUserCrud:
+    def test_create_and_read_user_round_trips(self, data_store: DataStore) -> None:
+        user = make_user(email="reviewer@example.com")
+
+        data_store.create_user(user)
+        result = data_store.read_user(user.id)
+
+        assert result == user
+
+    def test_user_email_is_unique_case_insensitively(self, data_store: DataStore) -> None:
+        data_store.create_user(make_user(email="reviewer@example.com"))
+
+        with pytest.raises(DuplicateDocumentError):
+            data_store.create_user(make_user(email="Reviewer@Example.com"))
+
+    def test_find_user_by_email_is_case_insensitive(self, data_store: DataStore) -> None:
+        user = make_user(email="reviewer@example.com")
+        data_store.create_user(user)
+
+        found = data_store.find_user_by_email("Reviewer@Example.com")
+
+        assert found is not None
+        assert found.id == user.id
+
+    def test_list_users_orders_by_created_at_descending(self, data_store: DataStore) -> None:
+        now = datetime.now(UTC).replace(microsecond=0)
+        older = make_user(email="older@example.com", createdAt=now - timedelta(days=1), updatedAt=now)
+        newer = make_user(email="newer@example.com", createdAt=now, updatedAt=now)
+        data_store.create_user(older)
+        data_store.create_user(newer)
+
+        results = data_store.list_users()
+
+        ids = [user.id for user in results if user.id in {older.id, newer.id}]
+        assert ids == [newer.id, older.id]
+
+    def test_update_and_deactivate_user(self, data_store: DataStore) -> None:
+        user = data_store.create_user(make_user(email="reviewer@example.com"))
+
+        updated = data_store.update_user(user.model_copy(update={"displayName": "Updated"}))
+        deactivated = data_store.deactivate_user(user.id)
+
+        assert updated.displayName == "Updated"
+        assert deactivated.isActive is False
+
+    def test_delete_user_removes_it(self, data_store: DataStore) -> None:
+        user = data_store.create_user(make_user(email="reviewer@example.com"))
+
+        data_store.delete_user(user.id)
+
+        with pytest.raises(DocumentNotFoundError):
+            data_store.read_user(user.id)
 
 
 class TestProcessCrud:

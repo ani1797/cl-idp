@@ -2,40 +2,90 @@
 
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { KpiCard, SectionHeader } from "@/components/brand/primitives";
 import { ErrorCard } from "@/components/error-card";
 import { PageLoadingState } from "@/components/page-loading-state";
+import { useSession } from "@/components/providers/session-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { api, type BusinessProcess } from "@/lib/api";
 import { showErrorToast } from "@/lib/errors";
-import { queryKeys } from "@/lib/query-keys";
-import { cn } from "@/lib/utils";
 import { confidenceThresholdFloatToPercent } from "@/lib/process-threshold";
+import { queryKeys } from "@/lib/query-keys";
+import { hasCapability } from "@/lib/roles";
 
-const statusStyles: Record<BusinessProcess["routingAnalyzerStatus"], string> = {
-  building: "border-amber-200 bg-amber-50 text-amber-700",
-  ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  failed: "border-red-200 bg-red-50 text-red-700",
+const statusBadgeVariants: Record<
+  BusinessProcess["routingAnalyzerStatus"],
+  "success" | "warning" | "destructive"
+> = {
+  building: "warning",
+  ready: "success",
+  failed: "destructive",
+};
+
+const statusIconNames: Record<
+  BusinessProcess["routingAnalyzerStatus"],
+  "check_circle" | "progress_activity" | "error"
+> = {
+  building: "progress_activity",
+  ready: "check_circle",
+  failed: "error",
 };
 
 function RoutingAnalyzerStatusBadge({ process }: { process: BusinessProcess }) {
   return (
     <div className="space-y-1">
-      <span
-        className={cn(
-          "inline-flex rounded-full border px-2.5 py-1 text-xs font-medium capitalize",
-          statusStyles[process.routingAnalyzerStatus],
-        )}
-      >
+      <Badge variant={statusBadgeVariants[process.routingAnalyzerStatus]} className="capitalize">
+        <Icon name={statusIconNames[process.routingAnalyzerStatus]} size={14} />
         {process.routingAnalyzerStatus}
-      </span>
+      </Badge>
       {process.routingAnalyzerError ? (
-        <p className="text-xs text-muted-foreground">{process.routingAnalyzerError}</p>
+        <p className="max-w-64 text-xs text-muted-foreground">{process.routingAnalyzerError}</p>
       ) : null}
     </div>
   );
+}
+
+function getProcessSearchText(process: BusinessProcess) {
+  return [
+    process.id,
+    process.name,
+    process.description,
+    process.ownerEmail,
+    process.routingAnalyzerStatus,
+    ...process.allowedAnalyzers.map((analyzer) => `${analyzer.id} ${analyzer.name}`),
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+function formatAveragePercent(values: number[]) {
+  if (values.length === 0) {
+    return "0%";
+  }
+
+  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+  return `${Math.round(average)}%`;
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
 }
 
 function DeleteProcessDialog({
@@ -87,7 +137,13 @@ function DeleteProcessDialog({
 
 export function ProcessListPage() {
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  const canWriteProcesses = hasCapability(user?.roleLabel, "processes:write");
   const [processToDelete, setProcessToDelete] = useState<BusinessProcess | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | BusinessProcess["routingAnalyzerStatus"]>(
+    "all",
+  );
 
   const processesQuery = useQuery({
     queryKey: queryKeys.processes.all,
@@ -107,6 +163,39 @@ export function ProcessListPage() {
       showErrorToast(error, "Unable to delete process");
     },
   });
+
+  const processes = useMemo(() => processesQuery.data ?? [], [processesQuery.data]);
+  const filteredProcesses = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return processes.filter((process) => {
+      const matchesSearch = normalizedSearch
+        ? getProcessSearchText(process).includes(normalizedSearch)
+        : true;
+      const matchesStatus = statusFilter === "all" || process.routingAnalyzerStatus === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [processes, searchTerm, statusFilter]);
+  const readyProcesses = processes.filter((process) => process.routingAnalyzerStatus === "ready").length;
+  const attentionProcesses = processes.filter(
+    (process) => process.routingAnalyzerStatus === "building" || process.routingAnalyzerStatus === "failed",
+  ).length;
+  const analyzerLinks = processes.reduce(
+    (total, process) => total + process.allowedAnalyzers.length,
+    0,
+  );
+  const averageThreshold = formatAveragePercent(
+    processes.map((process) => confidenceThresholdFloatToPercent(process.confidenceThreshold)),
+  );
+  const readyCaption =
+    processes.length > 0
+      ? `${Math.round((readyProcesses / processes.length) * 100)}% ready`
+      : "No registered processes";
+  const analyzerCaption =
+    processes.length > 0
+      ? `${(analyzerLinks / processes.length).toFixed(1)} avg per process`
+      : "No analyzers mapped";
 
   if (processesQuery.isLoading) {
     return (
@@ -129,120 +218,254 @@ export function ProcessListPage() {
     );
   }
 
-  const processes = processesQuery.data ?? [];
-
   return (
     <>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <section className="rounded-3xl border bg-background p-8 shadow-sm">
-          <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-2">
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Process catalog
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight">Business processes</h1>
-              <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-                Onboard, edit, and remove the business processes that drive document routing and
-                extraction for the Enterprise IDP demo.
+      <div className="flex flex-col gap-gutter">
+        <section className="flex flex-col gap-gutter">
+          <div className="flex flex-col gap-gutter md:flex-row md:items-end md:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <h1 className="text-headline-lg text-foreground">Business Processes</h1>
+                <Badge variant="neutral" className="text-label-caps">
+                  {processes.length} Total
+                </Badge>
+                <Badge variant="success" className="text-label-caps">
+                  {readyProcesses} Ready
+                </Badge>
+              </div>
+              <p className="text-body-md text-muted-foreground">
+                Manage document routing processes, assigned extraction analyzers, and confidence
+                thresholds for the Enterprise IDP demo.
               </p>
             </div>
-            <Button asChild size="lg">
-              <Link href="/processes/new">
-                <Plus className="size-4" />
-                New Process
-              </Link>
-            </Button>
+            {canWriteProcesses ? (
+              <Button asChild>
+                <Link href="/processes/new">
+                  <Icon name="add_circle" size={20} />
+                  New Process
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+
+          <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 xl:grid-cols-4">
+            <KpiCard
+              label="Pipeline capacity"
+              value={processes.length}
+              caption={`${processes.length === 1 ? "registered process" : "registered processes"}`}
+            />
+            <KpiCard label="Routing readiness" value={readyProcesses} caption={readyCaption} />
+            <KpiCard
+              label="Average threshold"
+              value={averageThreshold}
+              caption="confidence required"
+            />
+            <KpiCard
+              label="Analyzer coverage"
+              value={analyzerLinks}
+              caption={analyzerCaption}
+            />
           </div>
 
           {processes.length === 0 ? (
-            <div className="mt-8 rounded-3xl border border-dashed bg-muted/30 p-10 text-center">
-              <h2 className="text-xl font-semibold tracking-tight">Create your first business process</h2>
-              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+            <div className="rounded-lg border border-dashed bg-card p-10 text-center">
+              <h2 className="text-headline-md text-foreground">Create your first business process</h2>
+              <p className="mx-auto mt-3 max-w-2xl text-body-md text-muted-foreground">
                 No business processes have been onboarded yet. Create one to define allowed
                 analyzers, routing behavior, and notification thresholds.
               </p>
               <div className="mt-6">
-                <Button asChild>
-                  <Link href="/processes/new">New Process</Link>
-                </Button>
+                {canWriteProcesses ? (
+                  <Button asChild>
+                    <Link href="/processes/new">
+                      <Icon name="add_circle" size={20} />
+                      New Process
+                    </Link>
+                  </Button>
+                ) : null}
               </div>
             </div>
           ) : (
-            <div className="mt-8 overflow-hidden rounded-3xl border">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted/40">
-                    <tr className="text-left text-sm text-muted-foreground">
-                      <th className="px-4 py-3 font-medium">Name</th>
-                      <th className="px-4 py-3 font-medium">Description</th>
-                      <th className="px-4 py-3 font-medium">Allowed analyzers</th>
-                      <th className="px-4 py-3 font-medium">Threshold</th>
-                      <th className="px-4 py-3 font-medium">Owner email</th>
-                      <th className="px-4 py-3 font-medium">Routing analyzer status</th>
-                      <th className="px-4 py-3 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border bg-background text-sm">
-                    {processes.map((process) => (
-                      <tr key={process.id} className="align-top">
-                        <td className="px-4 py-4">
-                          <Link
-                            href={`/processes/${process.id}`}
-                            className="font-medium text-foreground underline-offset-4 hover:underline"
-                          >
-                            {process.name}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-4 text-muted-foreground">{process.description}</td>
-                        <td className="px-4 py-4 text-muted-foreground">
+            <>
+              <div className="rounded-lg border bg-card p-gutter">
+                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="relative min-w-0 flex-1">
+                    <Icon
+                      name="search"
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <Input
+                      type="search"
+                      value={searchTerm}
+                      onChange={(event) => setSearchTerm(event.target.value)}
+                      className="pl-10"
+                      placeholder="Search processes by name, ID, owner, status, or analyzer..."
+                      aria-label="Search processes"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="sr-only" htmlFor="process-status-filter">
+                      Filter by routing analyzer status
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="process-status-filter"
+                        value={statusFilter}
+                        onChange={(event) =>
+                          setStatusFilter(
+                            event.target.value as "all" | BusinessProcess["routingAnalyzerStatus"],
+                          )
+                        }
+                        className="h-8 appearance-none rounded-lg border border-input bg-background px-3 py-1 pr-9 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                      >
+                        <option value="all">All statuses</option>
+                        <option value="ready">Ready</option>
+                        <option value="building">Building</option>
+                        <option value="failed">Failed</option>
+                      </select>
+                      <Icon
+                        name="expand_more"
+                        size={18}
+                        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                      />
+                    </div>
+                    <Badge variant={attentionProcesses > 0 ? "warning" : "success"} className="h-8 px-3">
+                      <Icon name={attentionProcesses > 0 ? "pending_actions" : "task_alt"} size={16} />
+                      {attentionProcesses} needing attention
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-lg border bg-card">
+                <SectionHeader
+                  title="Process catalog"
+                  description="Configured business processes and their routing analyzer state."
+                  className="border-b px-gutter py-3"
+                />
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="px-gutter text-label-caps text-muted-foreground">
+                        Process definition
+                      </TableHead>
+                      <TableHead className="px-gutter text-label-caps text-muted-foreground">
+                        Allowed analyzers
+                      </TableHead>
+                      <TableHead className="px-gutter text-label-caps text-muted-foreground">
+                        Threshold
+                      </TableHead>
+                      <TableHead className="px-gutter text-label-caps text-muted-foreground">
+                        Owner email
+                      </TableHead>
+                      <TableHead className="px-gutter text-label-caps text-muted-foreground">
+                        Routing status
+                      </TableHead>
+                      <TableHead className="px-gutter text-right text-label-caps text-muted-foreground">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProcesses.map((process) => (
+                      <TableRow key={process.id} className="align-top">
+                        <TableCell className="max-w-sm px-gutter py-3 whitespace-normal">
+                          <div className="flex items-start gap-2">
+                            <Icon
+                              name="account_tree"
+                              size={20}
+                              className="mt-0.5 text-primary"
+                            />
+                            <div className="min-w-0">
+                              <Link
+                                href={`/processes/${process.id}`}
+                                className="block font-heading text-sm font-semibold leading-tight text-foreground underline-offset-4 hover:text-primary hover:underline"
+                              >
+                                {process.name}
+                              </Link>
+                              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                                {process.description}
+                              </p>
+                              <p className="mt-1 font-mono text-xs text-muted-foreground">
+                                {process.id}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-gutter py-3 whitespace-normal">
                           <div className="flex flex-wrap gap-2">
                             {process.allowedAnalyzers.map((analyzer) => (
-                              <span
-                                key={analyzer.id}
-                                className="rounded-full border bg-muted px-2.5 py-1 text-xs"
-                              >
+                              <Badge key={analyzer.id} variant="neutral">
                                 {analyzer.name}
-                              </span>
+                              </Badge>
                             ))}
                           </div>
-                        </td>
-                        <td className="px-4 py-4 text-muted-foreground">
-                          {confidenceThresholdFloatToPercent(process.confidenceThreshold)}%
-                        </td>
-                        <td className="px-4 py-4 text-muted-foreground">{process.ownerEmail}</td>
-                        <td className="px-4 py-4">
+                        </TableCell>
+                        <TableCell className="px-gutter py-3 tabular-figures text-foreground">
+                          <Badge variant="outline">
+                            {confidenceThresholdFloatToPercent(process.confidenceThreshold)}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-gutter py-3 text-muted-foreground">
+                          {process.ownerEmail}
+                        </TableCell>
+                        <TableCell className="px-gutter py-3">
                           <RoutingAnalyzerStatusBadge process={process} />
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex flex-wrap gap-2">
-                            <Button asChild variant="outline" size="sm">
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            Updated {formatDate(process.updatedAt)}
+                          </p>
+                        </TableCell>
+                        <TableCell className="px-gutter py-3">
+                          <div className="flex flex-wrap justify-end gap-2">
+                            <Button asChild variant="ghost" size="sm">
                               <Link href={`/processes/${process.id}`}>
                                 View
                               </Link>
                             </Button>
-                            <Button asChild variant="outline" size="sm">
-                              <Link href={`/processes/${process.id}/edit`}>
-                                <Pencil className="size-3.5" />
-                                Edit
-                              </Link>
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setProcessToDelete(process)}
-                            >
-                              <Trash2 className="size-3.5" />
-                              Delete
-                            </Button>
+                            {canWriteProcesses ? (
+                              <>
+                                <Button asChild variant="outline" size="sm">
+                                  <Link href={`/processes/${process.id}/edit`}>
+                                    <Icon name="edit" size={16} />
+                                    Edit
+                                  </Link>
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => setProcessToDelete(process)}
+                                >
+                                  <Icon name="delete" size={16} />
+                                  Delete
+                                </Button>
+                              </>
+                            ) : null}
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
+                {filteredProcesses.length === 0 ? (
+                  <div className="border-t px-gutter py-8 text-center">
+                    <p className="font-heading text-sm font-semibold text-foreground">
+                      No processes match these filters.
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Adjust the search term or routing analyzer status filter.
+                    </p>
+                  </div>
+                ) : null}
+                <div className="flex flex-col gap-2 border-t px-gutter py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                  <span>
+                    Showing {filteredProcesses.length} of {processes.length} processes
+                  </span>
+                  <span className="tabular-figures">Rows per page: {filteredProcesses.length}</span>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </section>
       </div>

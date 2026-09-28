@@ -9,10 +9,19 @@ from uuid import uuid4
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from app.auth import hash_password
 from app.config import get_settings
 from app.db import DataStore, DocumentNotFoundError, create_data_store
-from app.models import JobDocument, JobStatus
+from app.models import JobDocument, JobStatus, UserDocument
 from app.storage import BlobService
+
+# Fixed credentials for the Playwright live suite, independent of the
+# DEMO_*_EMAIL/PASSWORD env vars used by scripts/seed.py. Kept out of any
+# committed secret file; this is local/test-only and never used in a real
+# deployment (auth-guard rejects requests without a valid session or the
+# service token regardless of this user existing).
+E2E_USER_EMAIL = "e2e-playwright@example.com"
+E2E_USER_PASSWORD = "e2e-playwright-password"
 
 
 def build_services() -> tuple[DataStore, BlobService]:
@@ -93,6 +102,35 @@ def seed_failed_job(process_id: str, file_path: Path, file_name: str, error: str
     print(json.dumps({"jobId": job.id, "fileName": job.fileName}))
 
 
+def ensure_e2e_user() -> None:
+    """Idempotently create (or reactivate) the fixed Playwright test user."""
+    data_store, _blob = build_services()
+    now = datetime.now(UTC)
+
+    existing = data_store.find_user_by_email(E2E_USER_EMAIL)
+    if existing is not None:
+        if not existing.isActive:
+            existing.isActive = True
+            existing.updatedAt = now
+            data_store.update_user(existing)
+        print(json.dumps({"email": E2E_USER_EMAIL, "password": E2E_USER_PASSWORD, "created": False}))
+        return
+
+    data_store.create_user(
+        UserDocument(
+            id=str(uuid4()),
+            email=E2E_USER_EMAIL,
+            displayName="Playwright E2E User",
+            roleLabel="End User",
+            passwordHash=hash_password(E2E_USER_PASSWORD),
+            isActive=True,
+            createdAt=now,
+            updatedAt=now,
+        )
+    )
+    print(json.dumps({"email": E2E_USER_EMAIL, "password": E2E_USER_PASSWORD, "created": True}))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Support commands for local Playwright e2e runs.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -105,6 +143,8 @@ def parse_args() -> argparse.Namespace:
     seed_parser.add_argument("--file-path", type=Path, required=True)
     seed_parser.add_argument("--file-name", required=True)
     seed_parser.add_argument("--error", default="Forced E2E failure.")
+
+    subparsers.add_parser("ensure-e2e-user")
     return parser.parse_args()
 
 
@@ -117,6 +157,10 @@ def main() -> int:
 
     if args.command == "seed-failed-job":
         seed_failed_job(args.process_id, args.file_path, args.file_name, args.error)
+        return 0
+
+    if args.command == "ensure-e2e-user":
+        ensure_e2e_user()
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")

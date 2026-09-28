@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator, Iterable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import cast
@@ -15,6 +15,8 @@ from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.metrics import CallbackOptions, Observation
 
+from app.auth import SERVICE_TOKEN_HEADER, read_session_user, service_token_matches
+from app.authz import require_roles
 from app.config import get_settings
 from app.cu import (
     ContentUnderstandingError,
@@ -35,9 +37,15 @@ from app.models import (
     Health,
     HealthStatus,
     RoutingAnalyzerStatus,
+    UserRole,
 )
 from app.observability import init_observability
-from app.routers import register_jobs_routes, register_trigger_routes
+from app.routers import (
+    register_auth_routes,
+    register_jobs_routes,
+    register_trigger_routes,
+    register_user_routes,
+)
 from app.storage import BlobService, QueueService
 
 API_VERSION = "0.2.0"
@@ -47,6 +55,8 @@ API_DESCRIPTION = (
     "inference pipeline runs."
 )
 OPENAPI_TAGS = [
+    {"name": "auth", "description": "Cookie-backed authentication"},
+    {"name": "users", "description": "User administration"},
     {"name": "processes", "description": "Business process configuration"},
     {"name": "analyzers", "description": "Available Azure AI Content Understanding analyzers"},
     {"name": "jobs", "description": "Pipeline trigger, job polling, and review/approve"},
@@ -220,13 +230,21 @@ def register_routes(application: FastAPI) -> None:
         "/processes",
         response_model=BusinessProcess,
         status_code=201,
-        responses={400: {"model": Error}, 409: {"model": Error}, 502: {"model": Error}},
+        responses={
+            400: {"model": Error},
+            403: {"model": Error},
+            409: {"model": Error},
+            502: {"model": Error},
+        },
         tags=["processes"],
     )
     async def create_process_endpoint(
         payload: BusinessProcessInput,
         background_tasks: BackgroundTasks,
+        request: Request,
     ) -> BusinessProcess | JSONResponse:
+        if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
+            return forbidden
         existing_process = data_store(application).find_process_by_name(payload.name)
         if existing_process is not None:
             return error_response(
@@ -298,14 +316,23 @@ def register_routes(application: FastAPI) -> None:
     @application.put(
         "/processes/{processId}",
         response_model=BusinessProcess,
-        responses={400: {"model": Error}, 404: {"model": Error}, 409: {"model": Error}, 502: {"model": Error}},
+        responses={
+            400: {"model": Error},
+            403: {"model": Error},
+            404: {"model": Error},
+            409: {"model": Error},
+            502: {"model": Error},
+        },
         tags=["processes"],
     )
     async def update_process_endpoint(
         processId: str,
         payload: BusinessProcessInput,
         background_tasks: BackgroundTasks,
+        request: Request,
     ) -> BusinessProcess | JSONResponse:
+        if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
+            return forbidden
         try:
             existing_process = data_store(application).read_process(processId)
         except DocumentNotFoundError:
@@ -378,10 +405,12 @@ def register_routes(application: FastAPI) -> None:
     @application.delete(
         "/processes/{processId}",
         status_code=204,
-        responses={404: {"model": Error}},
+        responses={403: {"model": Error}, 404: {"model": Error}},
         tags=["processes"],
     )
-    async def delete_process_endpoint(processId: str) -> Response:
+    async def delete_process_endpoint(processId: str, request: Request) -> Response:
+        if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
+            return forbidden
         try:
             data_store(application).read_process(processId)
         except DocumentNotFoundError:
@@ -400,8 +429,17 @@ def register_routes(application: FastAPI) -> None:
         data_store(application).delete_process(processId)
         return Response(status_code=204)
 
+    register_auth_routes(application)
+    register_user_routes(application)
     register_jobs_routes(application)
     register_trigger_routes(application)
+
+
+def is_auth_exempt(request: Request) -> bool:
+    if request.method == "OPTIONS":
+        return True
+    path = request.url.path
+    return (request.method == "GET" and path == "/healthz") or path.startswith("/auth/")
 
 
 def create_app() -> FastAPI:
@@ -415,6 +453,32 @@ def create_app() -> FastAPI:
         servers=[{"url": "/api"}],
     )
     initialize_observability(application)
+
+    @application.middleware("http")
+    async def require_authentication(
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        if is_auth_exempt(request):
+            return await call_next(request)
+
+        settings = application.state.settings
+        if service_token_matches(request.headers.get(SERVICE_TOKEN_HEADER), settings):
+            return await call_next(request)
+
+        session_token = request.cookies.get(settings.session_cookie_name)
+        if session_token is not None:
+            user = read_session_user(session_token, settings, data_store(application))
+            if user is not None:
+                request.state.user = user
+                return await call_next(request)
+
+        return error_response(
+            status_code=401,
+            code="unauthorized",
+            message="Authentication is required.",
+        )
+
     allow_origins = {settings.web_origin}
     # Local dev convenience: `localhost` and `127.0.0.1` are the same server to
     # a developer but different origins to a browser's CORS check. Accept both
@@ -428,6 +492,7 @@ def create_app() -> FastAPI:
         allow_origins=sorted(allow_origins),
         allow_methods=["*"],
         allow_headers=["*"],
+        allow_credentials=True,
     )
     register_routes(application)
     return application

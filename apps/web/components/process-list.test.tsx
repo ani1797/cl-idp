@@ -4,7 +4,7 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProcessListPage } from "@/components/process-list-page";
-import { renderWithQueryClient } from "@/components/test-utils";
+import { renderWithSession } from "@/components/test-utils";
 import { api, type BusinessProcess } from "@/lib/api";
 
 vi.mock("next/link", () => ({
@@ -50,7 +50,7 @@ describe("ProcessListPage", () => {
   it("renders the empty state when no processes exist", async () => {
     mockedApi.listProcesses.mockResolvedValueOnce([]);
 
-    renderWithQueryClient(<ProcessListPage />);
+    renderWithSession(<ProcessListPage />);
 
     expect(await screen.findByText("Create your first business process")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "New Process" })).not.toHaveLength(0);
@@ -73,7 +73,7 @@ describe("ProcessListPage", () => {
       },
     ]);
 
-    renderWithQueryClient(<ProcessListPage />);
+    renderWithSession(<ProcessListPage />);
 
     expect(await screen.findByRole("link", { name: "Invoice Intake" })).toHaveAttribute(
       "href",
@@ -82,7 +82,8 @@ describe("ProcessListPage", () => {
     expect(screen.getByText("Routes invoices to the correct analyzer.")).toBeInTheDocument();
     expect(screen.getAllByText("Invoice").length).toBeGreaterThan(0);
     expect(screen.getByText("Claims Package")).toBeInTheDocument();
-    expect(screen.getAllByText("87%").length).toBe(2);
+    expect(screen.getByText("Average threshold")).toBeInTheDocument();
+    expect(within(screen.getByRole("table")).getAllByText("87%").length).toBe(2);
     expect(screen.getAllByText("owner@example.com").length).toBe(2);
     expect(screen.getByText("building")).toBeInTheDocument();
   });
@@ -93,7 +94,7 @@ describe("ProcessListPage", () => {
       .mockResolvedValueOnce([]);
     mockedApi.deleteProcess.mockResolvedValue(undefined);
 
-    renderWithQueryClient(<ProcessListPage />);
+    renderWithSession(<ProcessListPage />);
 
     const deleteButton = await screen.findByRole("button", { name: /delete/i });
     fireEvent.click(deleteButton);

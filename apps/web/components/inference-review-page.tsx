@@ -3,19 +3,15 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  AlertCircle,
-  ArrowLeft,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  FileSearch,
-  RefreshCcw,
-} from "lucide-react";
 import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
+import {
+  ConfidenceBadge,
+  bandOverlayStyles,
+  confidenceBandForPercent,
+  type ConfidenceBand,
+} from "@/components/brand/confidence-badge";
 import { ErrorCard } from "@/components/error-card";
 import {
   AverageConfidenceValue,
@@ -24,7 +20,11 @@ import {
   ReviewedIndicator,
 } from "@/components/job-history-ui";
 import { PageLoadingState } from "@/components/page-loading-state";
+import { useSession } from "@/components/providers/session-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
 import {
   api,
   type ExtractedField,
@@ -49,6 +49,7 @@ import {
 } from "@/lib/inference-review";
 import { getPollingInterval, pollingIntervals } from "@/lib/query";
 import { queryKeys } from "@/lib/query-keys";
+import { hasCapability } from "@/lib/roles";
 import { useObjectUrl } from "@/lib/use-object-url";
 import { cn } from "@/lib/utils";
 
@@ -64,27 +65,28 @@ type RenderedPageSize = {
   height: number;
 };
 
-function ConfidenceBadge({ confidence }: { confidence?: number }) {
-  if (confidence === undefined || confidence === null) {
-    return (
-      <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
-        n/a
-      </span>
-    );
+const svgBandOverlayStyles: Record<ConfidenceBand, string> = {
+  pass: cn(bandOverlayStyles.pass, "fill-confidence-pass/40 stroke-confidence-pass"),
+  warn: cn(bandOverlayStyles.warn, "fill-confidence-warn/40 stroke-confidence-warn"),
+  critical: cn(
+    bandOverlayStyles.critical,
+    "fill-confidence-critical/40 stroke-confidence-critical",
+  ),
+};
+
+function getConfidenceBand(confidence: number | null | undefined) {
+  if (confidence === null || confidence === undefined || Number.isNaN(confidence)) {
+    return "critical" satisfies ConfidenceBand;
   }
 
-  return (
-    <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
-      {(confidence * 100).toFixed(0)}%
-    </span>
-  );
+  return confidenceBandForPercent(Math.round(confidence * 100));
 }
 
 function FieldTypeBadge({ type }: { type: ExtractedField["type"] }) {
   return (
-    <span className="inline-flex rounded-full border border-slate-200 bg-background px-2 py-0.5 text-[11px] uppercase tracking-wide text-muted-foreground">
+    <Badge variant="neutral" className="text-label-caps h-auto px-2 py-0.5">
       {type}
-    </span>
+    </Badge>
   );
 }
 
@@ -140,11 +142,11 @@ function buildReviewHref(processId: string, jobId: string, from: string | null) 
 
 function DocumentEmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-[28rem] items-center justify-center rounded-2xl border border-dashed bg-muted/10 p-8 text-center">
+    <div className="flex min-h-[28rem] items-center justify-center rounded-lg border border-dashed bg-muted/30 p-8 text-center">
       <div className="max-w-md space-y-3">
-        <FileSearch className="mx-auto size-8 text-muted-foreground" />
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+        <Icon name="find_in_page" size={32} className="mx-auto text-muted-foreground" />
+        <h2 className="text-headline-md">{title}</h2>
+        <p className="text-body-md text-muted-foreground">{description}</p>
       </div>
     </div>
   );
@@ -166,12 +168,13 @@ function DocumentToolbar({
   canPage: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b pb-4 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-          Source document
-        </p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight">{fileName}</h2>
+    <div className="flex flex-col gap-3 border-b bg-muted/40 px-gutter py-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex items-center gap-gutter">
+        <Icon name="description" size={22} className="text-primary" />
+        <div>
+          <p className="text-label-caps text-primary">Source document</p>
+          <h2 className="text-body-md font-semibold text-foreground">{fileName}</h2>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <Button
@@ -181,10 +184,10 @@ function DocumentToolbar({
           onClick={onPreviousPage}
           disabled={!canPage || currentPage <= 1}
         >
-          <ChevronLeft className="size-4" />
+          <Icon name="chevron_left" size={16} />
           Previous
         </Button>
-        <span className="min-w-24 text-center text-sm text-muted-foreground">
+        <span className="tabular-figures min-w-24 text-center text-sm text-muted-foreground">
           Page {currentPage} of {totalPages}
         </span>
         <Button
@@ -195,7 +198,7 @@ function DocumentToolbar({
           disabled={!canPage || currentPage >= totalPages}
         >
           Next
-          <ChevronRight className="size-4" />
+          <Icon name="chevron_right" size={16} />
         </Button>
       </div>
     </div>
@@ -245,14 +248,16 @@ function BoundingBoxOverlay({
           }
 
           const active = field.path === focusedPath;
+          const band = getConfidenceBand(field.confidence);
 
           return (
             <g key={field.path}>
               <polygon
                 points={points.map((point) => `${point.x},${point.y}`).join(" ")}
                 className={cn(
-                  "pointer-events-auto cursor-pointer transition-colors",
-                  active ? "fill-amber-300/30 stroke-amber-500" : "fill-sky-300/15 stroke-sky-500/80",
+                  "pointer-events-auto cursor-pointer transition-all",
+                  svgBandOverlayStyles[band],
+                  active ? "opacity-100" : "opacity-70 hover:opacity-95",
                 )}
                 strokeWidth={active ? 3 : 2}
                 onClick={() => onSelectPath(field.path)}
@@ -260,7 +265,7 @@ function BoundingBoxOverlay({
               <rect
                 className={cn(
                   "pointer-events-none fill-none",
-                  active ? "stroke-amber-500/60" : "stroke-sky-500/30",
+                  active ? "stroke-primary" : "stroke-foreground/30",
                 )}
                 x={bounds.left}
                 y={bounds.top}
@@ -333,7 +338,7 @@ function PdfDocumentViewer({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="overflow-hidden rounded-lg border bg-card">
       <DocumentToolbar
         fileName={fileName}
         currentPage={currentPage}
@@ -342,7 +347,7 @@ function PdfDocumentViewer({
         onNextPage={() => onCurrentPageChange(Math.min(pageCount, currentPage + 1))}
         canPage={pageCount > 1}
       />
-      <div className="overflow-auto rounded-2xl bg-muted/20 p-4">
+      <div className="overflow-auto bg-muted/60 p-gutter">
         <div ref={pageFrameRef} className="relative mx-auto w-full max-w-full">
           <Document
             file={objectUrl}
@@ -403,7 +408,7 @@ function ImageDocumentViewer({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="overflow-hidden rounded-lg border bg-card">
       <DocumentToolbar
         fileName={fileName}
         currentPage={1}
@@ -412,13 +417,13 @@ function ImageDocumentViewer({
         onNextPage={() => undefined}
         canPage={false}
       />
-      <div className="overflow-auto rounded-2xl bg-muted/20 p-4">
+      <div className="overflow-auto bg-muted/60 p-gutter">
         <div className="relative mx-auto inline-block max-w-full">
           {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
           <img
             src={objectUrl}
             alt={fileName}
-            className="block max-w-full rounded-xl shadow-sm"
+            className="block max-w-full rounded-lg border"
             onLoad={(event) => {
               setRenderedSize({
                 width: event.currentTarget.clientWidth,
@@ -449,6 +454,7 @@ function FieldTree({
   onSelectField,
   onValueChange,
   onApprove,
+  canReview,
 }: {
   field: ExtractedField;
   level: number;
@@ -459,6 +465,7 @@ function FieldTree({
   onSelectField: (field: LeafField) => void;
   onValueChange: (field: LeafField, value: string) => void;
   onApprove: (field: LeafField) => void;
+  canReview: boolean;
 }) {
   const label = getFieldLabel(field);
 
@@ -479,9 +486,9 @@ function FieldTree({
           }
         }}
         className={cn(
-          "w-full rounded-2xl border p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          focusedPath === field.path ? "border-sky-300 bg-sky-50/70" : "border-border bg-background",
-          violation ? "border-amber-300 bg-amber-50/50" : "",
+          "w-full rounded-lg border bg-card p-gutter text-left transition hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          focusedPath === field.path ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border",
+          violation ? "border-warning-border bg-warning-surface/70" : "",
         )}
       >
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -489,11 +496,11 @@ function FieldTree({
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-medium text-foreground">{label}</p>
               <FieldTypeBadge type={field.type} />
-              <ConfidenceBadge confidence={field.confidence} />
+              <ConfidenceBadge value={field.confidence} />
               {approved ? (
-                <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">
+                <Badge variant="success" className="text-label-caps h-auto px-2 py-0.5">
                   Approved
-                </span>
+                </Badge>
               ) : null}
             </div>
             <p className="font-mono text-xs text-muted-foreground">{field.path}</p>
@@ -509,13 +516,15 @@ function FieldTree({
               type="button"
               variant="outline"
               size="sm"
-              className="border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+              aria-label={`Approve ${label}`}
+              disabled={!canReview}
+              className="border-warning-border bg-warning-surface text-warning hover:bg-warning-surface/80"
               onClick={(event) => {
                 event.stopPropagation();
                 onApprove(field);
               }}
             >
-              <Check className="size-4" />
+              <Icon name="check" size={16} />
               Approve
             </Button>
           ) : null}
@@ -524,17 +533,18 @@ function FieldTree({
           <label className="sr-only" htmlFor={`field-${field.path}`}>
             {field.path}
           </label>
-          <input
+          <Input
             id={`field-${field.path}`}
             value={value}
+            disabled={!canReview}
             onClick={(event) => event.stopPropagation()}
             onChange={(event) => onValueChange(field, event.target.value)}
-            className="flex min-h-10 w-full rounded-xl border bg-background px-3 py-2 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-10 bg-background"
           />
         </div>
         {violation ? (
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs text-amber-800">
-            <AlertCircle className="size-3.5" />
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-warning-border bg-warning-surface px-2.5 py-1 text-xs text-warning">
+            <Icon name="report_problem" size={14} />
             Low confidence and still unreviewed
           </div>
         ) : null}
@@ -545,7 +555,7 @@ function FieldTree({
   const children = getFieldChildren(field);
 
   return (
-    <details open className="group rounded-2xl border bg-muted/10" style={{ marginLeft: level * 12 }}>
+    <details open className="group rounded-lg border bg-card" style={{ marginLeft: level * 12 }}>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
         <span className="space-y-1">
           <span className="flex items-center gap-2">
@@ -556,7 +566,7 @@ function FieldTree({
         </span>
         <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
           {children.length} {children.length === 1 ? "item" : "items"}
-          <ChevronDown className="size-4 transition group-open:rotate-180" />
+          <Icon name="expand_more" size={16} className="transition group-open:rotate-180" />
         </span>
       </summary>
       <div className="space-y-3 border-t px-3 py-3">
@@ -572,6 +582,7 @@ function FieldTree({
             onSelectField={onSelectField}
             onValueChange={onValueChange}
             onApprove={onApprove}
+            canReview={canReview}
           />
         ))}
       </div>
@@ -592,7 +603,9 @@ function ReviewPanel({
   onValueChange,
   onApprove,
   onSave,
+  onReset,
   onBack,
+  canReview,
 }: {
   job: Job;
   processName: string;
@@ -606,17 +619,19 @@ function ReviewPanel({
   onValueChange: (field: LeafField, value: string) => void;
   onApprove: (field: LeafField) => void;
   onSave: () => void;
+  onReset: () => void;
   onBack: () => void;
+  canReview: boolean;
 }) {
+  const flaggedCount = job.confidenceViolations?.length ?? 0;
+
   return (
-    <section className="rounded-3xl border bg-background p-6 shadow-sm">
-      <div className="flex flex-col gap-4 border-b pb-6">
+    <section className="flex max-h-[calc(100vh-12rem)] flex-col rounded-lg border bg-card">
+      <div className="flex flex-col gap-4 border-b p-gutter">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              Human review
-            </p>
-            <h1 className="text-2xl font-semibold tracking-tight">{processName}</h1>
+            <p className="text-label-caps text-primary">Human-in-the-loop validation</p>
+            <h1 className="text-headline-lg">{processName}</h1>
             <p className="text-sm text-muted-foreground">
               Detected form: <span className="font-medium text-foreground">{formatDetectedForm(job)}</span>
             </p>
@@ -637,8 +652,21 @@ function ReviewPanel({
             </span>
           ) : null}
         </div>
+        {flaggedCount > 0 ? (
+          <div className="flex items-start gap-gutter rounded-lg border border-warning-border bg-warning-surface p-3 text-warning">
+            <Icon name="report_problem" size={22} className="mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-foreground">
+                {flaggedCount} {flaggedCount === 1 ? "field requires" : "fields require"} manual adjudication
+              </p>
+              <p className="text-body-md text-muted-foreground">
+                Review highlighted fields against the source document before applying approval.
+              </p>
+            </div>
+          </div>
+        ) : null}
       </div>
-      <div className="mt-6 space-y-4">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-gutter">
         {job.fields?.map((field) => (
           <FieldTree
             key={field.path}
@@ -651,16 +679,34 @@ function ReviewPanel({
             onSelectField={onSelectField}
             onValueChange={onValueChange}
             onApprove={onApprove}
+            canReview={canReview}
           />
         ))}
       </div>
-      <div className="mt-6 flex flex-wrap justify-end gap-3 border-t pt-6">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="button" onClick={onSave} disabled={saveDisabled || savePending}>
-          {savePending ? "Saving…" : "Save"}
-        </Button>
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-gutter border-t bg-card/95 p-gutter shadow-lg backdrop-blur">
+        <div className="flex items-center gap-2 text-body-md text-muted-foreground">
+          <span className="size-2 rounded-full bg-secondary" aria-hidden="true" />
+          <span>
+            {canReview
+              ? "Corrections are recorded in the review audit trail."
+              : "Your role has read-only access to this review. Corrections require a Reviewer or IT Admin."}
+          </span>
+        </div>
+        {canReview ? (
+          <div className="flex flex-wrap items-center gap-gutter">
+            <Button type="button" variant="ghost" className="text-destructive hover:text-destructive" onClick={onBack}>
+              Reject
+            </Button>
+            <Button type="button" variant="outline" onClick={onReset} disabled={saveDisabled || savePending}>
+              <Icon name="refresh" size={18} />
+              Reset
+            </Button>
+            <Button type="button" aria-label="Approve" onClick={onSave} disabled={saveDisabled || savePending}>
+              <Icon name="verified" size={20} />
+              {savePending ? "Approving…" : "Apply & Approve"}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </section>
   );
@@ -685,13 +731,13 @@ function NothingToReviewPanel({
       : "The document was classified successfully, but the analyzer returned no field values to review.";
 
   return (
-    <section className="rounded-3xl border bg-background p-6 shadow-sm">
+    <section className="rounded-lg border bg-card p-margin">
       <div className="space-y-3">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="text-label-caps text-primary">
           Review outcome
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+        <h1 className="text-headline-lg">{title}</h1>
+        <p className="text-body-md text-muted-foreground">{description}</p>
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <Button type="button" variant="outline" onClick={onBack}>
@@ -726,13 +772,13 @@ function NotReviewablePanel({
 }) {
   if (job.status === "failed") {
     return (
-      <section className="rounded-3xl border bg-background p-6 shadow-sm">
+      <section className="rounded-lg border bg-card p-margin">
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-label-caps text-destructive">
             Job failed
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">{job.fileName}</h1>
-          <p className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm leading-6 text-destructive">
+          <h1 className="text-headline-lg">{job.fileName}</h1>
+          <p className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-body-md text-destructive">
             {error}
           </p>
         </div>
@@ -749,13 +795,13 @@ function NotReviewablePanel({
   }
 
   return (
-    <section className="rounded-3xl border bg-background p-6 shadow-sm">
+    <section className="rounded-lg border bg-card p-margin">
       <div className="space-y-3">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="text-label-caps text-primary">
           Processing
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">{job.fileName}</h1>
-        <p className="text-sm leading-6 text-muted-foreground">
+        <h1 className="text-headline-lg">{job.fileName}</h1>
+        <p className="text-body-md text-muted-foreground">
           This job is still {job.status}. The review editor will appear automatically when processing finishes.
         </p>
         {showManualRefresh ? (
@@ -769,9 +815,57 @@ function NotReviewablePanel({
           Back
         </Button>
         <Button type="button" variant="outline" onClick={onRefresh}>
-          <RefreshCcw className="size-4" />
+          <Icon name="refresh" size={16} />
           Refresh
         </Button>
+      </div>
+    </section>
+  );
+}
+
+function JobHeaderStrip({
+  job,
+  processName,
+}: {
+  job: Job;
+  processName: string;
+}) {
+  return (
+    <section className="rounded-lg border bg-card">
+      <div className="flex flex-col gap-gutter p-gutter lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-gutter">
+          <div>
+            <p className="text-label-caps text-primary">Review workbench</p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-2">
+              <h1 className="text-headline-lg tabular-figures">#{job.id}</h1>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-body-md font-semibold text-foreground">{processName}</span>
+            </div>
+          </div>
+          <JobStatusBadge status={job.status} />
+        </div>
+        <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2 lg:min-w-[28rem]">
+          <div className="min-w-0">
+            <span className="text-label-caps block">File</span>
+            <span className="block break-all font-medium text-foreground">{job.fileName}</span>
+          </div>
+          <div className="min-w-0">
+            <span className="text-label-caps block">Detected form</span>
+            <span className="block break-words font-medium text-foreground">{formatDetectedForm(job)}</span>
+          </div>
+          {job.averageConfidence !== null && job.averageConfidence !== undefined ? (
+            <div className="min-w-0">
+              <span className="text-label-caps block">Average confidence</span>
+              <AverageConfidenceValue averageConfidence={job.averageConfidence} />
+            </div>
+          ) : null}
+          {job.estimatedCostUsd !== null && job.estimatedCostUsd !== undefined ? (
+            <div className="min-w-0">
+              <span className="text-label-caps block">Estimated cost</span>
+              <EstimatedCostValue estimatedCostUsd={job.estimatedCostUsd} />
+            </div>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -787,6 +881,8 @@ export function InferenceReviewPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  const canReview = hasCapability(user?.roleLabel, "review:act");
   const from = searchParams.get("from");
   const returnHref = useMemo(() => getReturnHref(processId, from), [from, processId]);
 
@@ -986,6 +1082,11 @@ export function InferenceReviewPage({
     setApprovals((currentApprovals) => new Set(currentApprovals).add(field.path));
   }
 
+  function onReset() {
+    setEdits(new Map());
+    setApprovals(new Set());
+  }
+
   function onManualRefresh() {
     setJobPollingStartedAt(new Date().toISOString());
     setManualRefreshExpired(false);
@@ -1115,24 +1216,27 @@ export function InferenceReviewPage({
         onValueChange={onValueChange}
         onApprove={onApprove}
         onSave={onSave}
+        onReset={onReset}
         onBack={() => router.push(returnHref)}
+        canReview={canReview}
       />
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-gutter">
       <div className="flex items-center justify-between">
         <Link
           href={returnHref}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
         >
-          <ArrowLeft className="size-4" />
+          <Icon name="arrow_back" size={16} />
           Back
         </Link>
       </div>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-        <section className="rounded-3xl border bg-background p-6 shadow-sm">{renderDocumentPane()}</section>
+      <JobHeaderStrip job={job} processName={process.name} />
+      <div className="grid gap-gutter xl:grid-cols-[minmax(0,1.05fr)_minmax(380px,0.95fr)]">
+        <section>{renderDocumentPane()}</section>
         {renderRightPane()}
       </div>
     </div>

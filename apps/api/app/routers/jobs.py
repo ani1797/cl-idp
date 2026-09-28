@@ -12,12 +12,13 @@ from typing import Annotated, cast
 from uuid import uuid4
 
 from azure.core.exceptions import ResourceNotFoundError
-from fastapi import FastAPI, Query, Response
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.metrics import Counter
 from PIL import Image, UnidentifiedImageError
 
+from app.authz import require_roles
 from app.db import DataStore, DataStoreError, DocumentNotFoundError, JobFilters
 from app.models import (
     ArrayField,
@@ -39,6 +40,7 @@ from app.models import (
     RoutingAnalyzerStatus,
     StringField,
     TimeField,
+    UserRole,
 )
 from app.observability import correlation_scope, set_span_attributes
 from app.pricing import estimate_document_cost_usd
@@ -109,7 +111,13 @@ def _narrow_bool_filter(filters: JobFilters, field_name: str, value: bool = True
     current = getattr(filters, field_name)
     if current is not None and current != value:
         return None
-    return replace(filters, **{field_name: value})
+    if field_name == "has_violations":
+        return replace(filters, has_violations=value)
+    if field_name == "reviewed":
+        return replace(filters, reviewed=value)
+    if field_name == "unclassified":
+        return replace(filters, unclassified=value)
+    raise ValueError(f"Unsupported boolean filter: {field_name}")
 
 
 def register_jobs_routes(application: FastAPI) -> None:
@@ -250,14 +258,17 @@ def register_jobs_routes(application: FastAPI) -> None:
     @application.put(
         "/processes/{processId}/jobs/{jobId}/review",
         response_model=Job,
-        responses={400: {"model": Error}, 404: {"model": Error}},
+        responses={400: {"model": Error}, 403: {"model": Error}, 404: {"model": Error}},
         tags=["jobs"],
     )
     async def review_job_endpoint(
         processId: str,
         jobId: str,
         payload: ReviewJobRequest,
+        request: Request,
     ) -> Job | JSONResponse:
+        if (forbidden := require_roles(request, UserRole.IT_ADMIN, UserRole.REVIEWER)) is not None:
+            return forbidden
         process_error = ensure_process_exists(application, processId)
         if process_error is not None:
             return process_error
@@ -336,10 +347,12 @@ def register_jobs_routes(application: FastAPI) -> None:
         "/processes/{processId}/jobs/{jobId}/retry",
         response_model=JobRef,
         status_code=202,
-        responses={404: {"model": Error}, 409: {"model": Error}},
+        responses={403: {"model": Error}, 404: {"model": Error}, 409: {"model": Error}},
         tags=["jobs"],
     )
-    async def retry_job_endpoint(processId: str, jobId: str) -> JobRef | JSONResponse:
+    async def retry_job_endpoint(processId: str, jobId: str, request: Request) -> JobRef | JSONResponse:
+        if (forbidden := require_roles(request, UserRole.IT_ADMIN, UserRole.REVIEWER)) is not None:
+            return forbidden
         try:
             process = data_store(application).read_process(processId)
         except DocumentNotFoundError:

@@ -1,4 +1,5 @@
 import type { components } from "../../../packages/shared/src/generated/api";
+import type { UserRole } from "@/lib/roles";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 
@@ -21,6 +22,40 @@ export type Job = Schema<"Job">;
 export type ReviewJobInput = {
   fields: ReviewedField[];
 };
+
+/**
+ * Auth contracts are hand-written until the OpenAPI schema in
+ * `packages/shared` is regenerated against the new /auth and /users routes.
+ * `roleLabel` is enforced server-side (see `apps/api/app/authz.py`) — the
+ * closed set of values lives in `lib/roles.ts`.
+ */
+export type AuthUser = {
+  id: string;
+  email: string;
+  displayName: string;
+  roleLabel: UserRole;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type LoginInput = {
+  email: string;
+  password: string;
+};
+
+export type CreateUserInput = {
+  email: string;
+  displayName: string;
+  roleLabel: UserRole;
+  password: string;
+};
+
+export type UpdateUserInput = Partial<{
+  displayName: string;
+  roleLabel: UserRole;
+  isActive: boolean;
+}>;
 
 export type JobListFilters = {
   status?: JobStatus[];
@@ -115,6 +150,8 @@ async function request<T>(path: string, options: RequestOptions = {}) {
 
   const response = await fetch(buildUrl(path, query), {
     method,
+    // The session is an httpOnly cookie, so every call must be credentialed.
+    credentials: "include",
     headers: formData
       ? headers
       : {
@@ -156,6 +193,46 @@ function buildTriggerFormData(file: Blob, fileName?: string) {
 export const api = {
   getHealth() {
     return request<Health>("/healthz", { expectedStatuses: [503] });
+  },
+  login(input: LoginInput) {
+    return request<AuthUser>("/auth/login", {
+      method: "POST",
+      body: input,
+    });
+  },
+  logout() {
+    return request<void>("/auth/logout", {
+      method: "POST",
+      responseType: "void",
+      expectedStatuses: [204],
+    });
+  },
+  getCurrentUser() {
+    return request<AuthUser>("/auth/me");
+  },
+  listUsers() {
+    return request<AuthUser[]>("/users");
+  },
+  createUser(input: CreateUserInput) {
+    return request<AuthUser>("/users", {
+      method: "POST",
+      body: input,
+      expectedStatuses: [201],
+    });
+  },
+  updateUser(userId: string, input: UpdateUserInput) {
+    return request<AuthUser>(`/users/${userId}`, {
+      method: "PATCH",
+      body: input,
+    });
+  },
+  resetUserPassword(userId: string, password: string) {
+    return request<void>(`/users/${userId}/reset-password`, {
+      method: "POST",
+      body: { password },
+      responseType: "void",
+      expectedStatuses: [204],
+    });
   },
   listProcesses() {
     return request<BusinessProcess[]>("/processes");

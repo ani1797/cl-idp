@@ -1,0 +1,688 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-tint": "#b61f35",
+        "surface-container-low": "#f6f4e9",
+        "inverse-surface": "#31312a",
+        "tertiary-container": "#674c00",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed": "#251a00",
+        "on-surface": "#1c1c16",
+        "surface": "#fcf9ef",
+        "tertiary-fixed": "#ffdf9d",
+        "on-background": "#1c1c16",
+        "on-primary-fixed-variant": "#920022",
+        "background": "#fcf9ef",
+        "surface-container-highest": "#e5e3d8",
+        "outline": "#8e706f",
+        "inverse-on-surface": "#f3f1e6",
+        "surface-bright": "#fcf9ef",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed": "#ffdad9",
+        "surface-variant": "#e5e3d8",
+        "tertiary-fixed-dim": "#eec058",
+        "on-primary": "#ffffff",
+        "on-secondary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary-fixed": "#400009",
+        "error": "#ba1a1a",
+        "on-secondary-fixed": "#002020",
+        "on-primary-container": "#ffaeae",
+        "primary-fixed-dim": "#ffb3b3",
+        "tertiary": "#4b3600",
+        "secondary-container": "#91efef",
+        "surface-container": "#f0eee3",
+        "on-error-container": "#93000a",
+        "surface-container-high": "#ebe8de",
+        "secondary-fixed": "#94f2f2",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "primary": "#79001a",
+        "outline-variant": "#e2bebd",
+        "on-secondary-container": "#006e6e",
+        "surface-dim": "#dcdad0",
+        "secondary": "#006a6a",
+        "on-error": "#ffffff",
+        "inverse-primary": "#ffb3b3",
+        "on-surface-variant": "#5a4040",
+        "secondary-fixed-dim": "#77d6d5"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "gutter": "16px",
+        "base": "4px",
+        "container-max-width": "1440px",
+        "margin": "24px"
+      },
+      "fontFamily": {
+        "tabular-nums": ["\"Source Sans 3\""],
+        "headline-md": ["Public Sans"],
+        "body-md": ["\"Source Sans 3\""],
+        "headline-lg": ["Public Sans"],
+        "label-caps": ["Public Sans"]
+      },
+      "fontSize": {
+        "tabular-nums": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+      }
+    }
+  }
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-base"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><span class="font-headline-md text-headline-md tracking-tight ml-base select-none whitespace-nowrap">Intelligent Document Processing</span><span class="ml-gutter inline-flex items-center px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase">PRODUCTION</span></div><div class="flex-1 max-w-lg mx-gutter"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-on-surface-variant pointer-events-none text-base">search</span><input class="w-full pl-9 pr-4 py-1.5 rounded-lg bg-surface text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-secondary" placeholder="Search by Document ID, Batch, or Policyholder..." type="search"></div></div><div class="flex items-center gap-gutter"><button class="font-label-caps text-label-caps tracking-wider px-base py-1 rounded hover:bg-primary transition-colors text-on-primary select-none" type="button">EN | FR</button><button class="p-1.5 rounded-full hover:bg-primary text-on-primary transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-xl">notifications</span></button><div class="flex items-center gap-base pl-base"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XaV9hK0paL3GVjPHY_80SPHkUOFd70wmWTMhnFZEEneTfeu9K67GhrK5B5Kf8rFNL0isEDDNWJphV1trTf04edaUyS0Lp9U08dOTWZ_LnD64eQIPFVd8rWrVUxNBdSfOBhVIP_1bvAW7f3s1-Zvytf8cs94KlXKLL-6N7QTer066FXyk-et0iHnWVwVI_5_8T9sFzDvGFT-33ey5ude8YW_dnBU2nMz5iNLhQMlNlRwhbtm5tWCAi7kYsr"><div class="flex flex-col text-left leading-none"><span class="font-headline-md text-body-md text-on-primary font-semibold">Marc-André Tremblay</span><span class="font-label-caps text-label-caps text-on-primary-container tracking-wider uppercase mt-0.5">IT Admin</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-40 flex flex-col justify-between py-margin shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><nav class="flex flex-col gap-1" data-active-classes="border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold"><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-headline-md text-body-md">Dashboard</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="processes" href="#"><span class="material-symbols-outlined">account_tree</span><span class="font-headline-md text-body-md">Processes</span></a><a class="flex items-center gap-gutter px-margin py-2.5 transition-colors border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold" data-path="form-model" href="#" aria-current="page"><span class="material-symbols-outlined">description</span><span class="font-headline-md text-body-md">Form Model</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="review-queue" href="#"><span class="material-symbols-outlined">rate_review</span><span class="font-headline-md text-body-md">Review Queue</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="api-and-integrations" href="#"><span class="material-symbols-outlined">integration_instructions</span><span class="font-headline-md text-body-md">API &amp; Integrations</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined">settings</span><span class="font-headline-md text-body-md">Settings</span></a></nav><div class="flex flex-col gap-1 px-margin pt-gutter"><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="font-body-md text-body-md">Docs</span></a><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#"><span class="material-symbols-outlined text-lg">help</span><span class="font-body-md text-body-md">Support</span></a></div></aside><div class="pl-64"><main class="relative pt-16 w-full min-h-screen bg-surface px-margin"><div class="flex flex-col w-full">
+<!-- Breadcrumb & Top Context Banner -->
+<div class="flex flex-wrap items-center justify-between gap-gutter pb-margin">
+<div class="flex flex-col gap-base">
+<div class="flex items-center gap-base text-on-surface-variant font-label-caps text-label-caps">
+<span class="hover:text-on-surface transition-colors cursor-pointer">CANADA LIFE IDP</span>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="hover:text-on-surface transition-colors cursor-pointer">INTELLIGENT DOCUMENT ENGINE</span>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="text-primary font-bold">NEURAL EXTRACTION CATALOG</span>
+</div>
+<div class="flex flex-wrap items-baseline gap-gutter">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Form Models</h1>
+<div class="flex items-center gap-base">
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-caps text-label-caps">184 Total Models</span>
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps">172 Production Active</span>
+<span class="inline-flex items-center px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps">12 In Training / Retraining</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-gutter">
+<button class="inline-flex items-center gap-base px-gutter py-2 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container-high font-headline-md text-body-md transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-base">download</span>
+<span class="">Export Registry</span>
+</button>
+<button class="inline-flex items-center gap-base px-gutter py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-headline-md text-body-md transition-all shadow-md active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform">neurology</span>
+<span class="">+ Train New Form Model</span>
+</button>
+</div>
+</div>
+<!-- Key Metrics Row (Bento Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-margin">
+<!-- Metric 1 -->
+<div class="p-gutter rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Total Certified Models</span>
+<span class="material-symbols-outlined text-primary text-xl">verified</span>
+</div>
+<div class="mt-margin">
+<div class="flex items-baseline gap-base">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface font-tabular-nums">184</span>
+<span class="font-label-caps text-label-caps text-secondary font-semibold">100% Registry Synced</span>
+</div>
+<div class="mt-base flex items-center justify-between text-on-surface-variant font-tabular-nums text-body-md">
+<span class="">142 Prebuilt Certified</span>
+<span class="h-1 w-1 rounded-full bg-outline-variant"></span>
+<span class="">42 Custom Studio</span>
+</div>
+</div>
+<div class="mt-gutter w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden flex">
+<div class="bg-primary h-full" style="width: 77%;"></div>
+<div class="bg-secondary h-full" style="width: 23%;"></div>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="p-gutter rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Avg Extraction Confidence</span>
+<span class="material-symbols-outlined text-secondary text-xl">auto_graph</span>
+</div>
+<div class="mt-margin">
+<div class="flex items-baseline gap-base">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface font-tabular-nums">97.4%</span>
+<span class="inline-flex items-center text-secondary font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span> +0.8% MoM
+          </span>
+</div>
+<div class="mt-base text-on-surface-variant text-body-md font-tabular-nums">
+          Based on 148,290 daily documents processed
+        </div>
+</div>
+<div class="mt-gutter flex items-center gap-base">
+<!-- Mini sparkline chart -->
+<svg class="w-full h-4 text-secondary" preserveAspectRatio="none" viewBox="0 0 100 20">
+<path d="M0,16 L15,14 L30,15 L45,10 L60,11 L75,6 L90,8 L100,3" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="p-gutter rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Active Training Pipelines</span>
+<span class="material-symbols-outlined text-primary text-xl">model_training</span>
+</div>
+<div class="mt-margin">
+<div class="flex items-baseline gap-base">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface font-tabular-nums">3</span>
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">In Progress</span>
+</div>
+<div class="mt-base text-on-surface-variant text-body-md">
+          1 Ensemble Classifier · 2 Form Extractors
+        </div>
+</div>
+<div class="mt-gutter flex items-center gap-gutter text-on-surface-variant font-label-caps text-label-caps">
+<span class="flex items-center gap-1">
+<span class="h-2 w-2 rounded-full bg-secondary-fixed-dim animate-ping"></span> GPU Node-04
+        </span>
+<span class="">ETA: 38m</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="p-gutter rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Retraining Buffer</span>
+<span class="material-symbols-outlined text-tertiary-container text-xl">psychology_alt</span>
+</div>
+<div class="mt-margin">
+<div class="flex items-baseline gap-base">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface font-tabular-nums">1,420</span>
+<span class="font-label-caps text-label-caps text-tertiary font-bold">Annotations</span>
+</div>
+<div class="mt-base text-on-surface-variant text-body-md">
+          Flagged review cases awaiting fine-tuning run
+        </div>
+</div>
+<div class="mt-gutter flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Trigger: 1,500 samples</span>
+<span class="font-label-caps text-label-caps text-primary font-semibold">94.6%</span>
+</div>
+</div>
+</div>
+<!-- Operational Filter Strip -->
+<div class="bg-surface-container-lowest p-gutter rounded-xl shadow-sm mb-margin flex flex-wrap items-center justify-between gap-gutter">
+<div class="flex-1 min-w-[280px] max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-base">search</span>
+<input class="w-full pl-9 pr-gutter py-2 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:bg-surface-container transition-colors" placeholder="Search by model ID, form name, or business unit..." type="text">
+</div>
+<div class="flex flex-wrap items-center gap-gutter">
+<!-- BU Filter -->
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant">BU:</span>
+<select class="px-base py-2 rounded-lg bg-surface-container-low text-on-surface font-headline-md text-body-md outline-none cursor-pointer">
+<option>All Business Units</option>
+<option>Group Benefits</option>
+<option>Individual Underwriting</option>
+<option>Wealth Management</option>
+<option>Expense &amp; Adjudication</option>
+</select>
+</div>
+<!-- Model Type Filter -->
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TYPE:</span>
+<select class="px-base py-2 rounded-lg bg-surface-container-low text-on-surface font-headline-md text-body-md outline-none cursor-pointer">
+<option>All Model Types</option>
+<option>Prebuilt (Certified)</option>
+<option>Custom (Studio Trained)</option>
+<option>Ensemble Extractor</option>
+</select>
+</div>
+<!-- Status Filter -->
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant">STATUS:</span>
+<select class="px-base py-2 rounded-lg bg-surface-container-low text-on-surface font-headline-md text-body-md outline-none cursor-pointer">
+<option>All Statuses</option>
+<option>Active / Healthy</option>
+<option>Retraining / Drift Alert</option>
+<option>Deprecated</option>
+</select>
+</div>
+<!-- Quick Reset -->
+<button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors" title="Reset Filters" type="button">
+<span class="material-symbols-outlined text-base">filter_alt_off</span>
+</button>
+</div>
+</div>
+<!-- Models Catalog Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-margin">
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-md text-body-md">
+<thead class="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase">
+<tr>
+<th class="py-3 px-gutter">Model Identifier &amp; Form Name</th>
+<th class="py-3 px-gutter">Architecture &amp; Version</th>
+<th class="py-3 px-gutter">Business Unit</th>
+<th class="py-3 px-gutter">Field Schema</th>
+<th class="py-3 px-gutter">Baseline Confidence</th>
+<th class="py-3 px-gutter">Connected Ingestion</th>
+<th class="py-3 px-gutter">Engine Health</th>
+<th class="py-3 px-gutter text-right">Model Governance</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-primary font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-CLAIM-04
+                    <span class="material-symbols-outlined text-secondary text-sm" title="Certified Enterprise Baseline">verified</span>
+</div>
+<div class="text-on-surface-variant text-body-md">Standard Group Health Claim</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container text-on-surface font-label-caps text-label-caps">
+                Prebuilt (Certified) v3.2
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Group Benefits</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">24 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Policyholder ID, Claim Amount, Treatment Codes, Provider Registry</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="flex items-center gap-base">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 99.1%
+                </span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">14 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">PROC-GH-8820 active</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-secondary"></span> Healthy
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Schema
+                </button>
+<button class="px-base py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors" type="button">
+                  Open Studio
+                </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-primary font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-DENT-02
+                    <span class="material-symbols-outlined text-secondary text-sm">verified</span>
+</div>
+<div class="text-on-surface-variant text-body-md">Dental Service Claim &amp; Invoicing</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container text-on-surface font-label-caps text-label-caps">
+                Prebuilt (Certified) v1.9
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Group Benefits</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">18 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Tooth Surface, Procedure Code, ODA Fee, Dentist License</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 98.4%
+              </span>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">9 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">Realtime EDI sync</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-secondary"></span> Healthy
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Schema
+                </button>
+<button class="px-base py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors" type="button">
+                  Open Studio
+                </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-secondary font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-RECEIPT-08
+                  </div>
+<div class="text-on-surface-variant text-body-md">Medical &amp; Pharmacy Receipt</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container-high text-on-surface font-label-caps text-label-caps">
+                Custom (Trained) v3.1
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Expense &amp; Adjudication</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">12 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Pharmacy DIN, Tax Subtotal, Prescribing Physician</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 94.8%
+              </span>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">5 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">Batch nightly OCR</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-secondary"></span> Healthy
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Schema
+                </button>
+<button class="px-base py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors" type="button">
+                  Open Studio
+                </button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-secondary font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-APS-01
+                  </div>
+<div class="text-on-surface-variant text-body-md">Attending Physician Statement (APS)</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container-high text-on-surface font-label-caps text-label-caps">
+                Custom (Trained) v4.1
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Individual Underwriting</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">38 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Handwritten ICD-10 notes, Diagnostics, Clinical Vitals</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 91.8%
+              </span>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">8 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">UW Med Queue</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-secondary"></span> Healthy
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Schema
+                </button>
+<button class="px-base py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors" type="button">
+                  Open Studio
+                </button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-primary font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-KYC-08
+                    <span class="material-symbols-outlined text-secondary text-sm">verified</span>
+</div>
+<div class="text-on-surface-variant text-body-md">Void Cheque &amp; Direct Deposit Auth</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-surface-container text-on-surface font-label-caps text-label-caps">
+                Prebuilt (Certified) v2.0
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Wealth Management / Bank Ops</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">8 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Institution Number, Transit Code, Account No, Account Holder</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 98.7%
+              </span>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">7 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">EFT Settlement</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-secondary"></span> Healthy
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Schema
+                </button>
+<button class="px-base py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors" type="button">
+                  Open Studio
+                </button>
+</div>
+</td>
+</tr>
+<!-- Row 6 (Retraining / Alert) -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<div class="p-2 rounded-lg bg-surface-container text-tertiary-container font-bold font-tabular-nums text-label-caps">
+                  CL
+                </div>
+<div>
+<div class="font-headline-md text-body-md font-bold text-on-surface flex items-center gap-base">
+                    CL-ENROLL-G2
+                  </div>
+<div class="text-on-surface-variant text-body-md">Group Benefit Enrollment Slip</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center px-base py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps">
+                Custom (In Retraining) v1.4
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<span class="text-on-surface">Group Benefits</span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">22 Extracted Fields</span>
+<span class="text-on-surface-variant text-body-md truncate max-w-[180px]">Dependent info, Beneficiary splits, Salary band</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="flex flex-col">
+<span class="inline-flex items-center gap-1 px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-xs">warning</span> 89.2%
+                </span>
+<span class="text-primary font-label-caps text-label-caps mt-0.5">Layout drift detected</span>
+</div>
+</td>
+<td class="py-3 px-gutter font-tabular-nums">
+<div class="text-on-surface font-semibold">4 Pipelines</div>
+<div class="text-on-surface-variant text-body-md">Paused for human audit</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="inline-flex items-center gap-1.5 px-base py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps font-bold">
+<span class="h-2 w-2 rounded-full bg-tertiary animate-pulse"></span> In Retraining
+              </span>
+</td>
+<td class="py-3 px-gutter text-right">
+<div class="inline-flex items-center gap-base">
+<button class="px-base py-1 rounded bg-surface-container-high hover:bg-surface-container text-on-surface font-label-caps text-label-caps transition-colors" type="button">
+                  View Drift
+                </button>
+<button class="px-base py-1 rounded bg-tertiary-container text-on-tertiary font-label-caps text-label-caps hover:bg-tertiary transition-colors" type="button">
+                  Resume Studio
+                </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="p-gutter bg-surface-container-low flex flex-wrap items-center justify-between gap-gutter text-on-surface-variant font-tabular-nums text-body-md">
+<div class="flex items-center gap-gutter">
+<span class="">Showing <strong class="text-on-surface">1-6</strong> of <strong class="text-on-surface">184</strong> registered models</span>
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps uppercase">Rows:</span>
+<select class="px-base py-1 rounded bg-surface-container text-on-surface font-tabular-nums text-body-md outline-none">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-base">
+<button class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant disabled:opacity-30" disabled="" type="button">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<button class="w-7 h-7 rounded bg-primary text-on-primary font-bold font-tabular-nums text-label-caps flex items-center justify-center" type="button">
+          1
+        </button>
+<button class="w-7 h-7 rounded hover:bg-surface-container text-on-surface font-tabular-nums text-label-caps flex items-center justify-center" type="button">
+          2
+        </button>
+<button class="w-7 h-7 rounded hover:bg-surface-container text-on-surface font-tabular-nums text-label-caps flex items-center justify-center" type="button">
+          3
+        </button>
+<span class="px-1 text-on-surface-variant">...</span>
+<button class="w-7 h-7 rounded hover:bg-surface-container text-on-surface font-tabular-nums text-label-caps flex items-center justify-center" type="button">
+          31
+        </button>
+<button class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Retraining & Neural Lifecycle Sub-panel -->
+
+</div>
+<script>
+  // Ensure the Form Model nav item has the active design system token styling in the left rail
+  (function() {
+    const activeNav = document.querySelector('aside nav a[data-path="form-model"]');
+    if (activeNav) {
+      const activeClasses = (activeNav.parentElement.getAttribute('data-active-classes') || '').split(' ').filter(Boolean);
+      activeClasses.forEach(c => activeNav.classList.add(c));
+      activeNav.classList.remove('text-on-surface-variant');
+    }
+  })();
+</script></main></div>
+
+</body></html>

@@ -17,7 +17,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl justify-center py-12">
+    <div className="flex w-full justify-center py-12">
       <ErrorCard
         title="Unable to render this page"
         message={getErrorMessage(error)}

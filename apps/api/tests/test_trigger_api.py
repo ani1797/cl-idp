@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 from pypdf import PdfWriter
 
-from app.db import DataStore, DocumentNotFoundError
+from app.db import DataStore
 from app.models import AnalyzerRef, BusinessProcessDocument, JobStatus, RoutingAnalyzerStatus
 from app.storage import BlobService, QueueService
 

@@ -4,7 +4,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InferenceReviewPage } from "@/components/inference-review-page";
-import { renderWithQueryClient } from "@/components/test-utils";
+import { renderWithSession } from "@/components/test-utils";
 import {
   getOverlayBounds,
   scaleBoundingBoxPoints,
@@ -231,7 +231,7 @@ const baseJob: Job = {
 
 function renderPage(job: Job = baseJob) {
   mockedApi.getJob.mockResolvedValue(job);
-  return renderWithQueryClient(
+  return renderWithSession(
     <InferenceReviewPage processId="process-1" jobId={job.id} />,
   );
 }
@@ -271,7 +271,7 @@ describe("InferenceReviewPage", () => {
   it("renders nested fields with indexed array groups and JSON pointer paths", async () => {
     renderPage();
 
-    expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
+    expect((await screen.findAllByText("Invoice Intake"))[0]).toBeInTheDocument();
     expect(screen.getByText("items")).toBeInTheDocument();
     expect(screen.getByText("[0]")).toBeInTheDocument();
     expect(screen.getAllByText("/items/0/description")[0]).toBeInTheDocument();
@@ -293,15 +293,15 @@ describe("InferenceReviewPage", () => {
 
     expect(await screen.findByText("Low confidence and still unreviewed")).toBeInTheDocument();
 
-    const saveButton = screen.getByRole("button", { name: "Save" });
-    expect(saveButton).toBeDisabled();
+    const approveButton = screen.getByRole("button", { name: "Approve" });
+    expect(approveButton).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve description" }));
 
     await waitFor(() => {
       expect(screen.queryByText("Low confidence and still unreviewed")).not.toBeInTheDocument();
     });
-    expect(saveButton).toBeEnabled();
+    expect(approveButton).toBeEnabled();
   });
 
   it("does not flag low-confidence fields when the job has no aggregate-gated violations", async () => {
@@ -311,35 +311,35 @@ describe("InferenceReviewPage", () => {
       confidenceViolations: [],
     });
 
-    expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
+    expect((await screen.findAllByText("Invoice Intake"))[0]).toBeInTheDocument();
     expect(screen.queryByText("Low confidence and still unreviewed")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Approve description" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Approve" })).toBeDisabled();
   });
 
   it("enables save after an edit even without approval", async () => {
     renderPage();
 
-    expect(await screen.findByRole("button", { name: "Save" })).toBeDisabled();
+    expect(await screen.findByRole("button", { name: "Approve" })).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText("/vendor/name"), {
       target: { value: "Fabrikam" },
     });
 
-    expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Approve" })).toBeEnabled();
   });
 
   it("saves only touched paths and returns to the encoded jobs backlog filter", async () => {
     setSearch("?from=%2Fprocesses%2Fprocess-1%2Fjobs%3Fstatus%3Dfailed");
     renderPage();
 
-    expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
+    expect((await screen.findAllByText("Invoice Intake"))[0]).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve description" }));
     fireEvent.change(screen.getByLabelText("/vendor/name"), {
       target: { value: "Fabrikam" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
 
     await waitFor(() => {
       expect(mockedApi.reviewJob).toHaveBeenCalledWith("process-1", "job-1", {
@@ -356,9 +356,9 @@ describe("InferenceReviewPage", () => {
     setSearch("?from=%2Fprocesses%2Fprocess-1%2Fjobs%3Fstatus%3Dfailed");
     renderPage();
 
-    expect(await screen.findByText("Invoice Intake")).toBeInTheDocument();
+    expect((await screen.findAllByText("Invoice Intake"))[0]).toBeInTheDocument();
 
-    fireEvent.click(screen.getAllByRole("button", { name: "Back" })[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Reject" }));
 
     expect(pushMock).toHaveBeenCalledWith("/processes/process-1/jobs?status=failed");
   });
@@ -378,7 +378,7 @@ describe("InferenceReviewPage", () => {
     expect(
       await screen.findByText("This document doesn’t match any accepted form."),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Upload another file" })).toHaveAttribute(
       "href",
       "/processes/process-1",
@@ -395,7 +395,7 @@ describe("InferenceReviewPage", () => {
     });
 
     expect(await screen.findByText("No fields were extracted.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument();
   });
 
   it("shows retry for failed jobs instead of the editor", async () => {
@@ -410,7 +410,7 @@ describe("InferenceReviewPage", () => {
 
     expect(await screen.findByText("Job failed")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument();
   });
 
   it("scales bounding boxes into expected pixel coordinates", () => {

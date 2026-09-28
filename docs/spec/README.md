@@ -31,6 +31,10 @@ same human review UI.
   semantics, and the worker model.
 - [`DECISIONS.md`](./DECISIONS.md) — log of resolved open questions and the
   reasoning behind each choice.
+- [`design-system.md`](./design-system.md) — the "Canada Life IDP Platform"
+  design system: brand colors, confidence-band semantics, typography,
+  shape/spacing/elevation, icons, and where each is implemented in
+  `apps/web`.
 - [`features/`](./features) — feature specs:
   - [Onboarding a New Business Process](./features/onboarding-business-process.md)
   - [Business Process Inference Testing Flow](./features/business-process-inference-testing.md)

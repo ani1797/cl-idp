@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed-variant": "#920022",
+            "secondary-container": "#91efef",
+            "on-secondary-container": "#006e6e",
+            "outline-variant": "#e2bebd",
+            "on-primary-fixed": "#400009",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#b61f35",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f6f4e9",
+            "on-secondary-fixed-variant": "#004f4f",
+            "surface-container-high": "#ebe8de",
+            "inverse-surface": "#31312a",
+            "on-tertiary": "#ffffff",
+            "primary": "#79001a",
+            "on-background": "#1c1c16",
+            "surface-container": "#f0eee3",
+            "tertiary-container": "#674c00",
+            "on-surface": "#1c1c16",
+            "error-container": "#ffdad6",
+            "background": "#fcf9ef",
+            "primary-container": "#a20a29",
+            "on-tertiary-fixed": "#251a00",
+            "on-secondary-fixed": "#002020",
+            "on-surface-variant": "#5a4040",
+            "on-error": "#ffffff",
+            "tertiary-fixed": "#ffdf9d",
+            "surface-bright": "#fcf9ef",
+            "on-error-container": "#93000a",
+            "secondary-fixed": "#94f2f2",
+            "tertiary-fixed-dim": "#eec058",
+            "outline": "#8e706f",
+            "inverse-on-surface": "#f3f1e6",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#77d6d5",
+            "surface-container-highest": "#e5e3d8",
+            "on-tertiary-container": "#eabd55",
+            "error": "#ba1a1a",
+            "secondary": "#006a6a",
+            "on-primary-container": "#ffaeae",
+            "primary-fixed": "#ffdad9",
+            "on-tertiary-fixed-variant": "#5b4300",
+            "primary-fixed-dim": "#ffb3b3",
+            "surface-dim": "#dcdad0",
+            "inverse-primary": "#ffb3b3",
+            "surface-variant": "#e5e3d8",
+            "surface": "#fcf9ef",
+            "tertiary": "#4b3600"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "margin": "24px",
+            "gutter": "16px",
+            "base": "4px",
+            "container-max-width": "1440px"
+          },
+          fontFamily: {
+            "label-caps": ["Public Sans"],
+            "tabular-nums": ["\"Source Sans 3\""],
+            "headline-md": ["Public Sans"],
+            "body-md": ["\"Source Sans 3\""],
+            "headline-lg": ["Public Sans"]
+          },
+          fontSize: {
+            "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700" }],
+            "tabular-nums": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary-fixed selection:text-on-primary-fixed antialiased">
+<!-- Minimal Clean Header -->
+<header class="w-full bg-surface/80 backdrop-blur-sm border-b border-surface-container-high/60">
+<div class="w-full max-w-[1440px] mx-auto px-6 lg:px-12 h-18 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-primary flex items-center justify-center text-on-primary font-bold text-sm tracking-wide shadow-sm">
+          CL
+        </div>
+<div class="flex flex-col">
+<span class="font-headline-md text-lg text-primary tracking-tight font-bold">Canada Life</span>
+<span class="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant/80">Intelligent Document Processing</span>
+</div>
+</div>
+<!-- Language Switcher -->
+<div class="flex items-center bg-surface-container rounded-lg p-0.5 text-xs font-semibold">
+<button class="px-3 py-1.5 rounded-md bg-surface-container-lowest text-on-surface shadow-xs font-bold transition-all" type="button">EN</button>
+<button class="px-3 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" type="button">FR</button>
+</div>
+</div>
+</header>
+<!-- Main Content: Centered Elegant Login Card -->
+<main class="w-full flex-1 flex flex-col items-center justify-center px-6 py-12">
+<div class="w-full max-w-[460px] mx-auto">
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_24px_rgba(28,28,22,0.06)] border border-surface-container-high/60 p-8 sm:p-10">
+<!-- Brand Header -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-3.5">
+<span class="material-symbols-outlined text-[26px]">document_scanner</span>
+</div>
+<h1 class="font-headline-lg text-2xl font-bold text-on-surface tracking-tight">
+            Sign in to Canada Life IDP
+          </h1>
+<p class="font-body-md text-sm text-on-surface-variant mt-1.5">
+            Intelligent Document Processing Platform
+          </p>
+</div>
+<!-- Microsoft Entra SSO Button (Primary Action) -->
+<button class="group w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-primary text-on-primary rounded-xl hover:bg-primary-container active:scale-[0.99] transition-all duration-150 shadow-sm" type="button">
+<svg class="w-5 h-5 shrink-0" fill="none" viewbox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H10V10H0V0Z" fill="#F25022"></path>
+<path d="M11 0H21V10H11V0Z" fill="#7FBA00"></path>
+<path d="M0 11H10V21H0V11Z" fill="#00A4EF"></path>
+<path d="M11 11H21V21H11V11Z" fill="#FFB900"></path>
+</svg>
+<span class="font-headline-md text-base font-semibold text-on-primary">
+            Sign in with Microsoft Entra ID
+          </span>
+<span class="material-symbols-outlined text-[18px] opacity-80 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</button>
+<!-- Subtle Divider -->
+<div class="relative my-7 flex items-center justify-center">
+<div class="w-full border-t border-surface-container-highest"></div>
+<span class="absolute bg-surface-container-lowest px-3 text-xs uppercase tracking-wider text-on-surface-variant/70 font-medium">
+            or continue with credentials
+          </span>
+</div>
+<!-- Standard Corporate Form -->
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<div>
+<label class="block font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold mb-1.5" for="username">
+              Work Email / Username
+            </label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 pr-10 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all" id="username" placeholder="name@canadalife.com" required="" type="email"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant/60 text-[20px] pointer-events-none">mail</span>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="block font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold" for="password">
+                Password
+              </label>
+<a class="text-xs font-semibold text-primary hover:underline transition-colors" href="#">
+                Forgot password?
+              </a>
+</div>
+<div class="relative">
+<input class="w-full h-11 px-3.5 pr-10 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all" id="password" placeholder="••••••••••••" required="" type="password"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant/60 text-[20px] pointer-events-none">lock</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input class="w-4 h-4 rounded border-outline-variant/60 text-primary focus:ring-primary/20 accent-primary cursor-pointer" type="checkbox"/>
+<span class="font-body-md text-xs text-on-surface-variant">Remember this device</span>
+</label>
+</div>
+<button class="w-full mt-2 h-11 flex items-center justify-center gap-2 bg-surface-container text-on-surface font-semibold text-sm rounded-lg hover:bg-surface-container-high active:scale-[0.99] transition-all" type="submit">
+<span>Sign In</span>
+</button>
+</form>
+<!-- Helpdesk / Support Note Inside Card -->
+<div class="mt-7 pt-5 border-t border-surface-container-high/80 text-center">
+<p class="font-body-md text-xs text-on-surface-variant flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant/70">help_outline</span>
+<span>Having trouble signing in?</span>
+<a class="font-semibold text-primary hover:underline inline-flex items-center" href="#">
+              Contact IT Helpdesk
+            </a>
+</p>
+</div>
+</div>
+<!-- Quick Security Assurance badge -->
+<div class="mt-4 flex items-center justify-center gap-1.5 text-xs text-on-surface-variant/70 font-medium">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+<span>Secured by Canada Life Single Sign-On Gateway</span>
+</div>
+</div>
+</main>
+<!-- Clean Institutional Page Footer -->
+<footer class="w-full bg-surface-container-low/60 border-t border-surface-container-high/50 py-4">
+<div class="w-full max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-on-surface-variant">
+<div class="flex items-center gap-2 text-center sm:text-left">
+<span>Strictly for authorized personnel only.</span>
+</div>
+<div class="flex items-center gap-5 flex-wrap justify-center sm:justify-end">
+<a class="hover:text-on-surface hover:underline transition-colors" href="#">Security Policy</a>
+<a class="hover:text-on-surface hover:underline transition-colors" href="#">Privacy Terms</a>
+<a class="hover:text-on-surface hover:underline transition-colors" href="#">Audit Disclosures</a>
+<span>© 2025 The Canada Life Assurance Company</span>
+</div>
+</div>
+</footer>
+</body></html>

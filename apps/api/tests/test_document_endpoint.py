@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 from pypdf import PdfReader
 
-from app.db import DataStore, DocumentNotFoundError
+from app.db import DataStore
 from app.models import JobDocument, JobStatus
 from app.storage import BlobService
 from tests.test_trigger_api import create_process, pdf_bytes

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import logging
+import secrets
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 COSMOS_EMULATOR_KEY = (
@@ -26,6 +28,15 @@ def _resolve_repo_root() -> Path:
 
 
 REPO_ROOT = _resolve_repo_root()
+logger = logging.getLogger(__name__)
+
+
+def _ephemeral_jwt_secret() -> str:
+    logger.warning(
+        "JWT_SECRET is unset; generated an ephemeral development-only secret. "
+        "Set JWT_SECRET in production so sessions survive restarts."
+    )
+    return secrets.token_urlsafe(48)
 
 
 class Settings(BaseSettings):
@@ -90,6 +101,18 @@ class Settings(BaseSettings):
         default="http://localhost:8000",
         alias="NEXT_PUBLIC_API_BASE_URL",
     )
+    jwt_secret: str = Field(default_factory=_ephemeral_jwt_secret, alias="JWT_SECRET")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    jwt_expiry_minutes: int = Field(default=8 * 60, alias="JWT_EXPIRY_MINUTES")
+    session_cookie_name: str = Field(default="cl_idp_session", alias="SESSION_COOKIE_NAME")
+    session_cookie_secure: bool = Field(default=False, alias="SESSION_COOKIE_SECURE")
+    service_api_token: str = Field(default="", alias="SERVICE_API_TOKEN")
+    demo_it_admin_email: str = Field(default="", alias="DEMO_IT_ADMIN_EMAIL")
+    demo_it_admin_password: str = Field(default="", alias="DEMO_IT_ADMIN_PASSWORD")
+    demo_reviewer_email: str = Field(default="", alias="DEMO_REVIEWER_EMAIL")
+    demo_reviewer_password: str = Field(default="", alias="DEMO_REVIEWER_PASSWORD")
+    demo_end_user_email: str = Field(default="", alias="DEMO_END_USER_EMAIL")
+    demo_end_user_password: str = Field(default="", alias="DEMO_END_USER_PASSWORD")
     applicationinsights_connection_string: str | None = Field(
         default=None,
         alias="APPLICATIONINSIGHTS_CONNECTION_STRING",
@@ -102,6 +125,13 @@ class Settings(BaseSettings):
     cu_endpoint: str = Field(default="", alias="CU_ENDPOINT")
     cu_api_key: str | None = Field(default=None, alias="CU_API_KEY")
     cu_model_deployment: str = Field(default="", alias="CU_MODEL_DEPLOYMENT")
+
+    @field_validator("jwt_secret", mode="before")
+    @classmethod
+    def generate_jwt_secret_when_blank(cls, value: object) -> object:
+        if value is None or value == "":
+            return _ephemeral_jwt_secret()
+        return value
 
 
 @lru_cache(maxsize=1)

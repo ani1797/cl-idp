@@ -1,0 +1,598 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Canada Life Intelligent Document Processing - Submit Documents</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#ffaeae",
+            "on-error-container": "#93000a",
+            "outline": "#8e706f",
+            "primary-fixed": "#ffdad9",
+            "tertiary": "#4b3600",
+            "secondary-container": "#91efef",
+            "surface-tint": "#b61f35",
+            "on-primary-fixed": "#400009",
+            "on-tertiary-fixed": "#251a00",
+            "tertiary-fixed-dim": "#eec058",
+            "surface-variant": "#e5e3d8",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed-variant": "#5b4300",
+            "on-secondary": "#ffffff",
+            "error-container": "#ffdad6",
+            "surface": "#fcf9ef",
+            "primary-fixed-dim": "#ffb3b3",
+            "error": "#ba1a1a",
+            "inverse-surface": "#31312a",
+            "inverse-on-surface": "#f3f1e6",
+            "secondary-fixed-dim": "#77d6d5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#ebe8de",
+            "secondary": "#006a6a",
+            "primary": "#79001a",
+            "on-tertiary-container": "#eabd55",
+            "surface-container-highest": "#e5e3d8",
+            "on-surface": "#1c1c16",
+            "on-secondary-container": "#006e6e",
+            "on-surface-variant": "#5a4040",
+            "surface-bright": "#fcf9ef",
+            "on-tertiary": "#ffffff",
+            "surface-dim": "#dcdad0",
+            "background": "#fcf9ef",
+            "surface-container": "#f0eee3",
+            "tertiary-container": "#674c00",
+            "on-primary-fixed-variant": "#920022",
+            "on-secondary-fixed-variant": "#004f4f",
+            "on-secondary-fixed": "#002020",
+            "inverse-primary": "#ffb3b3",
+            "on-error": "#ffffff",
+            "outline-variant": "#e2bebd",
+            "on-background": "#1c1c16",
+            "surface-container-low": "#f6f4e9",
+            "primary-container": "#a20a29",
+            "tertiary-fixed": "#ffdf9d",
+            "secondary-fixed": "#94f2f2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "16px",
+            "container-max-width": "1440px",
+            "base": "4px",
+            "margin": "24px"
+          },
+          "fontFamily": {
+            "headline-lg": ["Public Sans"],
+            "body-md": ["\"Source Sans 3\""],
+            "headline-md": ["Public Sans"],
+            "label-caps": ["Public Sans"],
+            "tabular-nums": ["\"Source Sans 3\""]
+          },
+          "fontSize": {
+            "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+            "tabular-nums": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface">
+<!-- Top Navbar -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-primary-container text-on-primary z-50 shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
+<div class="h-16 w-full px-margin flex items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<img alt="Canada Life Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO">
+<div class="flex items-center gap-3">
+<span class="font-headline-md text-headline-md tracking-tight text-on-primary whitespace-nowrap">Intelligent Document Processing</span>
+<span class="px-2 py-0.5 rounded text-label-caps font-label-caps bg-primary text-on-primary border border-outline-variant/30 uppercase">PRODUCTION</span>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-4 hidden md:block">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-primary/70 text-[20px]">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 rounded-lg bg-primary text-on-primary placeholder:text-on-primary/60 border border-outline-variant/30 text-body-md font-body-md focus:outline-none focus:ring-1 focus:ring-on-primary" placeholder="Search submissions, doc IDs, batch numbers..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-primary/60 rounded px-2 py-1 text-label-caps font-label-caps tracking-wider">
+<button class="text-on-primary font-bold px-1 hover:text-surface transition-colors" type="button">EN</button>
+<span class="text-on-primary/40 px-0.5">|</span>
+<button class="text-on-primary/70 px-1 hover:text-on-primary transition-colors" type="button">FR</button>
+</div>
+<button class="relative p-1.5 rounded-lg hover:bg-primary text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-secondary-container rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden sm:block">
+<div class="text-on-primary font-headline-md text-[14px] leading-tight font-semibold">Sarah Jenkins</div>
+<div class="text-on-primary/70 text-label-caps font-label-caps text-[11px] leading-tight">OPERATIONS / CLAIMS USER</div>
+</div>
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-on-primary/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXZmd1XGKgp_aC-Onx4xA--zkOYcTu7VFpVXfVhzicOYhLGJHLBgm2Cin-ZZFOgiC5dtipI1krFm-fUHjAQL8leyUfgJ49tidtLhDXUiSTczyi3v5t0Q2SbU3ZVa_JdtWi95mkOQjhVEFhI17We9-qU-ERy00_w8vQJZ4zciXzLC0yIrA_qEyHXzRb7P-JBHcJI9LwqxVAIbu9aiIITt65Md4B-VH1BU9RXODrh-dfJvpkeKJk11CK4Q">
+</div>
+</div>
+</div>
+</header>
+<!-- Left Sidebar Navigation -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+<div class="pt-4">
+<div class="px-6 pb-3">
+<span class="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider text-[11px]">Submitter Workspace</span>
+</div>
+<nav class="flex flex-col gap-0.5">
+<a class="flex items-center gap-3 px-6 py-3 text-body-md font-body-md bg-surface-container-high text-primary border-l-4 border-primary font-semibold transition-colors" data-path="document-upload-submit" href="#">
+<span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+<span class="">Document Upload / Submit</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="active-jobs-submissions" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="">Active Jobs &amp; Submissions</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="process-integrations-api-specs" href="#">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+<span class="">Process Integrations / API Specs</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-body-md font-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="help-documentation" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span class="">Help &amp; Documentation</span>
+</a>
+</nav>
+</div>
+<div class="p-4 bg-surface-container-low/50">
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-2 px-3 py-2 rounded text-label-caps font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span class="">Docs &amp; Guides</span>
+</a>
+<a class="flex items-center gap-2 px-3 py-2 rounded text-label-caps font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">support_agent</span>
+<span class="">Support &amp; Feedback</span>
+</a>
+</div>
+<div class="mt-3 pt-2 text-center">
+<span class="text-[11px] text-on-surface-variant/70 font-tabular-nums text-tabular-nums">v2.4.1 (Canada Life CA)</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Body -->
+<div class="pl-64">
+<main class="relative pt-16 bg-surface min-h-screen w-full px-margin">
+<div class="flex flex-col w-full pb-16">
+<!-- Top Breadcrumb Strip -->
+<div class="flex flex-wrap items-center justify-between gap-4 py-4 mb-2">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider text-[11px]">
+<span class="hover:text-primary transition-colors cursor-pointer">Canada Life IDP</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Operations Workspace</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="text-primary font-bold">Document Ingestion</span>
+</nav>
+<div class="flex items-center gap-2 text-label-caps font-label-caps text-secondary font-semibold text-[12px]">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span class="">256-Bit PIPEDA Compliant Secure Ingestion</span>
+</div>
+</div>
+<!-- Header Section -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight text-[26px] lg:text-[30px] leading-tight mb-1">
+              Submit Documents for Processing
+            </h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed max-w-2xl">
+              Choose your target business process and upload claims, receipts, or forms. Staged documents will be extracted, verified, and routed automatically.
+            </p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-label-caps font-label-caps uppercase text-[11px] font-bold shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">help_outline</span>
+<span class="">Process Guide</span>
+</button>
+</div>
+</div>
+<!-- 2-Column Responsive Layout: Left: Primary Task (Process & Upload) | Right: Triggered Jobs History -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+<!-- Left Zone: Selection + Upload Dock (7 Cols) -->
+<div class="xl:col-span-7 flex flex-col gap-6">
+<!-- STEP 1: Process Selection -->
+<section class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-outline-variant/30">
+<div class="flex items-center justify-between gap-4 mb-4">
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-container text-on-primary font-headline-md text-[12px] font-bold">1</span>
+<h2 class="text-headline-md font-headline-md text-on-surface text-[17px] tracking-tight">Select Target Process</h2>
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant text-[10px] bg-surface-container px-2 py-0.5 rounded font-semibold">REQUIRED</span>
+</div>
+<!-- Compact Process Selector Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="processGrid">
+<!-- Process 1 (Active) -->
+<div class="group relative p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer border-2 border-primary" data-process-id="PROC-GH-8820">
+<div class="flex items-start justify-between mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">medical_information</span>
+<span class="font-headline-md text-[13px] font-semibold text-on-surface">Group Health &amp; Dental Claims</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">radio_button_checked</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pl-7">
+<span class="">ID: PROC-GH-8820</span>
+<span class="text-secondary font-semibold">SLA: &lt; 15 Mins</span>
+</div>
+</div>
+<!-- Process 2 -->
+<div class="group relative p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer border border-transparent opacity-85 hover:opacity-100" data-process-id="PROC-DISAB-104">
+<div class="flex items-start justify-between mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">accessible</span>
+<span class="font-headline-md text-[13px] font-semibold text-on-surface">Disability Notice of Claim</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">radio_button_unchecked</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pl-7">
+<span class="">ID: PROC-DISAB-104</span>
+<span class="">SLA: 4 Hours</span>
+</div>
+</div>
+<!-- Process 3 -->
+<div class="group relative p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer border border-transparent opacity-85 hover:opacity-100" data-process-id="PROC-EFT-9912">
+<div class="flex items-start justify-between mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">account_balance</span>
+<span class="font-headline-md text-[13px] font-semibold text-on-surface">Direct Deposit &amp; Void Cheques</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">radio_button_unchecked</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pl-7">
+<span class="">ID: PROC-EFT-9912</span>
+<span class="text-secondary font-semibold">SLA: Realtime (&lt; 2m)</span>
+</div>
+</div>
+<!-- Process 4 -->
+<div class="group relative p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer border border-transparent opacity-85 hover:opacity-100" data-process-id="PROC-APS-3301">
+<div class="flex items-start justify-between mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">assignment_ind</span>
+<span class="font-headline-md text-[13px] font-semibold text-on-surface">Underwriting Attending Physician</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">radio_button_unchecked</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pl-7">
+<span class="">ID: PROC-APS-3301</span>
+<span class="">SLA: 24 Hours</span>
+</div>
+</div>
+</div>
+</section>
+<!-- STEP 2: File Upload Dock & Staging -->
+<section class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-outline-variant/30 flex flex-col gap-4">
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-container text-on-primary font-headline-md text-[12px] font-bold">2</span>
+<h2 class="text-headline-md font-headline-md text-on-surface text-[17px] tracking-tight">Upload Documents</h2>
+</div>
+<div class="text-label-caps font-label-caps text-on-surface-variant text-[11px] uppercase">
+                  PDF, TIFF, PNG, JPEG (Max 50MB)
+                </div>
+</div>
+<!-- Clean Drag & Drop Area -->
+<div class="group relative flex flex-col items-center justify-center text-center p-6 sm:p-8 rounded-lg border-2 border-dashed border-outline-variant/70 hover:border-primary bg-surface-container-low/60 hover:bg-surface-container-low transition-all cursor-pointer">
+<div class="w-12 h-12 mb-2 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+</div>
+<p class="text-body-md font-headline-md text-on-surface font-semibold text-[15px] mb-1">
+                  Drag &amp; drop files here, or <span class="text-primary underline">browse computer</span>
+</p>
+<p class="text-body-md font-body-md text-on-surface-variant text-[12px]">
+                  Batch uploads supported. Automated classification and OCR redaction applied immediately.
+                </p>
+<input aria-label="Upload document attachments" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple="" type="file">
+</div>
+<!-- Staged Queue Header & List -->
+<div class="mt-2">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-caps font-label-caps uppercase text-on-surface font-bold text-[11px] flex items-center gap-1.5">
+<span class="">Staged Files</span>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary/15 text-secondary text-[10px] font-bold">3 items</span>
+</span>
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-error text-[11px] uppercase transition-colors" type="button">Clear All</button>
+</div>
+<!-- Staged Files -->
+<div class="flex flex-col gap-2">
+<!-- File 1 -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-all">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+</div>
+<div class="min-w-0">
+<div class="font-headline-md text-on-surface text-[13px] truncate font-semibold">Group_Health_Claim_Batch_0492.pdf</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-[11px] font-tabular-nums">
+<span class="">3.4 MB</span>
+<span class="">•</span>
+<span class="">14 Pages</span>
+<span class="">•</span>
+<span class="text-secondary flex items-center gap-0.5 font-semibold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Ready
+                          </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Preview" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline hover:text-error transition-colors" title="Remove" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- File 2 -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-all">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined text-[18px]">image</span>
+</div>
+<div class="min-w-0">
+<div class="font-headline-md text-on-surface text-[13px] truncate font-semibold">Dental_Preauth_Receipt_Scans.tiff</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-[11px] font-tabular-nums">
+<span class="">8.1 MB</span>
+<span class="">•</span>
+<span class="">6 Pages</span>
+<span class="">•</span>
+<span class="text-secondary flex items-center gap-0.5 font-semibold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Ready
+                          </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Preview" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline hover:text-error transition-colors" title="Remove" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- File 3 -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-all">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+</div>
+<div class="min-w-0">
+<div class="font-headline-md text-on-surface text-[13px] truncate font-semibold">Attending_Physician_Note_088.pdf</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-[11px] font-tabular-nums">
+<span class="">1.8 MB</span>
+<span class="">•</span>
+<span class="">2 Pages</span>
+<span class="">•</span>
+<span class="text-secondary flex items-center gap-0.5 font-semibold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Ready
+                          </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Preview" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline hover:text-error transition-colors" title="Remove" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Immediate Action Footer -->
+<div class="pt-3 border-t border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="text-[12px] text-on-surface-variant">
+                  Total payload: <span class="font-bold text-on-surface font-tabular-nums">13.3 MB (22 pages)</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-body-md font-medium transition-colors" type="button">
+                    Save Draft
+                  </button>
+<button class="flex items-center gap-2 px-5 py-2 rounded-lg bg-primary-container hover:bg-primary text-on-primary text-body-md font-semibold shadow-md transition-all" type="button">
+<span class="">Submit &amp; Process</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Zone: Emphasized Triggered Jobs History (5 Cols) -->
+<div class="xl:col-span-5 flex flex-col gap-4">
+<section class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-outline-variant/30 flex flex-col h-full">
+<!-- Section Header -->
+<div class="flex items-center justify-between mb-3 pb-3 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">history_edu</span>
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface text-[17px] tracking-tight leading-tight">Triggered Jobs History</h2>
+<p class="text-[11px] text-on-surface-variant">Real-time status of your recently submitted documents</p>
+</div>
+</div>
+<a class="text-label-caps font-label-caps text-primary hover:underline text-[11px] uppercase font-bold" href="#">
+                  View All Jobs
+                </a>
+</div>
+<!-- Jobs Filter/Search Mini Bar -->
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-on-surface-variant text-[16px]">search</span>
+<input class="w-full pl-8 pr-3 py-1 text-[12px] rounded bg-surface-container-low text-on-surface border border-outline-variant/30 placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Filter by Job ID or Process..." type="text">
+</div>
+<button class="p-1.5 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors" title="Refresh queue" type="button">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+</div>
+<!-- Jobs List -->
+<div class="flex flex-col gap-3 flex-1 overflow-y-auto pr-0.5">
+<!-- Job Item 1: Processing -->
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant transition-all shadow-xs">
+<div class="flex items-start justify-between gap-2 mb-1.5">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-caps font-label-caps text-primary font-bold text-[12px]">JOB-99204</span>
+<span class="text-on-surface-variant text-[11px]">•</span>
+<span class="text-on-surface-variant text-[11px]">Just now</span>
+</div>
+<h3 class="font-headline-md text-[14px] text-on-surface font-semibold mt-0.5">Group Health &amp; Dental Claims</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/50 text-on-secondary-container text-label-caps font-label-caps text-[10px] font-bold flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                      Processing (68%)
+                    </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-outline-variant/20 font-tabular-nums">
+<span class="">3 files (22 pages)</span>
+<button class="text-primary hover:underline font-semibold flex items-center gap-0.5 text-[11px]" type="button">
+<span class="">View Pipeline</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Job Item 2: STP Approved -->
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant transition-all shadow-xs">
+<div class="flex items-start justify-between gap-2 mb-1.5">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-caps font-label-caps text-primary font-bold text-[12px]">JOB-99201</span>
+<span class="text-on-surface-variant text-[11px]">•</span>
+<span class="text-on-surface-variant text-[11px]">18 mins ago</span>
+</div>
+<h3 class="font-headline-md text-[14px] text-on-surface font-semibold mt-0.5">Group Health &amp; Dental Claims</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-label-caps font-label-caps text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+                      STP Approved
+                    </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-outline-variant/20 font-tabular-nums">
+<span class="">4 files (18 pages)</span>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface flex items-center gap-0.5 text-[11px]" title="Download Adjudication Payload" type="button">
+<span class="material-symbols-outlined text-[14px]">download</span>
+<span class="">Results</span>
+</button>
+<button class="text-primary hover:underline font-semibold flex items-center gap-0.5 text-[11px]" type="button">
+<span class="">Details</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Job Item 3: Under Review / Routed to HITL -->
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant transition-all shadow-xs">
+<div class="flex items-start justify-between gap-2 mb-1.5">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-caps font-label-caps text-primary font-bold text-[12px]">JOB-99184</span>
+<span class="text-on-surface-variant text-[11px]">•</span>
+<span class="text-on-surface-variant text-[11px]">52 mins ago</span>
+</div>
+<h3 class="font-headline-md text-[14px] text-on-surface font-semibold mt-0.5">Underwriting Attending Physician</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">person_search</span>
+                      Under Review
+                    </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-outline-variant/20 font-tabular-nums">
+<span class="">1 file (34 pages)</span>
+<button class="text-primary hover:underline font-semibold flex items-center gap-0.5 text-[11px]" type="button">
+<span class="">View Review Queue</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Job Item 4: Completed -->
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant transition-all shadow-xs">
+<div class="flex items-start justify-between gap-2 mb-1.5">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-caps font-label-caps text-primary font-bold text-[12px]">JOB-99172</span>
+<span class="text-on-surface-variant text-[11px]">•</span>
+<span class="text-on-surface-variant text-[11px]">2 hrs ago</span>
+</div>
+<h3 class="font-headline-md text-[14px] text-on-surface font-semibold mt-0.5">Direct Deposit &amp; Void Cheques</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant text-label-caps font-label-caps text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">task_alt</span>
+                      Completed
+                    </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-outline-variant/20 font-tabular-nums">
+<span class="">2 files (2 pages)</span>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface flex items-center gap-0.5 text-[11px]" title="Download verified transit record" type="button">
+<span class="material-symbols-outlined text-[14px]">download</span>
+<span class="">Record</span>
+</button>
+<button class="text-primary hover:underline font-semibold flex items-center gap-0.5 text-[11px]" type="button">
+<span class="">Details</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sub-card Note -->
+<div class="mt-4 pt-3 border-t border-outline-variant/30 flex items-start gap-2 text-on-surface-variant text-[11px]">
+<span class="material-symbols-outlined text-[16px] text-outline shrink-0 mt-0.5">verified</span>
+<span class="">Audit logs and extraction payloads remain stored for 90 days in adherence to Canada Life compliance governance.</span>
+</div>
+</section>
+</div>
+</div>
+</div>
+<script>
+        // Interactive selection logic for process selection cards
+        document.querySelectorAll('#processGrid > div').forEach(card => {
+          card.addEventListener('click', () => {
+            document.querySelectorAll('#processGrid > div').forEach(c => {
+              c.classList.remove('border-2', 'border-primary', 'opacity-100');
+              c.classList.add('border-transparent', 'opacity-85');
+              const icon = c.querySelector('.material-symbols-outlined:last-child');
+              if (icon) {
+                icon.textContent = 'radio_button_unchecked';
+                icon.classList.replace('text-primary', 'text-outline');
+              }
+            });
+            card.classList.remove('border-transparent', 'opacity-85');
+            card.classList.add('border-2', 'border-primary', 'opacity-100');
+            const activeIcon = card.querySelector('.material-symbols-outlined:last-child');
+            if (activeIcon) {
+              activeIcon.textContent = 'radio_button_checked';
+              activeIcon.classList.replace('text-outline', 'text-primary');
+            }
+          });
+        });
+      </script>
+</main>
+</div>
+
+
+</body></html>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LoaderCircle, Pencil, RefreshCcw, Trash2, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -22,12 +21,25 @@ import {
   NeedsReviewBadge,
 } from "@/components/job-history-ui";
 import { PageLoadingState } from "@/components/page-loading-state";
+import { useSession } from "@/components/providers/session-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { api, type BusinessProcess, type Job } from "@/lib/api";
 import { getErrorMessage, showErrorToast } from "@/lib/errors";
 import { confidenceThresholdFloatToPercent } from "@/lib/process-threshold";
 import { getPollingInterval, pollingIntervals } from "@/lib/query";
 import { queryKeys } from "@/lib/query-keys";
+import { hasCapability } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
@@ -44,9 +56,15 @@ const ACCEPTED_MIME_TYPES = [
 const FILE_INPUT_ACCEPT = ".pdf,.png,.jpg,.jpeg,.tif,.tiff";
 
 const processStatusStyles: Record<BusinessProcess["routingAnalyzerStatus"], string> = {
-  building: "border-amber-200 bg-amber-50 text-amber-700",
-  ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  failed: "border-red-200 bg-red-50 text-red-700",
+  building: "border-warning-border bg-warning-surface text-warning",
+  ready: "border-success-border bg-success-surface text-success",
+  failed: "border-destructive/20 bg-destructive/10 text-destructive",
+};
+
+const processStatusIcons: Record<BusinessProcess["routingAnalyzerStatus"], "sync" | "check_circle" | "error"> = {
+  building: "sync",
+  ready: "check_circle",
+  failed: "error",
 };
 
 function formatStatusLabel(status: string) {
@@ -112,12 +130,12 @@ function DeleteProcessDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-process-title"
-        className="w-full max-w-md rounded-3xl border bg-background p-6 shadow-xl"
+        className="w-full max-w-md rounded-lg border bg-card p-6 shadow-xl"
       >
         <div className="space-y-3">
           <h2 id="delete-process-title" className="text-xl font-semibold tracking-tight">
@@ -141,13 +159,28 @@ function DeleteProcessDialog({
   );
 }
 
-function StatusBadge({ status, tone }: { status: string; tone: string }) {
-  return <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-medium", tone)}>{status}</span>;
+function StatusBadge({
+  status,
+  tone,
+  icon,
+}: {
+  status: string;
+  tone: string;
+  icon: "sync" | "check_circle" | "error";
+}) {
+  return (
+    <span className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium", tone)}>
+      <Icon name={icon} size={14} className={icon === "sync" ? "animate-spin" : undefined} />
+      {status}
+    </span>
+  );
 }
 
 export function ProcessDetailPage({ processId }: { processId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  const canWriteProcesses = hasCapability(user?.roleLabel, "processes:write");
 
   const [processPollingStartedAt, setProcessPollingStartedAt] = useState<string | null>(null);
   const [showAnalyzerManualRefresh, setShowAnalyzerManualRefresh] = useState(false);
@@ -451,182 +484,199 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
 
   return (
     <>
-      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="rounded-3xl border bg-background p-8 shadow-sm">
-          <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-2">
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Process detail
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight">{process.name}</h1>
-              <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{process.description}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild variant="outline">
-                <Link href={`/processes/${process.id}/edit`}>
-                  <Pencil className="size-4" />
-                  Edit
-                </Link>
-              </Button>
-              <Button type="button" variant="destructive" onClick={() => setProcessToDelete(process)}>
-                <Trash2 className="size-4" />
-                Delete
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border bg-muted/20 p-5">
-              <p className="text-sm font-medium text-foreground">Allowed analyzers</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {allowAnalyzerNames.map((analyzer) => (
-                  <span key={analyzer.id} className="rounded-full border bg-background px-2.5 py-1 text-xs">
-                    {analyzer.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border bg-muted/20 p-5">
-              <p className="text-sm font-medium text-foreground">Routing analyzer status</p>
-              <div className="mt-3 space-y-3">
-                <StatusBadge
-                  status={formatStatusLabel(process.routingAnalyzerStatus)}
-                  tone={processStatusStyles[process.routingAnalyzerStatus]}
-                />
-                {process.routingAnalyzerError ? (
-                  <p className="text-sm leading-6 text-destructive">{process.routingAnalyzerError}</p>
-                ) : null}
-                {showAnalyzerManualRefresh && process.routingAnalyzerStatus === "building" ? (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                    Provisioning is taking longer than expected. Refresh manually to check the latest
-                    routing analyzer status.
-                    <div className="mt-3">
-                      <Button type="button" variant="outline" size="sm" onClick={() => void processQuery.refetch()}>
-                        <RefreshCcw className="size-3.5" />
-                        Refresh status
-                      </Button>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border bg-muted/20 p-5">
-              <p className="text-sm font-medium text-foreground">Average Confidence threshold</p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight">
-                {confidenceThresholdFloatToPercent(process.confidenceThreshold)}%
-              </p>
-            </div>
-
-            <div className="rounded-2xl border bg-muted/20 p-5">
-              <p className="text-sm font-medium text-foreground">Business owner</p>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{process.ownerEmail}</p>
-            </div>
-          </div>
-        </section>
-
-        <aside className="space-y-6">
-          <section className="rounded-3xl border bg-background p-6 shadow-sm">
-            <div className="space-y-2">
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Upload document
-              </p>
-              <h2 className="text-xl font-semibold tracking-tight">Inference testing</h2>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Upload a PDF, PNG, JPG, or TIFF up to 20 MB. Page-count checks still happen on the
-                backend.
-              </p>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <label
-                className={cn(
-                  "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed p-6 text-center transition-colors",
-                  uploadBlocked || triggerMutation.isPending || isPollingJob
-                    ? "cursor-not-allowed border-muted-foreground/20 bg-muted/20 text-muted-foreground"
-                    : "border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10",
-                )}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={onDrop}
-              >
-                <Upload className="size-8" />
-                <div className="space-y-1">
-                  <p className="font-medium">Drag and drop a document here</p>
-                  <p className="text-sm text-muted-foreground">
-                    or click to choose a file from your device
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  accept={FILE_INPUT_ACCEPT}
-                  aria-label="Choose document"
-                  className="sr-only"
-                  disabled={uploadBlocked || triggerMutation.isPending || isPollingJob}
-                  onChange={onFileInputChange}
-                />
-              </label>
-
-              {uploadDisabledReason ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                  {uploadDisabledReason}
-                </div>
-              ) : null}
-
-              {triggerMutation.isPending || isPollingJob ? (
-                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
-                  <div className="flex items-center gap-2 font-medium">
-                    <LoaderCircle className="size-4 animate-spin" />
-                    {triggerMutation.isPending ? "Uploading document…" : "Processing document…"}
-                  </div>
-                  <p className="mt-2 text-sm text-blue-900/80">
-                    {activeJob?.status === "running"
-                      ? "Extraction is running now."
-                      : "Waiting for the job to complete."}
-                  </p>
-                  {showJobManualRefresh && activeJobId ? (
-                    <div className="mt-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => void activeJobQuery.refetch()}
-                      >
-                        <RefreshCcw className="size-3.5" />
-                        Refresh job status
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {activeJobQuery.isError && activeJobId ? (
-                <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
-                  {getErrorMessage(activeJobQuery.error)}
-                </div>
-              ) : null}
-
-              {uploadError ? (
-                <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
-                  {uploadError}
-                </div>
-              ) : null}
-
-              {uploadNotice ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
-                  {uploadNotice}
-                </div>
-              ) : null}
-            </div>
-          </section>
-
-          <section className="rounded-3xl border bg-background p-6 shadow-sm">
-            <div className="flex flex-col gap-4 border-b pb-4">
+      <div className="space-y-6">
+        <Card className="rounded-lg">
+          <CardHeader className="gap-4 border-b">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="space-y-2">
-                <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                  Recent jobs
+                <p className="text-label-caps text-muted-foreground">Process detail</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="font-heading text-headline-lg text-foreground">{process.name}</h1>
+                  <StatusBadge
+                    status={formatStatusLabel(process.routingAnalyzerStatus)}
+                    tone={processStatusStyles[process.routingAnalyzerStatus]}
+                    icon={processStatusIcons[process.routingAnalyzerStatus]}
+                  />
+                </div>
+                <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{process.description}</p>
+                {process.routingAnalyzerError ? (
+                  <p className="max-w-3xl text-sm leading-6 text-destructive">{process.routingAnalyzerError}</p>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {canWriteProcesses ? (
+                  <Button asChild variant="outline">
+                    <Link href={`/processes/${process.id}/edit`}>
+                      <Icon name="edit" size={16} />
+                      Edit
+                    </Link>
+                  </Button>
+                ) : null}
+                <Button asChild variant="outline">
+                  <Link href={viewAllJobsHref}>
+                    <Icon name="receipt_long" size={16} />
+                    View all jobs
+                  </Link>
+                </Button>
+                {canWriteProcesses ? (
+                  <Button type="button" variant="destructive" onClick={() => setProcessToDelete(process)}>
+                    <Icon name="delete" size={16} />
+                    Delete
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <p className="text-label-caps text-muted-foreground">Process ID</p>
+                <p className="mt-3 break-all text-sm font-medium text-foreground">{process.id}</p>
+              </div>
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <p className="text-label-caps text-muted-foreground">Confidence threshold</p>
+                <p className="font-heading tabular-figures mt-3 text-2xl font-semibold">
+                  {confidenceThresholdFloatToPercent(process.confidenceThreshold)}%
                 </p>
-                <h2 className="text-xl font-semibold tracking-tight">History preview</h2>
+              </div>
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <p className="text-label-caps text-muted-foreground">Business owner</p>
+                <p className="mt-3 break-words text-sm font-medium text-foreground">{process.ownerEmail}</p>
+              </div>
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <p className="text-label-caps text-muted-foreground">Allowed analyzers</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {allowAnalyzerNames.map((analyzer) => (
+                    <Badge key={analyzer.id} variant="neutral">
+                      {analyzer.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {showAnalyzerManualRefresh && process.routingAnalyzerStatus === "building" ? (
+              <div className="mt-4 rounded-lg border border-warning-border bg-warning-surface p-3 text-sm text-warning">
+                Provisioning is taking longer than expected. Refresh manually to check the latest
+                routing analyzer status.
+                <div className="mt-3">
+                  <Button type="button" variant="outline" size="sm" onClick={() => void processQuery.refetch()}>
+                    <Icon name="refresh" size={14} />
+                    Refresh status
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-lg">
+          <CardHeader className="border-b">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-1">
+                <p className="text-label-caps text-muted-foreground">Primary action</p>
+                <CardTitle className="text-headline-md">Upload documents</CardTitle>
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Drop a PDF, PNG, JPG, or TIFF document to trigger extraction for this process.
+                  Files must be 20 MB or smaller; page-count checks still happen on the backend.
+                </p>
+              </div>
+              <Badge variant="outline">PDF, TIFF, PNG, JPEG</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <label
+              className={cn(
+                "group flex min-h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 text-center transition-colors",
+                uploadBlocked || triggerMutation.isPending || isPollingJob
+                  ? "cursor-not-allowed border-border bg-muted/30 text-muted-foreground"
+                  : "border-primary/40 bg-card hover:border-primary hover:bg-primary/5",
+              )}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={onDrop}
+            >
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-105">
+                <Icon name="cloud_upload" size={30} />
+              </span>
+              <div className="space-y-1">
+                <p className="font-heading text-base font-semibold text-foreground">
+                  Drag and drop a document here, or <span className="text-primary underline">browse computer</span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Automated classification, extraction, and review routing starts immediately.
+                </p>
+              </div>
+              <input
+                type="file"
+                accept={FILE_INPUT_ACCEPT}
+                aria-label="Choose document"
+                className="sr-only"
+                disabled={uploadBlocked || triggerMutation.isPending || isPollingJob}
+                onChange={onFileInputChange}
+              />
+            </label>
+
+            {uploadDisabledReason ? (
+              <div className="rounded-lg border border-warning-border bg-warning-surface p-3 text-sm text-warning">
+                {uploadDisabledReason}
+              </div>
+            ) : null}
+
+            {triggerMutation.isPending || isPollingJob ? (
+              <div className="rounded-lg border border-info-border bg-info-surface p-3 text-sm text-info">
+                <div className="flex items-center gap-2 font-medium">
+                  <Icon name="progress_activity" size={16} className="animate-spin" />
+                  {triggerMutation.isPending ? "Uploading document…" : "Processing document…"}
+                </div>
+                <p className="mt-2 text-sm">
+                  {activeJob?.status === "running"
+                    ? "Extraction is running now."
+                    : "Waiting for the job to complete."}
+                </p>
+                {showJobManualRefresh && activeJobId ? (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void activeJobQuery.refetch()}
+                    >
+                      <Icon name="refresh" size={14} />
+                      Refresh job status
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeJobQuery.isError && activeJobId ? (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                {getErrorMessage(activeJobQuery.error)}
+              </div>
+            ) : null}
+
+            {uploadError ? (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                {uploadError}
+              </div>
+            ) : null}
+
+            {uploadNotice ? (
+              <div className="rounded-lg border border-success-border bg-success-surface p-3 text-sm text-success">
+                {uploadNotice}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-lg">
+          <CardHeader className="border-b">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-1">
+                <p className="text-label-caps text-muted-foreground">Recent jobs</p>
+                <CardTitle className="text-headline-md">Triggered jobs history</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Real-time status of the most recent documents submitted to this process.
+                </p>
               </div>
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <input
@@ -637,13 +687,14 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                 Needs review only
               </label>
             </div>
-
+          </CardHeader>
+          <CardContent>
             {recentJobsQuery.isLoading ? (
-              <div className="mt-4 text-sm text-muted-foreground">Loading recent jobs…</div>
+              <div className="text-sm text-muted-foreground">Loading recent jobs…</div>
             ) : null}
 
             {recentJobsQuery.isError ? (
-              <div className="mt-4 rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
                 <p className="font-medium">Recent job history is unavailable right now.</p>
                 <p className="mt-1">{getErrorMessage(recentJobsQuery.error)}</p>
                 <div className="mt-3">
@@ -655,20 +706,20 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
             ) : null}
 
             {!recentJobsQuery.isLoading && !recentJobsQuery.isError ? (
-              <div className="mt-4 overflow-hidden rounded-2xl border">
+              <div className="overflow-hidden rounded-lg border">
                 {recentJobsQuery.data && recentJobsQuery.data.length > 0 ? (
-                  <table className="min-w-full divide-y divide-border text-left text-sm">
-                    <thead className="bg-muted/40 text-muted-foreground">
-                      <tr>
-                        <th className="px-3 py-2 font-medium">File</th>
-                        <th className="px-3 py-2 font-medium">Submitted</th>
-                        <th className="px-3 py-2 font-medium">Status</th>
-                        <th className="px-3 py-2 font-medium">Detected form</th>
-                        <th className="px-3 py-2 font-medium">Confidence</th>
-                        <th className="px-3 py-2 font-medium">Est. cost</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border bg-background">
+                  <Table>
+                    <TableHeader className="bg-muted/50">
+                      <TableRow>
+                        <TableHead>File</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Detected form</TableHead>
+                        <TableHead>Confidence</TableHead>
+                        <TableHead>Est. cost</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {recentJobsQuery.data.map((job) => {
                         const interactive = job.status !== "failed";
                         const detectedFormLabel = job.unclassified
@@ -676,18 +727,18 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                           : job.detectedFormName || job.detectedForm || "—";
 
                         return (
-                          <tr
+                          <TableRow
                             key={job.id}
                             tabIndex={interactive ? 0 : undefined}
                             role={interactive ? "link" : undefined}
                             className={cn(
                               "align-top",
-                              interactive ? "cursor-pointer hover:bg-muted/20 focus:bg-muted/20 focus:outline-none" : "",
+                              interactive ? "cursor-pointer focus:bg-muted/50 focus:outline-none" : "",
                             )}
                             onClick={interactive ? () => onJobRowActivate(job) : undefined}
                             onKeyDown={interactive ? (event) => onJobRowKeyDown(event, job) : undefined}
                           >
-                            <td className="px-3 py-3">
+                            <TableCell className="min-w-64 whitespace-normal p-3">
                               <div className="space-y-2">
                                 <p className="font-medium text-foreground">{job.fileName}</p>
                                 <div className="flex flex-wrap gap-2">
@@ -695,18 +746,16 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                                     <NeedsReviewBadge show />
                                   ) : null}
                                   {job.unclassified ? (
-                                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
-                                      No matching form
-                                    </span>
+                                    <Badge variant="neutral">No matching form</Badge>
                                   ) : null}
                                 </div>
                                 {job.status === "failed" && job.error ? (
                                   <p className="text-xs leading-5 text-destructive">{job.error}</p>
                                 ) : null}
                               </div>
-                            </td>
-                            <td className="px-3 py-3 text-muted-foreground">{formatDateTime(job.submittedAt)}</td>
-                            <td className="px-3 py-3">
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">{formatDateTime(job.submittedAt)}</TableCell>
+                            <TableCell>
                               <JobStatusBadge status={job.status} />
                               {job.status === "failed" ? (
                                 <div className="mt-3">
@@ -724,19 +773,19 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                                   </Button>
                                 </div>
                               ) : null}
-                            </td>
-                            <td className="px-3 py-3 text-muted-foreground">{detectedFormLabel}</td>
-                            <td className="px-3 py-3">
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">{detectedFormLabel}</TableCell>
+                            <TableCell>
                               <AverageConfidenceValue averageConfidence={job.averageConfidence} />
-                            </td>
-                            <td className="px-3 py-3">
+                            </TableCell>
+                            <TableCell>
                               <EstimatedCostValue estimatedCostUsd={job.estimatedCostUsd} />
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 ) : (
                   <div className="p-4 text-sm text-muted-foreground">
                     No jobs match the current filter yet.
@@ -744,14 +793,8 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                 )}
               </div>
             ) : null}
-
-            <div className="mt-4">
-              <Button asChild variant="outline">
-                <Link href={viewAllJobsHref}>View all jobs</Link>
-              </Button>
-            </div>
-          </section>
-        </aside>
+          </CardContent>
+        </Card>
       </div>
 
       <DeleteProcessDialog

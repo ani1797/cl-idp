@@ -47,6 +47,7 @@ def resolve_repo_root() -> Path:
 REPO_ROOT = resolve_repo_root()
 SAMPLES_ROOT = REPO_ROOT / "samples"
 DEFAULT_API_BASE_URL = os.environ.get("CL_IDP_API_BASE_URL", "http://127.0.0.1:8000")
+SERVICE_TOKEN_HEADER = "X-Service-Token"
 PROCESS_READY_TIMEOUT_SECONDS = 10 * 60
 JOB_READY_TIMEOUT_SECONDS = 10 * 60
 PROCESS_POLL_SECONDS = 5
@@ -94,6 +95,14 @@ class SampleResult:
     grounded_fields_present: bool
 
 
+@dataclass(frozen=True)
+class DemoUserSeed:
+    role_label: str
+    display_name: str
+    email_env: str
+    password_env: str
+
+
 SCENARIOS: tuple[ProcessScenario, ...] = (
     ProcessScenario(
         name="Canada Life Group Benefits Administration",
@@ -133,6 +142,12 @@ LEGACY_PROCESS_NAMES: tuple[str, ...] = (
     "Group Benefits Application",
 )
 
+DEMO_USERS: tuple[DemoUserSeed, ...] = (
+    DemoUserSeed("IT Admin", "IT Admin", "DEMO_IT_ADMIN_EMAIL", "DEMO_IT_ADMIN_PASSWORD"),
+    DemoUserSeed("Reviewer", "Reviewer", "DEMO_REVIEWER_EMAIL", "DEMO_REVIEWER_PASSWORD"),
+    DemoUserSeed("End User", "End User", "DEMO_END_USER_EMAIL", "DEMO_END_USER_PASSWORD"),
+)
+
 
 class SeedError(RuntimeError):
     pass
@@ -141,7 +156,14 @@ class SeedError(RuntimeError):
 class SeedClient:
     def __init__(self, base_url: str, *, timeout: float = 30.0) -> None:
         self.base_url = base_url.rstrip("/")
-        self._client = httpx.Client(base_url=self.base_url, timeout=timeout, follow_redirects=True)
+        service_token = os.environ.get("SERVICE_API_TOKEN", "")
+        headers = {SERVICE_TOKEN_HEADER: service_token} if service_token else {}
+        self._client = httpx.Client(
+            base_url=self.base_url,
+            timeout=timeout,
+            follow_redirects=True,
+            headers=headers,
+        )
 
     def close(self) -> None:
         self._client.close()
@@ -197,6 +219,42 @@ class SeedClient:
 
     def get_process(self, process_id: str) -> dict[str, Any]:
         return self.require_success("GET", f"/processes/{process_id}")
+
+    def list_users(self) -> list[dict[str, Any]]:
+        return self.require_success("GET", "/users")
+
+    def create_user(self, seed: DemoUserSeed, email: str, password: str) -> dict[str, Any]:
+        return self.require_success(
+            "POST",
+            "/users",
+            expected_status=201,
+            json={
+                "email": email,
+                "displayName": seed.display_name,
+                "roleLabel": seed.role_label,
+                "password": password,
+                "isActive": True,
+            },
+        )
+
+    def update_user(self, user_id: str, seed: DemoUserSeed, email: str) -> dict[str, Any]:
+        return self.require_success(
+            "PATCH",
+            f"/users/{user_id}",
+            json={
+                "email": email,
+                "displayName": seed.display_name,
+                "roleLabel": seed.role_label,
+                "isActive": True,
+            },
+        )
+
+    def reset_user_password(self, user_id: str, password: str) -> dict[str, Any]:
+        return self.require_success(
+            "POST",
+            f"/users/{user_id}/reset-password",
+            json={"password": password},
+        )
 
     def list_jobs(self, process_id: str, *, file_name: str | None = None) -> list[dict[str, Any]]:
         params = {"limit": 100}
@@ -259,6 +317,33 @@ def ensure_api_reachable(client: SeedClient) -> None:
     status = health.get("status")
     dependencies = health.get("dependencies")
     print(f"Health check: status={status} dependencies={dependencies}")
+
+
+def ensure_service_token_configured() -> None:
+    if not os.environ.get("SERVICE_API_TOKEN"):
+        raise SeedError("SERVICE_API_TOKEN must be set for non-interactive seed API calls.")
+
+
+def ensure_demo_users(client: SeedClient) -> None:
+    existing_by_email = {str(user["email"]).lower(): user for user in client.list_users()}
+    for seed in DEMO_USERS:
+        email = os.environ.get(seed.email_env, "").strip().lower()
+        password = os.environ.get(seed.password_env, "")
+        if not email or not password:
+            raise SeedError(
+                f"{seed.email_env} and {seed.password_env} must be set to seed the {seed.role_label} demo user."
+            )
+
+        existing = existing_by_email.get(email)
+        if existing is None:
+            created = client.create_user(seed, email, password)
+            print(f"Created demo user: {seed.role_label} ({created['email']})")
+            existing_by_email[str(created["email"]).lower()] = created
+            continue
+
+        updated = client.update_user(str(existing["id"]), seed, email)
+        client.reset_user_password(str(existing["id"]), password)
+        print(f"Demo user already exists, refreshed: {seed.role_label} ({updated['email']})")
 
 
 def ensure_process(client: SeedClient, seed: ProcessSeed) -> ProcessResult:
@@ -611,7 +696,9 @@ def main() -> int:
     client = SeedClient(args.api_base_url)
     sample_results: list[SampleResult] = []
     try:
+        ensure_service_token_configured()
         ensure_api_reachable(client)
+        ensure_demo_users(client)
         delete_legacy_processes(client)
         for scenario in SCENARIOS:
             process_result = ensure_process(

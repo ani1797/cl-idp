@@ -1,15 +1,17 @@
 "use client";
 
-import { LoaderCircle } from "lucide-react";
-
+import { ConfidenceBadge } from "@/components/brand/confidence-badge";
+import { Badge } from "@/components/ui/badge";
+import { Icon, type IconName } from "@/components/ui/icon";
 import { type JobStatus } from "@/lib/api";
-import { cn } from "@/lib/utils";
 
-const jobStatusStyles: Record<JobStatus, string> = {
-  queued: "border-slate-200 bg-slate-50 text-slate-700",
-  running: "border-blue-200 bg-blue-50 text-blue-700",
-  succeeded: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  failed: "border-red-200 bg-red-50 text-red-700",
+type BadgeVariant = React.ComponentProps<typeof Badge>["variant"];
+
+const jobStatusPresentation: Record<JobStatus, { variant: BadgeVariant; icon: IconName }> = {
+  queued: { variant: "neutral", icon: "schedule" },
+  running: { variant: "info", icon: "sync" },
+  succeeded: { variant: "success", icon: "check_circle" },
+  failed: { variant: "destructive", icon: "error" },
 };
 
 function formatSentenceCaseLabel(value: string) {
@@ -41,14 +43,16 @@ export function formatConfidencePercent(averageConfidence?: number | null) {
   return `${(averageConfidence * 100).toFixed(0)}%`;
 }
 
-export function AverageConfidenceValue({ averageConfidence }: { averageConfidence?: number | null }) {
-  const formatted = formatConfidencePercent(averageConfidence);
-
-  if (formatted === null) {
+export function AverageConfidenceValue({
+  averageConfidence,
+}: {
+  averageConfidence?: number | null;
+}) {
+  if (averageConfidence === null || averageConfidence === undefined) {
     return <span className="text-muted-foreground">—</span>;
   }
 
-  return <span className="font-medium text-foreground">{formatted}</span>;
+  return <ConfidenceBadge value={averageConfidence} />;
 }
 
 const costFormatter = new Intl.NumberFormat(undefined, {
@@ -78,19 +82,17 @@ export function EstimatedCostValue({ estimatedCostUsd }: { estimatedCostUsd?: nu
     return <span className="text-muted-foreground">—</span>;
   }
 
-  return <span className="font-medium text-foreground">{formatted}</span>;
+  return <span className="text-foreground tabular-figures font-medium">{formatted}</span>;
 }
 
 export function JobStatusBadge({ status }: { status: JobStatus }) {
+  const { variant, icon } = jobStatusPresentation[status];
+
   return (
-    <span
-      className={cn(
-        "inline-flex rounded-full border px-2.5 py-1 text-xs font-medium",
-        jobStatusStyles[status],
-      )}
-    >
+    <Badge variant={variant}>
+      <Icon name={icon} size={14} className={status === "running" ? "animate-spin" : undefined} />
       {formatJobStatusLabel(status)}
-    </span>
+    </Badge>
   );
 }
 
@@ -100,9 +102,10 @@ export function NeedsReviewBadge({ show }: { show: boolean }) {
   }
 
   return (
-    <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-800">
+    <Badge variant="warning">
+      <Icon name="flag" size={14} />
       Needs review
-    </span>
+    </Badge>
   );
 }
 
@@ -110,23 +113,17 @@ export function ReviewedIndicator({ reviewedAt }: { reviewedAt?: string }) {
   const reviewed = Boolean(reviewedAt);
 
   return (
-    <span
-      className={cn(
-        "inline-flex rounded-full border px-2 py-0.5 text-xs",
-        reviewed
-          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-          : "border-slate-200 bg-slate-50 text-slate-700",
-      )}
-    >
+    <Badge variant={reviewed ? "success" : "neutral"}>
+      <Icon name={reviewed ? "task_alt" : "radio_button_unchecked"} size={14} />
       {reviewed ? "Reviewed" : "Not reviewed"}
-    </span>
+    </Badge>
   );
 }
 
 export function ProcessingIndicator({ status }: { status: Extract<JobStatus, "queued" | "running"> }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700">
-      <LoaderCircle className="size-3.5 animate-spin" />
+    <span className="text-info inline-flex items-center gap-1.5 text-xs font-medium">
+      <Icon name="progress_activity" size={14} className="animate-spin" />
       {status === "running" ? "Processing" : "Queued"}
     </span>
   );

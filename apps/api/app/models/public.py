@@ -34,6 +34,54 @@ class Health(ModelBase):
     version: str | None = None
 
 
+class UserRole(StrEnum):
+    """The fixed set of roles RBAC enforcement is based on.
+
+    `roleLabel` doubles as both the enforced role and its display label, so
+    the set is intentionally small and closed — it is validated by Pydantic
+    on every write, and any request with an unrecognized value is rejected
+    with a 422 rather than silently falling back to a role.
+    """
+
+    IT_ADMIN = "IT Admin"
+    REVIEWER = "Reviewer"
+    END_USER = "End User"
+
+
+class User(ModelBase):
+    id: str
+    email: EmailStr
+    displayName: str
+    roleLabel: UserRole
+    isActive: bool
+    createdAt: datetime
+    updatedAt: datetime
+
+
+class LoginRequest(ModelBase):
+    email: EmailStr
+    password: str = PydanticField(min_length=1)
+
+
+class UserCreateRequest(ModelBase):
+    email: EmailStr
+    displayName: str
+    roleLabel: UserRole
+    password: str = PydanticField(min_length=8)
+    isActive: bool = True
+
+
+class UserUpdateRequest(ModelBase):
+    email: EmailStr | None = None
+    displayName: str | None = None
+    roleLabel: UserRole | None = None
+    isActive: bool | None = None
+
+
+class UserResetPasswordRequest(ModelBase):
+    password: str = PydanticField(min_length=8)
+
+
 class AnalyzerRef(ModelBase):
     id: str
     name: str

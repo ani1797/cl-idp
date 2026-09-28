@@ -2,8 +2,10 @@
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { Toaster } from "sonner";
 
+import { RouteGuard } from "@/components/providers/route-guard";
+import { SessionProvider } from "@/components/providers/session-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { createAppQueryClient } from "@/lib/query";
 
 export function AppProviders({
@@ -13,8 +15,10 @@ export function AppProviders({
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster closeButton richColors position="top-right" />
+      <SessionProvider>
+        <RouteGuard>{children}</RouteGuard>
+        <Toaster closeButton richColors position="top-right" />
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

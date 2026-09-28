@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, ArrowLeft, RefreshCcw } from "lucide-react";
 import {
   type ChangeEvent,
   type KeyboardEvent,
+  type ReactNode,
   useEffect,
   useMemo,
   useState,
 } from "react";
 
+import { KpiCard, SectionHeader } from "@/components/brand/primitives";
 import {
   AverageConfidenceValue,
   EstimatedCostValue,
@@ -24,7 +25,18 @@ import {
 } from "@/components/job-history-ui";
 import { ErrorCard } from "@/components/error-card";
 import { PageLoadingState } from "@/components/page-loading-state";
+import { useSession } from "@/components/providers/session-provider";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   api,
   type AnalyzerRef,
@@ -36,6 +48,7 @@ import {
 import { getErrorMessage, showErrorToast } from "@/lib/errors";
 import { getPollingInterval, pollingIntervals } from "@/lib/query";
 import { queryKeys } from "@/lib/query-keys";
+import { hasCapability } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const JOBS_LIMIT = 100;
@@ -58,13 +71,19 @@ type ProcessJobsFilterState = {
 
 type SearchParamsReader = Pick<URLSearchParams, "get" | "getAll">;
 
-type SummaryCardProps = {
-  label: string;
-  value: number | string;
-};
-
 type FailedJobErrorProps = {
   error: string;
+};
+
+const EMPTY_FILTER_STATE: ProcessJobsFilterState = {
+  status: [],
+  detectedForm: [],
+  hasViolations: false,
+  reviewed: "any",
+  unclassified: false,
+  fileName: "",
+  submittedFromDate: "",
+  submittedToDate: "",
 };
 
 function FileNameFilterInput({
@@ -89,29 +108,27 @@ function FileNameFilterInput({
   }, [initialValue, onCommit, value]);
 
   return (
-    <input
-      id="file-name-filter"
-      type="search"
-      value={value}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-      placeholder="Search by file name"
-      className="w-full rounded-2xl border bg-background px-3 py-2 text-sm"
-    />
-  );
-}
-
-function SummaryCard({ label, value }: SummaryCardProps) {
-  return (
-    <div className="rounded-2xl border bg-muted/20 p-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>
+    <div className="relative">
+      <Icon
+        name="search"
+        size={18}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+      />
+      <Input
+        id="file-name-filter"
+        type="search"
+        value={value}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
+        placeholder="Search by file name"
+        className="h-9 bg-card pl-9"
+      />
     </div>
   );
 }
 
 function FailedJobError({ error }: FailedJobErrorProps) {
   return (
-    <details className="max-w-xl rounded-2xl border border-destructive/20 bg-destructive/5 p-3 text-xs text-destructive">
+    <details className="max-w-xl rounded-lg border border-destructive/20 bg-destructive/5 p-2 text-xs text-destructive">
       <summary className="cursor-pointer list-none font-medium">
         <span className="block truncate">Error: {error}</span>
       </summary>
@@ -262,6 +279,49 @@ function toggleMultiSelectValue(current: string[], value: string, checked: boole
   return uniq(next);
 }
 
+function FilterChip({
+  checked,
+  children,
+}: {
+  checked: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition",
+        checked
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-foreground",
+      )}
+    >
+      {checked ? <Icon name="check" size={14} /> : null}
+      {children}
+    </span>
+  );
+}
+
+function FilterGroup({
+  legend,
+  children,
+  className,
+}: {
+  legend: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <fieldset className={cn("space-y-2", className)}>
+      <legend className="text-label-caps text-muted-foreground">{legend}</legend>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </fieldset>
+  );
+}
+
+function clearableFilterState() {
+  return { ...EMPTY_FILTER_STATE };
+}
+
 function getDetectedFormOptions(process: BusinessProcess | undefined, jobs: Job[] | undefined, selected: string[]) {
   const labelById = new Map<string, string>();
 
@@ -291,6 +351,8 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  const canRetryJobs = hasCapability(user?.roleLabel, "review:act");
 
   const filterState = useMemo(() => parseSearchParams(searchParams), [searchParams]);
   const [listPollingStartedAt, setListPollingStartedAt] = useState<string | null>(null);
@@ -413,18 +475,16 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
 
   if (processQuery.isError || !processQuery.data) {
     return (
-      <div className="mx-auto w-full max-w-7xl">
-        <ErrorCard
-          title="Could not load process jobs"
-          message="The business process or its job history could not be loaded. Please try again."
-          onRetry={() => {
-            void processQuery.refetch();
-            void jobsQuery.refetch();
-            void summaryQuery.refetch();
-            void unfilteredSummaryQuery.refetch();
-          }}
-        />
-      </div>
+      <ErrorCard
+        title="Could not load process jobs"
+        message="The business process or its job history could not be loaded. Please try again."
+        onRetry={() => {
+          void processQuery.refetch();
+          void jobsQuery.refetch();
+          void summaryQuery.refetch();
+          void unfilteredSummaryQuery.refetch();
+        }}
+      />
     );
   }
 
@@ -441,23 +501,21 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
 
   if (jobsQuery.isError || summaryQuery.isError || unfilteredSummaryQuery.isError) {
     return (
-      <div className="mx-auto w-full max-w-7xl">
-        <ErrorCard
-          title="Could not load job history"
-          message={
-            jobsQuery.isError
-              ? getErrorMessage(jobsQuery.error)
-              : summaryQuery.isError
-                ? getErrorMessage(summaryQuery.error)
-                : getErrorMessage(unfilteredSummaryQuery.error)
-          }
-          onRetry={() => {
-            void jobsQuery.refetch();
-            void summaryQuery.refetch();
-            void unfilteredSummaryQuery.refetch();
-          }}
-        />
-      </div>
+      <ErrorCard
+        title="Could not load job history"
+        message={
+          jobsQuery.isError
+            ? getErrorMessage(jobsQuery.error)
+            : summaryQuery.isError
+              ? getErrorMessage(summaryQuery.error)
+              : getErrorMessage(unfilteredSummaryQuery.error)
+        }
+        onRetry={() => {
+          void jobsQuery.refetch();
+          void summaryQuery.refetch();
+          void unfilteredSummaryQuery.refetch();
+        }}
+      />
     );
   }
 
@@ -476,111 +534,70 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
   const noMatches = !noJobsYet && summary.total === 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <section className="rounded-3xl border bg-background p-8 shadow-sm">
-        <div className="flex flex-col gap-4 border-b pb-6 lg:flex-row lg:items-start lg:justify-between">
+    <div className="flex w-full flex-col gap-6">
+      <section className="rounded-lg border bg-card p-4">
+        <div className="flex flex-col gap-4 border-b pb-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
             <Link
               href={`/processes/${processId}`}
               className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
             >
-              <ArrowLeft className="size-4" />
+              <Icon name="arrow_back" size={16} />
               Back to process detail
             </Link>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="text-label-caps text-muted-foreground">
               Process jobs
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight">{process.name}</h1>
+            <h1 className="text-headline-lg text-foreground">{process.name}</h1>
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
               Filter, review, and retry document inference jobs for this business process.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Button type="button" variant="outline" onClick={() => void jobsQuery.refetch()}>
-              <RefreshCcw className="size-4" />
+              <Icon name="sync" size={16} />
               Refresh jobs
             </Button>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <SummaryCard label="Total jobs" value={summary.total} />
-          <SummaryCard label="Needs review" value={summary.needsReview} />
-          <SummaryCard label="Failed" value={summary.failed} />
-          <SummaryCard label="Unclassified" value={summary.unclassified} />
-          <SummaryCard label="Estimated cost" value={formatCostUsd(summary.totalEstimatedCostUsd) ?? "$0.00"} />
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <KpiCard label="Total jobs" value={summary.total} caption="Matching current filters" />
+          <KpiCard label="Needs review" value={summary.needsReview} caption="Confidence exceptions" />
+          <KpiCard label="Failed" value={summary.failed} caption="Retry eligible" />
+          <KpiCard label="Unclassified" value={summary.unclassified} caption="No matching form" />
+          <KpiCard
+            label="Estimated cost"
+            value={formatCostUsd(summary.totalEstimatedCostUsd) ?? "$0.00"}
+            caption="Filtered total"
+          />
         </div>
       </section>
 
-      <section className="rounded-3xl border bg-background p-8 shadow-sm">
-        <div className="flex flex-col gap-4 border-b pb-6">
+      <section className="rounded-lg border bg-card">
+        <div className="flex flex-col gap-4 border-b p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold tracking-tight">Filters</h2>
-              <p className="text-sm text-muted-foreground">
-                All filters sync to the URL so this backlog view can be refreshed or shared.
-              </p>
-            </div>
+            <SectionHeader
+              title="Filters"
+              description="All filters sync to the URL so this backlog view can be refreshed or shared."
+            />
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() =>
-                updateFilters({
-                  status: [],
-                  detectedForm: [],
-                  hasViolations: false,
-                  reviewed: "any",
-                  unclassified: false,
-                  fileName: "",
-                  submittedFromDate: "",
-                  submittedToDate: "",
-                })
+                updateFilters(clearableFilterState())
               }
               disabled={!hasActiveFilters}
             >
+              <Icon name="filter_alt_off" size={16} />
               Clear filters
             </Button>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
-            <fieldset className="space-y-3">
-              <legend className="text-sm font-medium">Status</legend>
-              <div className="space-y-2">
-                {STATUS_OPTIONS.map((status) => (
-                  <label key={status} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={filterState.status.includes(status)}
-                      onChange={(event) => updateStatusFilter(status, event.target.checked)}
-                    />
-                    {status}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="space-y-3">
-              <legend className="text-sm font-medium">Detected form</legend>
-              <div className="max-h-44 space-y-2 overflow-auto rounded-2xl border p-3">
-                {detectedFormOptions.length > 0 ? (
-                  detectedFormOptions.map((option) => (
-                    <label key={option.value} className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={filterState.detectedForm.includes(option.value)}
-                        onChange={(event) => updateDetectedFormFilter(option.value, event.target.checked)}
-                      />
-                      {option.label}
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">No detected forms available yet.</p>
-                )}
-              </div>
-            </fieldset>
-
-            <div className="space-y-3">
-              <label htmlFor="file-name-filter" className="text-sm font-medium">
+          <div className="grid gap-4 xl:grid-cols-[minmax(16rem,1.2fr)_minmax(20rem,2fr)_minmax(14rem,1fr)]">
+            <div className="space-y-2">
+              <label htmlFor="file-name-filter" className="text-label-caps text-muted-foreground">
                 File name
               </label>
               <FileNameFilterInput
@@ -595,8 +612,23 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
               />
             </div>
 
-            <div className="space-y-3">
-              <label htmlFor="reviewed-filter" className="text-sm font-medium">
+            <FilterGroup legend="Status">
+              {STATUS_OPTIONS.map((status) => (
+                <label key={status} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    aria-label={status}
+                    checked={filterState.status.includes(status)}
+                    onChange={(event) => updateStatusFilter(status, event.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <FilterChip checked={filterState.status.includes(status)}>{status}</FilterChip>
+                </label>
+              ))}
+            </FilterGroup>
+
+            <div className="space-y-2">
+              <label htmlFor="reviewed-filter" className="text-label-caps text-muted-foreground">
                 Reviewed
               </label>
               <select
@@ -608,89 +640,124 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
                     reviewed: event.target.value as ReviewedFilter,
                   })
                 }
-                className="w-full rounded-2xl border bg-background px-3 py-2 text-sm"
+                className="h-9 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <option value="any">Any</option>
                 <option value="reviewed">Reviewed</option>
                 <option value="not-reviewed">Not reviewed</option>
               </select>
             </div>
+          </div>
 
-            <label className="flex items-center gap-2 rounded-2xl border p-4 text-sm">
-              <input
-                type="checkbox"
-                checked={filterState.hasViolations}
-                onChange={(event) =>
-                  updateFilters({
-                    ...filterState,
-                    hasViolations: event.target.checked,
-                  })
-                }
-              />
-              Needs review only
-            </label>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <FilterGroup legend="Detected form" className="min-w-0">
+              {detectedFormOptions.length > 0 ? (
+                detectedFormOptions.map((option) => (
+                  <label key={option.value} className="cursor-pointer">
+                    <input
+                      type="checkbox"
+                      aria-label={option.label}
+                      checked={filterState.detectedForm.includes(option.value)}
+                      onChange={(event) => updateDetectedFormFilter(option.value, event.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <FilterChip checked={filterState.detectedForm.includes(option.value)}>
+                      {option.label}
+                    </FilterChip>
+                  </label>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No detected forms available yet.</p>
+              )}
+            </FilterGroup>
 
-            <label className="flex items-center gap-2 rounded-2xl border p-4 text-sm">
-              <input
-                type="checkbox"
-                checked={filterState.unclassified}
-                onChange={(event) =>
-                  updateFilters({
-                    ...filterState,
-                    unclassified: event.target.checked,
-                  })
-                }
-              />
-              Unclassified only
-            </label>
-
-            <div className="space-y-3">
-              <label htmlFor="submitted-from-filter" className="text-sm font-medium">
-                Submitted from
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="cursor-pointer">
+                <input
+                  type="checkbox"
+                  aria-label="Needs review only"
+                  checked={filterState.hasViolations}
+                  onChange={(event) =>
+                    updateFilters({
+                      ...filterState,
+                      hasViolations: event.target.checked,
+                    })
+                  }
+                  className="peer sr-only"
+                />
+                <FilterChip checked={filterState.hasViolations}>
+                  <Icon name="flag" size={14} />
+                  Needs review only
+                </FilterChip>
               </label>
-              <input
-                id="submitted-from-filter"
-                type="date"
-                value={filterState.submittedFromDate}
-                onChange={(event) =>
-                  updateFilters({
-                    ...filterState,
-                    submittedFromDate: event.target.value,
-                  })
-                }
-                className="w-full rounded-2xl border bg-background px-3 py-2 text-sm"
-              />
-            </div>
 
-            <div className="space-y-3">
-              <label htmlFor="submitted-to-filter" className="text-sm font-medium">
-                Submitted to
+              <label className="cursor-pointer">
+                <input
+                  type="checkbox"
+                  aria-label="Unclassified only"
+                  checked={filterState.unclassified}
+                  onChange={(event) =>
+                    updateFilters({
+                      ...filterState,
+                      unclassified: event.target.checked,
+                    })
+                  }
+                  className="peer sr-only"
+                />
+                <FilterChip checked={filterState.unclassified}>
+                  <Icon name="help" size={14} />
+                  Unclassified only
+                </FilterChip>
               </label>
-              <input
-                id="submitted-to-filter"
-                type="date"
-                value={filterState.submittedToDate}
-                onChange={(event) =>
-                  updateFilters({
-                    ...filterState,
-                    submittedToDate: event.target.value,
-                  })
-                }
-                className="w-full rounded-2xl border bg-background px-3 py-2 text-sm"
-              />
+
+              <div className="space-y-2">
+                <label htmlFor="submitted-from-filter" className="text-label-caps text-muted-foreground">
+                  Submitted from
+                </label>
+                <Input
+                  id="submitted-from-filter"
+                  type="date"
+                  value={filterState.submittedFromDate}
+                  onChange={(event) =>
+                    updateFilters({
+                      ...filterState,
+                      submittedFromDate: event.target.value,
+                    })
+                  }
+                  className="h-9 bg-card"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="submitted-to-filter" className="text-label-caps text-muted-foreground">
+                  Submitted to
+                </label>
+                <Input
+                  id="submitted-to-filter"
+                  type="date"
+                  value={filterState.submittedToDate}
+                  onChange={(event) =>
+                    updateFilters({
+                      ...filterState,
+                      submittedToDate: event.target.value,
+                    })
+                  }
+                  className="h-9 bg-card"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {showingCappedResults ? (
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <div className="m-4 rounded-lg border border-warning-border bg-warning-surface p-3 text-sm text-warning-foreground">
             Showing first {jobs.length} of {summary.total} matching jobs — narrow your filters.
           </div>
         ) : null}
 
         {noJobsYet ? (
-          <div className="mt-6 rounded-3xl border border-dashed bg-muted/30 p-10 text-center">
-            <h3 className="text-xl font-semibold tracking-tight">No jobs yet for this process</h3>
+          <div className="m-4 rounded-lg border border-dashed bg-muted/30 p-10 text-center">
+            <h3 className="text-headline-md text-foreground">No jobs yet for this process</h3>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
               Upload a document from the process detail screen to start building this job history.
             </p>
@@ -701,8 +768,8 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
             </div>
           </div>
         ) : noMatches ? (
-          <div className="mt-6 rounded-3xl border border-dashed bg-muted/30 p-10 text-center">
-            <h3 className="text-xl font-semibold tracking-tight">No jobs match these filters</h3>
+          <div className="m-4 rounded-lg border border-dashed bg-muted/30 p-10 text-center">
+            <h3 className="text-headline-md text-foreground">No jobs match these filters</h3>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
               Try broadening the filters or clear them to return to the full job history.
             </p>
@@ -710,16 +777,7 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
               <Button
                 type="button"
                 onClick={() =>
-                  updateFilters({
-                    status: [],
-                    detectedForm: [],
-                    hasViolations: false,
-                    reviewed: "any",
-                    unclassified: false,
-                    fileName: "",
-                    submittedFromDate: "",
-                    submittedToDate: "",
-                  })
+                  updateFilters(clearableFilterState())
                 }
               >
                 Clear filters
@@ -727,58 +785,57 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
             </div>
           </div>
         ) : (
-          <div className="mt-6 overflow-hidden rounded-3xl border">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-left text-sm">
-                <thead className="bg-muted/40 text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-3 font-medium">File name</th>
-                    <th className="px-4 py-3 font-medium">Submitted</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Detected form</th>
-                    <th className="px-4 py-3 font-medium">Field count</th>
-                    <th className="px-4 py-3 font-medium">Confidence</th>
-                    <th className="px-4 py-3 font-medium">Est. cost</th>
-                    <th className="px-4 py-3 font-medium">Needs review</th>
-                    <th className="px-4 py-3 font-medium">Reviewed</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border bg-background">
+          <div className="overflow-hidden">
+            <Table className="min-w-[1080px]">
+                <TableHeader className="bg-muted/50">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">File name</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Submitted</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Status</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Detected form</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Field count</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Confidence</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Est. cost</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Needs review</TableHead>
+                    <TableHead className="h-9 px-3 text-label-caps text-muted-foreground">Reviewed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="bg-card">
                   {jobs.map((job) => {
                     const interactive = job.status === "succeeded";
                     const needsReview = Boolean(job.confidenceViolations && job.confidenceViolations.length > 0);
 
                     return (
-                      <tr
+                      <TableRow
                         key={job.id}
                         tabIndex={interactive ? 0 : undefined}
                         role={interactive ? "link" : undefined}
                         className={cn(
                           "align-top",
-                          interactive ? "cursor-pointer hover:bg-muted/20 focus:bg-muted/20 focus:outline-none" : "",
+                          interactive ? "cursor-pointer focus:bg-muted/50 focus:outline-none" : "",
                         )}
                         onClick={interactive ? () => onJobActivate(job) : undefined}
                         onKeyDown={interactive ? (event) => onJobKeyDown(event, job) : undefined}
                       >
-                        <td className="px-4 py-4">
-                          <div className="space-y-2">
+                        <TableCell className="max-w-[18rem] px-3 py-3 align-top">
+                          <div className="space-y-1.5">
                             <p className="font-medium text-foreground">{job.fileName}</p>
                             {job.unclassified ? (
-                              <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">
+                              <span className="inline-flex rounded-full border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                 No matching form
                               </span>
                             ) : null}
                             {job.status === "failed" && job.error ? <FailedJobError error={job.error} /> : null}
                           </div>
-                        </td>
-                        <td className="px-4 py-4 text-muted-foreground">{formatDateTime(job.submittedAt)}</td>
-                        <td className="px-4 py-4">
-                          <div className="space-y-3">
+                        </TableCell>
+                        <TableCell className="px-3 py-3 text-muted-foreground">{formatDateTime(job.submittedAt)}</TableCell>
+                        <TableCell className="px-3 py-3 align-top">
+                          <div className="space-y-2">
                             <JobStatusBadge status={job.status} />
                             {job.status === "queued" || job.status === "running" ? (
                               <ProcessingIndicator status={job.status} />
                             ) : null}
-                            {job.status === "failed" ? (
+                            {job.status === "failed" && canRetryJobs ? (
                               <Button
                                 type="button"
                                 variant="outline"
@@ -793,33 +850,32 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
                               </Button>
                             ) : null}
                           </div>
-                        </td>
-                        <td className="px-4 py-4 text-muted-foreground">{formatDetectedForm(job)}</td>
-                        <td className="px-4 py-4 text-muted-foreground">{job.fieldCount ?? 0}</td>
-                        <td className="px-4 py-4">
+                        </TableCell>
+                        <TableCell className="px-3 py-3 text-muted-foreground">{formatDetectedForm(job)}</TableCell>
+                        <TableCell className="px-3 py-3 text-muted-foreground tabular-figures">{job.fieldCount ?? 0}</TableCell>
+                        <TableCell className="px-3 py-3">
                           <AverageConfidenceValue averageConfidence={job.averageConfidence} />
-                        </td>
-                        <td className="px-4 py-4">
+                        </TableCell>
+                        <TableCell className="px-3 py-3">
                           <EstimatedCostValue estimatedCostUsd={job.estimatedCostUsd} />
-                        </td>
-                        <td className="px-4 py-4">
+                        </TableCell>
+                        <TableCell className="px-3 py-3">
                           <NeedsReviewBadge show={needsReview} />
-                        </td>
-                        <td className="px-4 py-4">
+                        </TableCell>
+                        <TableCell className="px-3 py-3">
                           <ReviewedIndicator reviewedAt={job.reviewedAt} />
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+            </Table>
           </div>
         )}
 
         {listPollingStartedAt ? (
-          <div className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
-            <AlertCircle className="size-3.5" />
+          <div className="m-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <Icon name="info" size={14} />
             Live updates are active while queued or running jobs remain in this view.
           </div>
         ) : null}

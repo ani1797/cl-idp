@@ -1,0 +1,343 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-tint": "#b61f35",
+        "surface-container-low": "#f6f4e9",
+        "inverse-surface": "#31312a",
+        "tertiary-container": "#674c00",
+        "on-secondary-fixed-variant": "#004f4f",
+        "on-tertiary-container": "#eabd55",
+        "on-tertiary-fixed": "#251a00",
+        "on-surface": "#1c1c16",
+        "surface": "#fcf9ef",
+        "tertiary-fixed": "#ffdf9d",
+        "on-background": "#1c1c16",
+        "on-primary-fixed-variant": "#920022",
+        "background": "#fcf9ef",
+        "surface-container-highest": "#e5e3d8",
+        "outline": "#8e706f",
+        "inverse-on-surface": "#f3f1e6",
+        "surface-bright": "#fcf9ef",
+        "on-tertiary-fixed-variant": "#5b4300",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed": "#ffdad9",
+        "surface-variant": "#e5e3d8",
+        "tertiary-fixed-dim": "#eec058",
+        "on-primary": "#ffffff",
+        "on-secondary": "#ffffff",
+        "primary-container": "#a20a29",
+        "on-primary-fixed": "#400009",
+        "error": "#ba1a1a",
+        "on-secondary-fixed": "#002020",
+        "on-primary-container": "#ffaeae",
+        "primary-fixed-dim": "#ffb3b3",
+        "tertiary": "#4b3600",
+        "secondary-container": "#91efef",
+        "surface-container": "#f0eee3",
+        "on-error-container": "#93000a",
+        "surface-container-high": "#ebe8de",
+        "secondary-fixed": "#94f2f2",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "primary": "#79001a",
+        "outline-variant": "#e2bebd",
+        "on-secondary-container": "#006e6e",
+        "surface-dim": "#dcdad0",
+        "secondary": "#006a6a",
+        "on-error": "#ffffff",
+        "inverse-primary": "#ffb3b3",
+        "on-surface-variant": "#5a4040",
+        "secondary-fixed-dim": "#77d6d5"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "gutter": "16px",
+        "base": "4px",
+        "container-max-width": "1440px",
+        "margin": "24px"
+      },
+      "fontFamily": {
+        "tabular-nums": ["\"Source Sans 3\""],
+        "headline-md": ["Public Sans"],
+        "body-md": ["\"Source Sans 3\""],
+        "headline-lg": ["Public Sans"],
+        "label-caps": ["Public Sans"]
+      },
+      "fontSize": {
+        "tabular-nums": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+      }
+    }
+  }
+}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-primary-container text-on-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 w-full px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-base"><img alt="Brand logo. - Primary color: #a20a29
+- Font: publicSans
+- Mode: light
+- Roundness: rounded-md
+- Style: ## Brand &amp; Style
+The Canada Life IDP (Intelligent Document Processing) platform is an internal enterprise SaaS console designed for financial services professionals. The visual language is grounded in trustworthiness, precision, and regulatory calm. It avoids marketing-oriented flourishes in favor of a &quot;governance software&quot; aesthetic that remains unmistakably aligned with Canada Life's corporate identity.
+
+The style is **Corporate / Modern**, emphasizing high information density, structural clarity, and brand-authentic color application. It prioritizes functional utility for data-heavy tasks like forensic reviews and audit ledger management.
+
+## Layout &amp; Spacing
+The system uses a precise grid-based layout designed for enterprise efficiency.
+
+- **Grid Model**: A 12-column fluid grid on desktop, shifting to 4 columns on mobile.
+- **Density**: Compact spacing is preferred to maximize the information visible above the fold in document review screens.
+- **Chrome**: 
+  - **Top Bar**: Persistent navigation with a brand-colored background (`#A20A29` or `#36362F`).
+  - **Left Rail**: Icon-driven navigation where the active state is marked by a maroon left-border accent.
+- **Bilingual Support**: All layouts must account for varying string lengths between English and French, especially in navigation and button labels.
+
+## Elevation &amp; Depth
+Depth is used sparingly to maintain the &quot;flat&quot; professional feel of financial software.
+
+- **Tonal Layering**: UI depth is primarily communicated through color (white cards on off-white backgrounds) rather than heavy shadows.
+- **Outlines**: 1px hairline borders in low-contrast neutral tones define boundaries for inputs and containers.
+- **Shadows**: Soft, subtle shadows are reserved only for elevated temporal surfaces such as modals, dropdown menus, and the sticky footer used for reviewer actions.
+- **OCR Overlays**: Bounding boxes use a 40% fill opacity of the semantic color with a solid 2px outline for clarity against document backgrounds.
+
+## Components
+- **Buttons**: Primary buttons use Shiraz Maroon; secondary buttons use Deep Teal or outlined styles.
+- **Confidence Badges**: Pill-shaped components displaying a percentage and an icon. Colors must strictly follow the semantic bands (`#1E7B4D`, `#B08824`, `#A20A29`).
+- **Input Fields**: 8px rounded corners with hairline borders. Focus states use the brand maroon.
+- **Sliders**: Confidence threshold sliders use a maroon filled track and a teal marker to indicate the recommended baseline.
+- **Environment Badges**: Solid maroon for PRODUCTION; outlined neutral for SANDBOX.
+- **OCR Overlays**: 2px solid outlines with 40% semi-transparent fills, mapped 1:1 to the confidence badge colors.
+- **Navigation**: Left rail items use a vertical 4px maroon border-left for the active state.
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><span class="font-headline-md text-headline-md tracking-tight ml-base select-none whitespace-nowrap">Intelligent Document Processing</span><span class="ml-gutter inline-flex items-center px-base py-0.5 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase">PRODUCTION</span></div><div class="flex-1 max-w-lg mx-gutter"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-on-surface-variant pointer-events-none text-base">search</span><input class="w-full pl-9 pr-4 py-1.5 rounded-lg bg-surface text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-secondary" placeholder="Search by Document ID, Batch, or Policyholder..." type="search"></div></div><div class="flex items-center gap-gutter"><button class="font-label-caps text-label-caps tracking-wider px-base py-1 rounded hover:bg-primary transition-colors text-on-primary select-none" type="button">EN | FR</button><button class="p-1.5 rounded-full hover:bg-primary text-on-primary transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-xl">notifications</span></button><div class="flex items-center gap-base pl-base"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XaV9hK0paL3GVjPHY_80SPHkUOFd70wmWTMhnFZEEneTfeu9K67GhrK5B5Kf8rFNL0isEDDNWJphV1trTf04edaUyS0Lp9U08dOTWZ_LnD64eQIPFVd8rWrVUxNBdSfOBhVIP_1bvAW7f3s1-Zvytf8cs94KlXKLL-6N7QTer066FXyk-et0iHnWVwVI_5_8T9sFzDvGFT-33ey5ude8YW_dnBU2nMz5iNLhQMlNlRwhbtm5tWCAi7kYsr"><div class="flex flex-col text-left leading-none"><span class="font-headline-md text-body-md text-on-primary font-semibold">Marc-André Tremblay</span><span class="font-label-caps text-label-caps text-on-primary-container tracking-wider uppercase mt-0.5">IT Admin</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-40 flex flex-col justify-between py-margin shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><nav class="flex flex-col gap-1" data-active-classes="border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold"><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-headline-md text-body-md">Dashboard</span></a><a aria-current="page" class="flex items-center gap-gutter px-margin py-2.5 transition-colors border-l-4 border-primary-container bg-surface-container-high text-on-surface font-semibold" data-path="processes" href="#"><span class="material-symbols-outlined">account_tree</span><span class="font-headline-md text-body-md">Processes</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="form-model" href="#"><span class="material-symbols-outlined">description</span><span class="font-headline-md text-body-md">Form Model</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="review-queue" href="#"><span class="material-symbols-outlined">rate_review</span><span class="font-headline-md text-body-md">Review Queue</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="api-and-integrations" href="#"><span class="material-symbols-outlined">integration_instructions</span><span class="font-headline-md text-body-md">API &amp; Integrations</span></a><a class="flex items-center gap-gutter px-margin py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined">settings</span><span class="font-headline-md text-body-md">Settings</span></a></nav><div class="flex flex-col gap-1 px-margin pt-gutter"><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="#"><span class="material-symbols-outlined text-lg">menu_book</span><span class="font-body-md text-body-md">Docs</span></a><a class="flex items-center gap-gutter py-2 text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#"><span class="material-symbols-outlined text-lg">help</span><span class="font-body-md text-body-md">Support</span></a></div></aside><div class="pl-64"><main class="relative pt-16 w-full min-h-screen bg-surface px-margin"><div class="flex flex-col w-full pb-28">
+<!-- Sub-Header & Breadcrumb Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-base py-margin">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-base text-on-surface-variant font-label-caps text-label-caps">
+<a class="flex items-center gap-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+<span class="">Back to Processes</span>
+</a>
+<span class="text-outline">/</span>
+<span class="text-on-surface">Onboard New Process</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary font-label-caps text-label-caps tracking-wider">PIPELINE DRAFT #8820</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-on-surface">Onboard New Process Pipeline</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+        Attach and configure specialized machine learning document extraction models to parse inbound claim documents, receipts, and supporting invoices.
+      </p>
+</div>
+<div class="flex items-center gap-base self-start md:self-center shrink-0">
+<button class="px-gutter py-2 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-headline-md text-body-md flex items-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-lg">save</span>
+<span class="">Save Draft</span>
+</button>
+<button class="px-gutter py-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors font-headline-md text-body-md" type="button">
+        Exit to Processes
+      </button>
+</div>
+</div>
+<!-- Wizard 4-Stage Stepper -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-margin shadow-sm mb-margin">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter relative">
+<!-- Stage 01: Completed -->
+<div class="flex items-center gap-base bg-surface-container-low/70 rounded-lg p-3">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider flex items-center gap-1">
+            Stage 01 • Completed
+          </span>
+<span class="font-headline-md text-body-md text-on-surface truncate">The Basics</span>
+</div>
+</div>
+<!-- Stage 02: Active -->
+<div class="flex items-center gap-base bg-primary-container text-on-primary rounded-lg p-3 shadow-md relative overflow-hidden">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest text-primary-container font-headline-md flex items-center justify-center shrink-0">
+          2
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-primary-container uppercase tracking-wider">
+            Stage 02 • Active
+          </span>
+<span class="font-headline-md text-body-md text-on-primary font-semibold truncate">Attached Form Models</span>
+</div>
+<div class="absolute right-2 -bottom-2 text-on-primary/10 select-none pointer-events-none">
+<span class="material-symbols-outlined text-5xl">description</span>
+</div>
+</div>
+<!-- Stage 03: Pending -->
+<div class="flex items-center gap-base bg-surface-container-low/40 rounded-lg p-3 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant font-headline-md flex items-center justify-center shrink-0">
+          3
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
+            Stage 03
+          </span>
+<span class="font-headline-md text-body-md text-on-surface-variant truncate">HITL Thresholds</span>
+</div>
+</div>
+<!-- Stage 04: Pending -->
+<div class="flex items-center gap-base bg-surface-container-low/40 rounded-lg p-3 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant font-headline-md flex items-center justify-center shrink-0">
+          4
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
+            Stage 04
+          </span>
+<span class="font-headline-md text-body-md text-on-surface-variant truncate">Confirm &amp; Deploy</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Dual-Column Grid -->
+<div class="grid grid-cols-12 gap-margin">
+<!-- Main Configuration Column (8 Cols) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-margin">
+<!-- Section 1: Form Models Selection -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm flex flex-col gap-gutter"><div class="flex items-start justify-between flex-wrap gap-base"><div><div class="flex items-center gap-base"><span class="material-symbols-outlined text-primary-container text-xl">token</span><h2 class="font-headline-md text-headline-md text-on-surface">Primary Form Model Assignment</h2></div><p class="font-body-md text-body-md text-on-surface-variant mt-1">Select and configure specialized AI classifiers and schema extractors for <span class="font-semibold text-on-surface">Group Health &amp; Dental Claim Adjudication</span> (<span class="font-mono text-primary font-semibold">PROC-GH-8820</span>).</p></div><span class="px-base py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps">3 Models Attached</span></div><div class="flex flex-col gap-base bg-surface-container-low p-3 rounded-xl"><div class="flex flex-col md:flex-row items-center gap-base"><div class="relative flex-1 w-full"><span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-base">search</span><input class="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Search form models to attach (e.g. claim forms, tax slips, receipts)..." type="search"></div><button class="w-full md:w-auto px-margin py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors font-headline-md text-body-md flex items-center justify-center gap-1 shrink-0 shadow-sm" type="button"><span class="material-symbols-outlined text-base">add</span><span class="">Attach Model</span></button></div><div class="flex items-center gap-base flex-wrap pt-1"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase mr-1">Filter:</span><button class="px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-caps text-label-caps transition-colors" type="button">All Models (3)</button><button class="px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps transition-colors" type="button">Prebuilt (Certified)</button><button class="px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps transition-colors" type="button">Custom (Trained)</button></div></div><div class="bg-surface-container-low rounded-xl p-gutter shadow-sm transition-all hover:shadow-md"><div class="flex items-start justify-between gap-gutter"><div class="flex items-start gap-gutter"><div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm"><span class="material-symbols-outlined text-2xl">medical_services</span></div><div class="flex flex-col gap-1"><div class="flex items-center gap-base flex-wrap"><span class="font-headline-md text-headline-md text-on-surface">CL-CLAIM-04 • Standard Group Health Claim</span><span class="px-2 py-0.5 rounded bg-primary-fixed text-primary font-label-caps text-label-caps">PRIMARY</span><span class="px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-sm">verified</span> Prebuilt (Certified)</span><span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">v2.4</span></div><p class="font-body-md text-body-md text-on-surface-variant">Parses multi-page standard Canadian health benefit submissions, member details, health plan codes, and attending physician blocks.</p></div></div><div class="flex items-center gap-base shrink-0"><label class="relative inline-flex items-center cursor-pointer" title="Active Model"><input checked="" class="sr-only peer" type="checkbox"><div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div></label><button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="Remove Model" type="button"><span class="material-symbols-outlined text-xl">close</span></button></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-base mt-gutter pt-gutter bg-surface-container rounded-lg p-3"><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extracted Fields</span><span class="font-headline-md text-body-md font-semibold text-on-surface">24 Attributes</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extraction Engine</span><span class="font-body-md text-body-md text-on-surface">Key-Value + Table Matrix</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Last Retrained</span><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">2025-02-14 (CL-SOV)</span></div></div></div><div class="bg-surface-container-low rounded-xl p-gutter shadow-sm transition-all hover:shadow-md"><div class="flex items-start justify-between gap-gutter"><div class="flex items-start gap-gutter"><div class="w-10 h-10 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-2xl">dentistry</span></div><div class="flex flex-col gap-1"><div class="flex items-center gap-base flex-wrap"><span class="font-headline-md text-headline-md text-on-surface">CL-DENT-02 • Dental Service Claim &amp; Invoicing</span><span class="px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-sm">verified</span> Prebuilt (Certified)</span><span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">v1.9</span></div><p class="font-body-md text-body-md text-on-surface-variant">ODA/CDA procedure codes, tooth surface nomenclature, specialist referral breakdown, and split fee table matrix.</p></div></div><div class="flex items-center gap-base shrink-0"><label class="relative inline-flex items-center cursor-pointer" title="Active Model"><input checked="" class="sr-only peer" type="checkbox"><div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div></label><button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="Remove Model" type="button"><span class="material-symbols-outlined text-xl">close</span></button></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-base mt-gutter pt-gutter bg-surface-container rounded-lg p-3"><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extracted Fields</span><span class="font-headline-md text-body-md font-semibold text-on-surface">18 Attributes</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extraction Engine</span><span class="font-body-md text-body-md text-on-surface">Hierarchical Tables</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Last Retrained</span><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">2025-01-28</span></div></div></div><div class="bg-surface-container-low rounded-xl p-gutter shadow-sm transition-all hover:shadow-md"><div class="flex items-start justify-between gap-gutter"><div class="flex items-start gap-gutter"><div class="w-10 h-10 rounded-lg bg-surface-container-high text-tertiary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-2xl">receipt_long</span></div><div class="flex flex-col gap-1"><div class="flex items-center gap-base flex-wrap"><span class="font-headline-md text-headline-md text-on-surface">CL-RECEIPT-08 • Standard Medical &amp; Pharmacy Receipt</span><span class="px-2 py-0.5 rounded bg-tertiary-fixed-dim text-on-surface font-label-caps text-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-sm">build</span> Custom (Trained)</span><span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">v3.1</span></div><p class="font-body-md text-body-md text-on-surface-variant">Thermal receipts, DIN pharmacy logs, co-pay tax breakdowns, register totals, and practitioner stamp reconciliation.</p></div></div><div class="flex items-center gap-base shrink-0"><label class="relative inline-flex items-center cursor-pointer" title="Active Model"><input checked="" class="sr-only peer" type="checkbox"><div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div></label><button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="Remove Model" type="button"><span class="material-symbols-outlined text-xl">close</span></button></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-base mt-gutter pt-gutter bg-surface-container rounded-lg p-3"><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extracted Fields</span><span class="font-headline-md text-body-md font-semibold text-on-surface">12 Attributes</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Extraction Engine</span><span class="font-body-md text-body-md text-on-surface">Line-Item Sequence</span></div><div><span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Last Retrained</span><span class="font-tabular-nums text-tabular-nums text-on-surface-variant">2025-02-02</span></div></div></div><button class="w-full py-3 px-gutter rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors text-primary flex items-center justify-center gap-base font-headline-md text-body-md" type="button"><span class="material-symbols-outlined text-lg">add_circle</span><span class="">Attach Additional Model from Catalog</span></button></div>
+<!-- Section 2: Pre-Processing & Routing Rules -->
+
+</div>
+<!-- Right Column / Pipeline Summary Rail (4 Cols) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-margin">
+<!-- Topology Card -->
+<div class="bg-surface-container-lowest rounded-xl p-margin shadow-sm flex flex-col gap-gutter">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary-container">schema</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Stage 02 Topology</h3>
+</div>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+</div>
+<!-- Topology Flow Mini Visualization -->
+<div class="bg-surface-container-low rounded-lg p-gutter flex flex-col gap-gutter">
+<div class="flex items-center justify-between text-on-surface-variant font-label-caps text-label-caps">
+<span class="">PIPELINE FLOW</span>
+<span class="text-secondary font-bold">LIVE PREVIEW</span>
+</div>
+<!-- Flow Diagram -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-base p-2 rounded bg-surface-container text-on-surface">
+<span class="material-symbols-outlined text-base text-primary">input</span>
+<span class="font-headline-md text-body-md font-semibold">Inbound Queue</span>
+<span class="ml-auto font-label-caps text-label-caps text-on-surface-variant">PDF / TIFF</span>
+</div>
+<div class="flex justify-center text-outline">
+<span class="material-symbols-outlined text-sm">south</span>
+</div>
+<div class="flex items-center gap-base p-2 rounded bg-primary-container text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-base">call_split</span>
+<span class="font-headline-md text-body-md font-semibold">Multi-Doc Page Splitter</span>
+<span class="ml-auto font-label-caps text-label-caps text-on-primary-container">v2.1</span>
+</div>
+<div class="flex justify-center text-outline">
+<span class="material-symbols-outlined text-sm">south</span>
+</div>
+<!-- Multi-model Branching Box -->
+<div class="p-2.5 rounded-lg bg-surface-container flex flex-col gap-1.5">
+<span class="font-label-caps text-label-caps text-on-surface-variant">MODEL DISPATCH ENSEMBLE</span>
+<div class="flex items-center justify-between text-on-surface text-body-md">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> CL-CLAIM-04</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold">98.2%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface text-body-md">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> CL-DENT-02</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold">96.8%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface text-body-md">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> CL-RECEIPT-08</span>
+<span class="font-tabular-nums text-tabular-nums font-semibold">97.4%</span>
+</div>
+</div>
+<div class="flex justify-center text-outline">
+<span class="material-symbols-outlined text-sm">south</span>
+</div>
+<div class="flex items-center gap-base p-2 rounded bg-surface-container-high text-on-surface-variant opacity-80">
+<span class="material-symbols-outlined text-base">fact_check</span>
+<span class="font-headline-md text-body-md font-semibold">Stage 03: HITL Verification</span>
+<span class="ml-auto font-label-caps text-label-caps text-outline">NEXT</span>
+</div>
+</div>
+</div>
+<!-- Summary Metrics List -->
+<div class="flex flex-col gap-base">
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Attached Models</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">3 Active Models</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Total Fields Tracked</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">54 Structured Fields</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Boundary Classification</span>
+<span class="font-headline-md text-body-md font-semibold text-secondary">Automated Multi-Doc</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Pipeline Identity</span>
+<span class="font-mono text-primary font-bold">PROC-GH-8820</span>
+</div>
+</div>
+</div>
+<!-- Compliance & Governance Card -->
+
+<!-- Quick Help & Documentation Note -->
+<div class="bg-surface-container-low rounded-xl p-gutter flex items-start gap-gutter shadow-sm">
+<span class="material-symbols-outlined text-primary-container text-2xl shrink-0 mt-0.5">info</span>
+<div class="flex flex-col gap-1">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Need a custom form schema?</span>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            You can train and test custom field models under the Form Model studio tab before attaching them here.
+          </p>
+<a class="text-primary font-headline-md text-body-md font-semibold hover:underline mt-1 inline-flex items-center gap-1" href="#">
+            Open Model Studio <span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Footer Bar -->
+<div class="fixed bottom-0 left-64 right-0 z-40 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.06)] px-margin py-3 flex items-center justify-between gap-gutter">
+<!-- Footer Left: Save Status -->
+<div class="flex items-center gap-base">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+<span class="font-body-md text-body-md text-on-surface-variant">Draft saved 1 min ago</span>
+<span class="mx-1 text-outline-variant">•</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">AUTO-SYNC ENABLED</span>
+</div>
+<!-- Footer Middle: Draft Utilities -->
+<div class="hidden sm:flex items-center gap-base">
+<button class="px-gutter py-2 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-headline-md text-body-md flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-base">save</span>
+<span class="">Save Draft</span>
+</button>
+<button class="px-gutter py-2 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-headline-md text-body-md flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-base">bookmark</span>
+<span class="">Save as Template</span>
+</button>
+</div>
+<!-- Footer Right: Step Navigation CTAs -->
+<div class="flex items-center gap-gutter">
+<button class="px-gutter py-2 rounded-lg bg-surface-container-highest text-on-surface hover:bg-surface-dim transition-colors font-headline-md text-body-md flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+<span class="">Back to Stage 01: The Basics</span>
+</button>
+<button class="px-margin py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary transition-all font-headline-md text-body-md flex items-center gap-base shadow-sm hover:shadow-md" type="button">
+<span class="">Continue to Stage 03: HITL Thresholds</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

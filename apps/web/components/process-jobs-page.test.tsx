@@ -4,7 +4,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProcessJobsPage } from "@/components/process-jobs-page";
-import { renderWithQueryClient } from "@/components/test-utils";
+import { renderWithSession } from "@/components/test-utils";
 import {
   api,
   type BusinessProcess,
@@ -123,7 +123,7 @@ const baseJob: Job = {
 };
 
 function renderPage() {
-  return renderWithQueryClient(<ProcessJobsPage processId="process-1" />);
+  return renderWithSession(<ProcessJobsPage processId="process-1" />);
 }
 
 function mockSummaryResponses(filtered: JobsSummary, unfiltered = filtered) {

@@ -1,0 +1,537 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { colors: { 'on-tertiary-fixed': '#251a00', 'primary': '#79001a', 'on-primary-fixed': '#400009', 'error-container': '#ffdad6', 'on-primary-container': '#ffaeae', 'tertiary-fixed-dim': '#eec058', 'on-secondary': '#ffffff', 'tertiary': '#4b3600', 'tertiary-container': '#674c00', 'background': '#fcf9ef', 'surface-tint': '#b61f35', 'primary-fixed': '#ffdad9', 'inverse-surface': '#31312a', 'on-error-container': '#93000a', 'inverse-on-surface': '#f3f1e6', 'secondary-fixed-dim': '#77d6d5', 'on-background': '#1c1c16', 'on-surface-variant': '#5a4040', 'surface-bright': '#fcf9ef', 'on-primary': '#ffffff', 'surface-container-highest': '#e5e3d8', 'primary-fixed-dim': '#ffb3b3', 'on-surface': '#1c1c16', 'surface-container-high': '#ebe8de', 'secondary-container': '#91efef', 'secondary': '#006a6a', 'inverse-primary': '#ffb3b3', 'on-secondary-fixed-variant': '#004f4f', 'outline-variant': '#e2bebd', 'on-tertiary-fixed-variant': '#5b4300', 'surface-dim': '#dcdad0', 'surface-variant': '#e5e3d8', 'surface-container-lowest': '#ffffff', 'on-secondary-container': '#006e6e', 'surface': '#fcf9ef', 'on-error': '#ffffff', 'on-primary-fixed-variant': '#920022', 'on-tertiary': '#ffffff', 'surface-container': '#f0eee3', 'secondary-fixed': '#94f2f2', 'surface-container-low': '#f6f4e9', 'tertiary-fixed': '#ffdf9d', 'outline': '#8e706f', 'primary-container': '#a20a29', 'on-secondary-fixed': '#002020', 'on-tertiary-container': '#eabd55', 'error': '#ba1a1a' }, borderRadius: { 'DEFAULT': '0.25rem', 'lg': '0.5rem', 'xl': '0.75rem', 'full': '9999px' }, spacing: { 'margin': '24px', 'base': '4px', 'gutter': '16px', 'container-max-width': '1440px' }, fontFamily: { 'headline-md': ['Public Sans'], 'label-caps': ['Public Sans'], 'tabular-nums': ['"Source Sans 3"'], 'body-md': ['"Source Sans 3"'], 'headline-lg': ['Public Sans'] }, fontSize: { 'headline-md': ['20px', { lineHeight: '28px', fontWeight: '600' }], 'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '700' }], 'tabular-nums': ['14px', { lineHeight: '20px', fontWeight: '400' }], 'body-md': ['14px', { lineHeight: '20px', fontWeight: '400' }], 'headline-lg': ['24px', { lineHeight: '32px', fontWeight: '600' }] } } } }</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-gutter flex items-center justify-between gap-gutter"><div class="flex items-center gap-base"><img alt="Canada Life IDP Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Urph2Pu2K4pbVmpgnEC635-Uo0pq9TPZvdJyaYRczbdchcfKc-7kiUMJKyzRT2Jo9JeyfqSZNaw3eV7t0fd2nqV0WzMyaSP2VWBRt_ci32obTF6iSlCER6pGXPztDJ0yzXIWmct49zylcqUC2doDXnhFOLMSEiyVIVhQVZZOfAS86wTA-iM6oaqltKt5zMFvTFL4N1Ft28RORFKrLRxnUW0LMR7kuHEZRsPBG74xVkEyulwvLqGbrEDVPO"><div class="flex flex-col ml-base"><span class="font-headline-md text-headline-md font-bold tracking-tight text-primary leading-none">Canada Life</span><span class="font-label-caps text-label-caps uppercase text-on-surface-variant">IDP Console</span></div></div><div class="hidden md:flex items-center gap-gutter flex-1 max-w-2xl mx-margin"><div class="flex items-center gap-base"><span class="inline-flex items-center px-base py-0.5 rounded text-label-caps font-label-caps bg-primary-container text-on-primary">PRODUCTION</span><div class="flex items-center gap-base px-base py-0.5 bg-surface-container rounded"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Healthy</span></div></div><div class="relative flex-1"><span class="material-symbols-outlined absolute left-base top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">search</span><input class="w-full pl-8 pr-base py-1 bg-surface-container-low rounded-lg text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:bg-surface-container-lowest transition-colors" placeholder="Search document ID, batch, or policyholder..." type="text"></div></div><div class="flex items-center gap-gutter shrink-0"><div class="flex items-center bg-surface-container rounded-lg p-0.5 font-label-caps text-label-caps"><button class="px-base py-0.5 rounded bg-surface-container-lowest font-bold text-on-surface shadow-[0_1px_4px_rgba(0,0,0,0.04)]">EN</button><button class="px-base py-0.5 rounded text-on-surface-variant hover:text-on-surface transition-colors">FR</button></div><div class="relative flex items-center"><button aria-label="Notifications" class="p-base rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span></button></div><div class="h-8 w-px bg-surface-container-highest"></div><div class="flex items-center gap-base"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw1OU2Xr0KiQe-SOhqintUwqTA3HXqTH3_6AtL5cbwLsvEtWg_FPexmMtcOJiotEhdLefCS2uV-fyS9zSaJoPZXAQWg3ySx83Dn9OTujTtDiEII6fxxE8ob39yJ4JPKlDhSDQ6o3NXy8BCxkH28zyO4iD_8R8mofxFVzqVBtlIXzkbhW3B3k_Ygtrb5QnOKz4_qyW9mv_LFOH-vd04WfCnjKOWsY_hEiAstOVkZa-3YfOPyGBEb28FUQ"><div class="hidden lg:flex flex-col text-left"><span class="font-headline-md text-body-md font-semibold text-on-surface leading-tight">Marc-André Tremblay</span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">IT Admin</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-30 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="py-margin flex flex-col gap-base"><div class="px-margin mb-base"><span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Navigation</span></div><nav class="flex flex-col" data-active-classes="bg-surface-container-high text-primary font-bold border-l-4 border-primary-container"><a aria-current="page" class="flex items-center gap-base px-margin py-base transition-colors bg-surface-container-high text-primary font-bold border-l-4 border-primary-container" data-path="dashboard" href="#"><span class="material-symbols-outlined text-xl">dashboard</span><span class="font-body-md text-body-md">Dashboard</span></a><a class="flex items-center gap-base px-margin py-base text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="processes" href="#"><span class="material-symbols-outlined text-xl">account_tree</span><span class="font-body-md text-body-md">Processes</span></a><a class="flex items-center gap-base px-margin py-base text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="form-model" href="#"><span class="material-symbols-outlined text-xl">description</span><span class="font-body-md text-body-md">Form Model</span></a><a class="flex items-center gap-base px-margin py-base text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="review-queue" href="#"><span class="material-symbols-outlined text-xl">rule</span><span class="font-body-md text-body-md">Review Queue</span></a><a class="flex items-center gap-base px-margin py-base text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="api-integrations" href="#"><span class="material-symbols-outlined text-xl">hub</span><span class="font-body-md text-body-md">API &amp; Integrations</span></a><a class="flex items-center gap-base px-margin py-base text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-xl">settings</span><span class="font-body-md text-body-md">Settings</span></a></nav></div><div class="p-margin flex flex-col gap-base bg-surface-container-low"><div class="flex items-center justify-between pt-base text-on-surface-variant font-label-caps text-label-caps"><a class="hover:text-primary transition-colors flex items-center gap-base" data-path="documentation" href="#"><span class="material-symbols-outlined text-sm">menu_book</span>Docs</a><a class="hover:text-primary transition-colors flex items-center gap-base" data-path="support" href="#"><span class="material-symbols-outlined text-sm">support_agent</span>Support</a></div></div></aside><div class="pl-64"><main class="w-full min-h-screen pt-16 bg-background px-gutter py-margin"><div class="flex flex-col w-full">
+<!-- Top Command & Telemetry Bar -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-gutter mb-margin">
+<div class="flex flex-col gap-base">
+<div class="flex items-center gap-base flex-wrap">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">System Operations Dashboard</h1>
+
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+        Real-time infrastructure health, process orchestration, and model ingestion telemetry across enterprise tenants.
+      </p>
+</div>
+<!-- Action & Timeframe Controls -->
+<div class="flex items-center gap-base flex-wrap shrink-0">
+<!-- Timeframe Toggle -->
+<div class="inline-flex items-center p-0.5 bg-surface-container rounded-lg shadow-sm">
+<button class="px-gutter py-1 rounded bg-surface-container-lowest font-label-caps text-label-caps text-on-surface font-bold shadow-sm transition-colors">Last 24 Hours</button>
+<button class="px-gutter py-1 rounded font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors">Last 7 Days</button>
+<button class="px-gutter py-1 rounded font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors">Last 30 Days</button>
+</div>
+<!-- Secondary Action -->
+<button class="inline-flex items-center gap-base px-gutter py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-headline-md text-body-md hover:bg-surface-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-lg text-on-surface-variant">download</span>
+<span class="">Export Telemetry</span>
+</button>
+<!-- Primary Action -->
+<button class="inline-flex items-center gap-base px-margin py-1.5 rounded-lg bg-primary-container text-on-primary font-headline-md text-body-md shadow-md hover:brightness-110 active:scale-[0.99] transition-all">
+<span class="material-symbols-outlined text-lg">bolt</span>
+<span class="">Trigger Ingestion Batch</span>
+</button>
+</div>
+</div>
+<!-- Primary Key Metrics Grid (Bento Elevation) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter mb-margin">
+<!-- Metric 1: Business Processes Onboard -->
+<div class="relative bg-surface-container-lowest p-margin rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden">
+<div class="flex items-start justify-between gap-base mb-base">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Business Processes</span>
+<span class="font-headline-lg text-3xl font-bold tracking-tight text-on-surface mt-1">48</span>
+</div>
+<div class="p-2 bg-secondary-container/40 rounded-lg text-secondary">
+<span class="material-symbols-outlined text-2xl">account_tree</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+        Active pipelines across Group Benefits, Individual Life, Wealth &amp; Reinsurance.
+      </p>
+<div class="pt-gutter bg-surface-container-low -mx-margin -mb-margin px-margin pb-margin flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 font-label-caps text-label-caps px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span> +4 this quarter
+          </span>
+<span class="font-tabular-nums text-tabular-nums text-xs text-on-surface-variant font-medium">36 Auto • 10 Hybrid • 2 Pending</span>
+</div>
+<!-- Segmentation Bar -->
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 75%;" title="Automated: 75%"></div>
+<div class="bg-tertiary-fixed-dim h-full" style="width: 20.8%;" title="Hybrid-Review: 20.8%"></div>
+<div class="bg-outline-variant h-full" style="width: 4.2%;" title="Pending: 4.2%"></div>
+</div>
+</div>
+</div>
+<!-- Metric 2: Form Models Trained -->
+<div class="relative bg-surface-container-lowest p-margin rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden">
+<div class="flex items-start justify-between gap-base mb-base">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Form Models Trained</span>
+<span class="font-headline-lg text-3xl font-bold tracking-tight text-on-surface mt-1">184</span>
+</div>
+<div class="p-2 bg-primary-fixed/50 rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">model_training</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+        Active models in claims, KYC, automated underwriting &amp; group enrollment.
+      </p>
+<div class="pt-gutter bg-surface-container-low -mx-margin -mb-margin px-margin pb-margin flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 font-label-caps text-label-caps px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-bold">
+<span class="material-symbols-outlined text-xs">verified</span> 97.4% Avg Baseline
+          </span>
+<span class="font-tabular-nums text-tabular-nums text-xs text-on-surface-variant font-medium">8 retrained in 48h</span>
+</div>
+<!-- Progress track -->
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-primary-container h-full" style="width: 97.4%;"></div>
+</div>
+</div>
+</div>
+<!-- Metric 3: Total Ingestion Volume (24h) -->
+<div class="relative bg-surface-container-lowest p-margin rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden">
+<div class="flex items-start justify-between gap-base mb-base">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Total Ingestion (24h)</span>
+<span class="font-headline-lg text-3xl font-bold tracking-tight text-on-surface mt-1">148,290</span>
+</div>
+<div class="p-2 bg-surface-container-high rounded-lg text-on-surface">
+<span class="material-symbols-outlined text-2xl">auto_read_pause</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+        Pages extracted across multi-page batches with strict SLA adherence.
+      </p>
+<div class="pt-gutter bg-surface-container-low -mx-margin -mb-margin px-margin pb-margin flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 font-label-caps text-label-caps px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-bold">
+<span class="material-symbols-outlined text-xs">arrow_upward</span> +12.4% vs 7d avg
+          </span>
+<span class="font-tabular-nums text-tabular-nums text-xs font-semibold text-primary">92.6% STP Rate</span>
+</div>
+<!-- Mini SVG Sparkline -->
+<div class="w-full h-5 flex items-end">
+<svg class="w-full h-5 text-secondary" fill="none" preserveAspectRatio="none" viewBox="0 0 100 24">
+<path d="M0,18 L12,14 L24,19 L36,11 L48,13 L60,8 L72,12 L84,5 L100,2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<path d="M0,18 L12,14 L24,19 L36,11 L48,13 L60,8 L72,12 L84,5 L100,2 L100,24 L0,24 Z" fill="currentColor" fill-opacity="0.1"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Metric 4: Human-in-the-Loop Review Backlog -->
+<div class="relative bg-surface-container-lowest p-margin rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden">
+<div class="flex items-start justify-between gap-base mb-base">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">HITL Review Backlog</span>
+<span class="font-headline-lg text-3xl font-bold tracking-tight text-primary mt-1">312</span>
+</div>
+<div class="p-2 bg-error-container/60 rounded-lg text-on-error-container">
+<span class="material-symbols-outlined text-2xl">pending_actions</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+        Documents queued across 6 lines of business awaiting manual adjudicator review.
+      </p>
+<div class="pt-gutter bg-surface-container-low -mx-margin -mb-margin px-margin pb-margin flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 font-label-caps text-label-caps px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-bold">
+<span class="material-symbols-outlined text-xs">hourglass_top</span> Avg wait: 14m
+          </span>
+<span class="font-tabular-nums text-tabular-nums text-xs text-on-surface-variant font-medium">Threshold: &lt;30m SLA</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-tertiary-fixed-dim h-full" style="width: 46%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 1: Onboarded Business Processes & Ingestion Pipeline -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-margin">
+<div class="p-margin flex flex-col md:flex-row md:items-center justify-between gap-base bg-surface-container-lowest">
+<div class="flex flex-col">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-xl">hub</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Onboarded Business Processes &amp; Ingestion Pipeline</h2>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant mt-0.5">Execution status, model linkages, and STP performance across active organizational workflows.</span>
+</div>
+<div class="flex items-center gap-base">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-base top-1/2 -translate-y-1/2 text-on-surface-variant text-base">filter_list</span>
+<select class="pl-7 pr-gutter py-1 bg-surface-container-low rounded-lg font-label-caps text-label-caps text-on-surface uppercase focus:outline-none">
+<option>All Business Units (4)</option>
+<option>Group Benefits</option>
+<option>Individual Underwriting</option>
+<option>Wealth Management</option>
+<option>Retentions</option>
+</select>
+</div>
+<button class="px-gutter py-1 rounded-lg bg-surface-container-low font-headline-md text-body-md text-on-surface hover:bg-surface-container transition-colors">
+          + Add Workflow
+        </button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-3 px-margin">Process Name</th>
+<th class="py-3 px-gutter">Business Unit</th>
+<th class="py-3 px-gutter text-center">Assigned Models</th>
+<th class="py-3 px-gutter text-right">24h Ingestion Volume</th>
+<th class="py-3 px-gutter text-center">STP Rate</th>
+<th class="py-3 px-gutter">Pipeline Health</th>
+<th class="py-3 px-margin text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-on-surface font-body-md">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-margin">
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Group Disability Claims Intake</span>
+<span class="font-tabular-nums text-xs text-on-surface-variant font-mono">PROC-GD-9421 • High Throughput</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-xs font-medium text-on-surface">Group Benefits</span>
+</td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 font-tabular-nums text-tabular-nums px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-medium">
+<span class="material-symbols-outlined text-xs text-primary">layers</span> 14 models
+              </span>
+</td>
+<td class="py-3 px-gutter text-right font-tabular-nums text-tabular-nums font-semibold">
+              42,180 docs
+            </td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-xs">task_alt</span> 94.2%
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">Operational</span>
+</div>
+</td>
+<td class="py-3 px-margin text-right">
+<button class="px-gutter py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-headline-md text-xs font-semibold transition-colors">
+                Configure
+              </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-margin">
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Individual Life New Policy Underwriting</span>
+<span class="font-tabular-nums text-xs text-on-surface-variant font-mono">PROC-IL-2018 • Multi-page Complex</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-xs font-medium text-on-surface">Individual Underwriting</span>
+</td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 font-tabular-nums text-tabular-nums px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-medium">
+<span class="material-symbols-outlined text-xs text-primary">layers</span> 8 models
+              </span>
+</td>
+<td class="py-3 px-gutter text-right font-tabular-nums text-tabular-nums font-semibold">
+              28,450 docs
+            </td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-xs">task_alt</span> 91.8%
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">Operational</span>
+</div>
+</td>
+<td class="py-3 px-margin text-right">
+<button class="px-gutter py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-headline-md text-xs font-semibold transition-colors">
+                Configure
+              </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-margin">
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Wealth RRSP Transfer Authorization</span>
+<span class="font-tabular-nums text-xs text-on-surface-variant font-mono">PROC-WL-6612 • Regulatory Strict</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-xs font-medium text-on-surface">Wealth Mgmt</span>
+</td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 font-tabular-nums text-tabular-nums px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-medium">
+<span class="material-symbols-outlined text-xs text-primary">layers</span> 5 models
+              </span>
+</td>
+<td class="py-3 px-gutter text-right font-tabular-nums text-tabular-nums font-semibold">
+              19,230 docs
+            </td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-bold font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-xs">sync_problem</span> 86.4%
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-label-caps text-label-caps uppercase text-tertiary font-bold">High Queue (84)</span>
+</div>
+</td>
+<td class="py-3 px-margin text-right">
+<button class="px-gutter py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-headline-md text-xs font-semibold transition-colors">
+                Configure
+              </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-margin">
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Critical Illness Medical APS Processing</span>
+<span class="font-tabular-nums text-xs text-on-surface-variant font-mono">PROC-CI-3109 • OCR Dense Handwriting</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-xs font-medium text-on-surface">Individual Underwriting</span>
+</td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 font-tabular-nums text-tabular-nums px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-medium">
+<span class="material-symbols-outlined text-xs text-primary">layers</span> 12 models
+              </span>
+</td>
+<td class="py-3 px-gutter text-right font-tabular-nums text-tabular-nums font-semibold">
+              34,810 docs
+            </td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-xs">task_alt</span> 90.1%
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">Operational</span>
+</div>
+</td>
+<td class="py-3 px-margin text-right">
+<button class="px-gutter py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-headline-md text-xs font-semibold transition-colors">
+                Configure
+              </button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-margin">
+<div class="flex items-center gap-base">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Group Dental Invoicing &amp; Adjudication</span>
+<span class="font-tabular-nums text-xs text-on-surface-variant font-mono">PROC-GD-1194 • EDI &amp; Scanned Bills</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-gutter">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-xs font-medium text-on-surface">Group Benefits</span>
+</td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 font-tabular-nums text-tabular-nums px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-medium">
+<span class="material-symbols-outlined text-xs text-primary">layers</span> 9 models
+              </span>
+</td>
+<td class="py-3 px-gutter text-right font-tabular-nums text-tabular-nums font-semibold">
+              23,620 docs
+            </td>
+<td class="py-3 px-gutter text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-xs">task_alt</span> 98.2%
+              </span>
+</td>
+<td class="py-3 px-gutter">
+<div class="flex items-center gap-base">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">Operational</span>
+</div>
+</td>
+<td class="py-3 px-margin text-right">
+<button class="px-gutter py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-headline-md text-xs font-semibold transition-colors">
+                Configure
+              </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Summary Bar -->
+<div class="p-gutter bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-base text-xs text-on-surface-variant font-tabular-nums">
+<span class="">Showing 5 of 48 registered processes</span>
+<div class="flex items-center gap-gutter">
+<span class="">Combined Ingestion Peak: <strong>214 pages/sec</strong></span>
+<span class="">Backlog Distribution: <strong>94% within 15min SLA</strong></span>
+</div>
+</div>
+</div>
+<!-- Section 2: Trained Form Models & Extraction Performance (Two Column Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-margin">
+<!-- Column A: Top Performing Models -->
+<div class="bg-surface-container-lowest p-margin rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-gutter">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary text-xl">psychology</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Top Performing Models</h3>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 rounded bg-secondary/10 text-secondary uppercase font-bold">F1 Score &gt;0.96</span>
+</div>
+<div class="flex flex-col gap-base">
+<!-- Model Item 1 -->
+<div class="p-gutter bg-surface-container-low rounded-lg flex flex-col gap-base hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps font-mono px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">CL-CLAIM-04</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Standard Claim Form v3.2</span>
+</div>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+                99.1% Confidence
+              </span>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant font-tabular-nums">
+<span class="">Precision: <strong>99.4%</strong> • Recall: <strong>98.9%</strong></span>
+<span class="">Last retrained: 18h ago (Automated)</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 99.1%;"></div>
+</div>
+</div>
+<!-- Model Item 2 -->
+<div class="p-gutter bg-surface-container-low rounded-lg flex flex-col gap-base hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps font-mono px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">CL-KYC-08</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Void Cheque &amp; Direct Deposit v2.0</span>
+</div>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+                98.4% Confidence
+              </span>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant font-tabular-nums">
+<span class="">Precision: <strong>98.7%</strong> • Recall: <strong>98.1%</strong></span>
+<span class="">Last retrained: 3d ago</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 98.4%;"></div>
+</div>
+</div>
+<!-- Model Item 3 -->
+<div class="p-gutter bg-surface-container-low rounded-lg flex flex-col gap-base hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-base">
+<span class="font-label-caps text-label-caps font-mono px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">CL-APS-01</span>
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Attending Physician Statement (APS) v4.1</span>
+</div>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold font-label-caps text-label-caps">
+                94.8% Confidence
+              </span>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant font-tabular-nums">
+<span class="">Precision: <strong>95.2%</strong> • Recall: <strong>94.3%</strong></span>
+<span class="">Last retrained: 42h ago</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 94.8%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-gutter flex items-center justify-between">
+<a class="font-headline-md text-body-md text-primary hover:underline inline-flex items-center gap-1" href="#">
+          Browse all 184 active models <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+<span class="font-tabular-nums text-xs text-on-surface-variant">Active Canary deployments: 2</span>
+</div>
+</div>
+<!-- Column B: Model Drift & Retraining Pipeline -->
+<div class="bg-surface-container-lowest p-margin rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-gutter">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-tertiary text-xl">troubleshoot</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Model Drift &amp; Retraining Pipeline</h3>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed uppercase font-bold">Feedback Loop</span>
+</div>
+<!-- Drift Warning Alert Banner -->
+<div class="p-gutter rounded-lg bg-surface-container-low mb-gutter flex items-start gap-base">
+<span class="material-symbols-outlined text-tertiary text-xl shrink-0 mt-0.5">warning</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-md font-semibold text-on-surface">Drift Notice: CL-ENROLL-G2 Group Enrollment</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs mt-0.5">
+              Confidence declined 2.8% over last 14 days due to new Q3 Quebec tax deduction slips layout variations.
+            </p>
+</div>
+</div>
+<!-- Annotation telemetry card -->
+<div class="p-margin bg-surface-container-low rounded-lg flex flex-col gap-base">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Human Reviewer Feedback Buffer</span>
+<span class="font-headline-lg text-2xl font-bold text-on-surface font-tabular-nums">1,420 Annotations</span>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-secondary font-bold uppercase">Ready to Fine-Tune</span>
+<p class="text-xs text-on-surface-variant font-tabular-nums">Min required: 500 samples</p>
+</div>
+</div>
+<!-- Threshold progress meter -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-tabular-nums text-on-surface-variant">
+<span class="">Collected: 1,420 / 2,000 max target</span>
+<span class="">71% Full</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 71%;"></div>
+</div>
+</div>
+<div class="pt-base flex items-center justify-between text-xs text-on-surface-variant">
+<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-xs text-secondary">check_circle</span> Bias &amp; PII audit passed</span>
+<span class="">Est compute: 45 GPU-mins</span>
+</div>
+</div>
+</div>
+<div class="pt-gutter flex flex-col sm:flex-row items-center justify-between gap-base">
+<span class="font-body-md text-xs text-on-surface-variant">Next automated retraining window: <strong>02:00 AM EDT</strong></span>
+<button class="w-full sm:w-auto inline-flex items-center justify-center gap-base px-gutter py-2 rounded-lg bg-secondary text-on-secondary font-headline-md text-body-md font-semibold shadow-sm hover:brightness-110 active:scale-[0.99] transition-all">
+<span class="material-symbols-outlined text-lg">autorenew</span>
+<span class="">Schedule Active Retraining</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Section 3: System Infrastructure & Security Posture (High-Density Row) -->
+
+</div></main></div>
+
+</body></html>

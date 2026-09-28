@@ -1,9 +1,22 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import EmailStr
 from pydantic import Field as PydanticField
 
-from app.models.public import BusinessProcess, Job, ModelBase
+from app.models.public import BusinessProcess, Job, ModelBase, UserRole
+
+
+class UserDocument(ModelBase):
+    id: str
+    email: EmailStr
+    displayName: str
+    roleLabel: UserRole
+    passwordHash: str
+    isActive: bool = True
+    createdAt: datetime
+    updatedAt: datetime
 
 
 class BusinessProcessDocument(BusinessProcess):

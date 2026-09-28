@@ -1,7 +1,7 @@
 from app.config import Settings
 from app.db.base import DataStore, JobFilters
 from app.db.cosmos import CosmosService
-from app.db.exceptions import DataStoreError, DocumentNotFoundError
+from app.db.exceptions import DataStoreError, DocumentNotFoundError, DuplicateDocumentError
 from app.db.mongo import MongoService
 
 __all__ = [
@@ -9,6 +9,7 @@ __all__ = [
     "DataStore",
     "DataStoreError",
     "DocumentNotFoundError",
+    "DuplicateDocumentError",
     "JobFilters",
     "MongoService",
     "create_data_store",

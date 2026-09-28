@@ -31,6 +31,10 @@ export default defineConfig({
     video: "off",
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
+    // Pre-authenticated in globalSetup so every page/request fixture starts
+    // with a valid session cookie; the RouteGuard would otherwise bounce
+    // every navigation to /login now that auth protects all but /healthz.
+    storageState: path.join(webRoot, ".playwright", "storage-state.json"),
   },
   globalSetup: "./e2e/global-setup.ts",
   globalTeardown: "./e2e/global-teardown.ts",

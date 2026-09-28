@@ -54,7 +54,7 @@ def register_auth_routes(application: FastAPI) -> None:
             max_age=settings.jwt_expiry_minutes * 60,
             httponly=True,
             secure=settings.session_cookie_secure,
-            samesite="lax",
+            samesite=settings.session_cookie_samesite,
         )
         return public_user(user)
 
@@ -65,7 +65,7 @@ def register_auth_routes(application: FastAPI) -> None:
             key=settings.session_cookie_name,
             httponly=True,
             secure=settings.session_cookie_secure,
-            samesite="lax",
+            samesite=settings.session_cookie_samesite,
         )
         response.status_code = 204
         return response

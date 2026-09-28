@@ -4,12 +4,15 @@ from datetime import UTC, datetime
 from typing import cast
 from uuid import uuid4
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from app import main as app_main
 from app.auth import hash_password, verify_password
+from app.config import get_settings
 from app.models import UserDocument
-from tests.conftest import TEST_SERVICE_TOKEN
+from tests.conftest import TEST_SERVICE_TOKEN, clean_backend_state
 
 
 def make_user(**overrides: object) -> UserDocument:
@@ -54,6 +57,47 @@ def test_login_success_sets_cookie_and_returns_public_user(api_client: TestClien
     assert app.state.settings.session_cookie_name in response.cookies
     assert "httponly" in response.headers["set-cookie"].lower()
     assert "samesite=lax" in response.headers["set-cookie"].lower()
+
+
+def test_login_cookie_samesite_is_env_configurable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # SESSION_COOKIE_SAMESITE must default to "lax" for same-site deployments
+    # (e.g. local docker-compose) but be overridable to "none" for genuinely
+    # cross-site deployments (e.g. separate *.azurewebsites.net subdomains in
+    # Azure), where browsers silently drop "lax" cookies on credentialed
+    # fetch/XHR calls. See infra/main.bicep's api app settings.
+    monkeypatch.setenv("SESSION_COOKIE_SAMESITE", "none")
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
+    get_settings.cache_clear()
+    app = app_main.create_app()
+    with TestClient(app) as client:
+        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        fastapi_app = cast(FastAPI, client.app)
+        clean_backend_state(
+            fastapi_app.state.data_store,
+            fastapi_app.state.blob_service,
+            fastapi_app.state.queue_service,
+        )
+        try:
+            fastapi_app.state.data_store.create_user(make_user())
+
+            response = client.post(
+                "/auth/login",
+                json={"email": "reviewer@example.com", "password": "correct-password"},
+            )
+
+            assert response.status_code == 200
+            set_cookie = response.headers["set-cookie"].lower()
+            assert "samesite=none" in set_cookie
+            assert "secure" in set_cookie
+        finally:
+            clean_backend_state(
+                fastapi_app.state.data_store,
+                fastapi_app.state.blob_service,
+                fastapi_app.state.queue_service,
+            )
+    get_settings.cache_clear()
 
 
 def test_login_failure_does_not_set_cookie(api_client: TestClient) -> None:

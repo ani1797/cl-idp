@@ -44,6 +44,14 @@ param webImageTag string = 'latest'
 @description('Container image tag deployed for the api App Service (built and pushed to the ACR module below by CI/deploy tooling).')
 param apiImageTag string = 'latest'
 
+@secure()
+@description('Secret key used to sign/verify JWT session cookies for the DB-backed auth system. Must be identical across every api instance/restart (an ephemeral per-process fallback exists in app/config.py for local dev only, but would silently invalidate sessions on every restart/scale-out in Azure). Leave blank to auto-generate a deterministic value stable across redeployments of the same resource group; override for a stronger, independently-rotatable secret.')
+param jwtSecret string = ''
+
+@secure()
+@description('Shared bearer token trusted-automation callers (the seed script; the worker calls the datastore directly and does not need it) send via the X-Service-Token header to bypass interactive-session auth. Leave blank to auto-generate a deterministic value stable across redeployments of the same resource group.')
+param serviceApiToken string = ''
+
 @description('SMTP relay host for review-needed notification emails. Points at an unauthenticated relay by default; set to an authenticated (or private) relay hostname together with the mail auth/TLS params below.')
 param smtpHost string = '127.0.0.1'
 
@@ -230,6 +238,41 @@ module storageSecret 'modules/kv-secret.bicep' = {
 var mongoSecretUri = '${keyVault.outputs.keyVaultUri}secrets/mongo-connection-string'
 var storageSecretUri = '${keyVault.outputs.keyVaultUri}secrets/storage-connection-string'
 
+// Auth secrets (JWT signing key + service-to-service bearer token). Both are
+// deterministic-if-unset (derived from the subscription/resource-group
+// identity) so repeat `az deployment sub create` runs with the same
+// parameters never rotate them out from under an already-seeded/logged-in
+// environment, while still letting a caller pass a stronger explicit value.
+var effectiveJwtSecret = empty(jwtSecret)
+  ? '${uniqueString(subscription().subscriptionId, resourceGroupName, 'jwt-secret-v1')}${uniqueString(resourceGroupName, subscription().subscriptionId, 'jwt-secret-v2')}${uniqueString(namePrefix, subscription().subscriptionId, 'jwt-secret-v3')}'
+  : jwtSecret
+var effectiveServiceApiToken = empty(serviceApiToken)
+  ? '${uniqueString(subscription().subscriptionId, resourceGroupName, 'service-api-token-v1')}${uniqueString(resourceGroupName, subscription().subscriptionId, 'service-api-token-v2')}'
+  : serviceApiToken
+
+module jwtSecretKv 'modules/kv-secret.bicep' = {
+  name: 'jwt-secret'
+  scope: rg
+  params: {
+    keyVaultName: keyVault.outputs.keyVaultName
+    secretName: 'jwt-secret'
+    secretValue: effectiveJwtSecret
+  }
+}
+
+module serviceApiTokenKv 'modules/kv-secret.bicep' = {
+  name: 'service-api-token'
+  scope: rg
+  params: {
+    keyVaultName: keyVault.outputs.keyVaultName
+    secretName: 'service-api-token'
+    secretValue: effectiveServiceApiToken
+  }
+}
+
+var jwtSecretUri = '${keyVault.outputs.keyVaultUri}secrets/jwt-secret'
+var serviceApiTokenUri = '${keyVault.outputs.keyVaultUri}secrets/service-api-token'
+
 // Only written when an authenticated (or private) relay is configured; the
 // default unauthenticated relay has no secret to store.
 module smtpSecret 'modules/kv-secret.bicep' = if (!empty(smtpPassword)) {
@@ -342,6 +385,22 @@ module apiApp 'modules/app-service.bicep' = {
       {
         name: 'WEB_ORIGIN'
         value: 'https://${namePrefix}-web.azurewebsites.net'
+      }
+      {
+        name: 'JWT_SECRET'
+        value: '@Microsoft.KeyVault(SecretUri=${jwtSecretUri})'
+      }
+      {
+        name: 'SERVICE_API_TOKEN'
+        value: '@Microsoft.KeyVault(SecretUri=${serviceApiTokenUri})'
+      }
+      {
+        name: 'SESSION_COOKIE_SECURE'
+        value: 'true'
+      }
+      {
+        name: 'SESSION_COOKIE_SAMESITE'
+        value: 'none'
       }
     ], mailAppSettings)
   }

@@ -106,6 +106,17 @@ class Settings(BaseSettings):
     jwt_expiry_minutes: int = Field(default=8 * 60, alias="JWT_EXPIRY_MINUTES")
     session_cookie_name: str = Field(default="cl_idp_session", alias="SESSION_COOKIE_NAME")
     session_cookie_secure: bool = Field(default=False, alias="SESSION_COOKIE_SECURE")
+    # "lax" works for local dev (web/api share the "localhost" site regardless
+    # of port). Deployments where web and api live on different subdomains of
+    # a public-suffix domain (e.g. Azure App Service's *.azurewebsites.net)
+    # are cross-site for cookie purposes — browsers silently drop a "lax"
+    # cookie on the credentialed fetch/XHR calls the frontend makes, so those
+    # environments must set this to "none" (which requires
+    # SESSION_COOKIE_SECURE=true; browsers reject SameSite=None without
+    # Secure).
+    session_cookie_samesite: Literal["lax", "strict", "none"] = Field(
+        default="lax", alias="SESSION_COOKIE_SAMESITE"
+    )
     service_api_token: str = Field(default="", alias="SERVICE_API_TOKEN")
     demo_it_admin_email: str = Field(default="", alias="DEMO_IT_ADMIN_EMAIL")
     demo_it_admin_password: str = Field(default="", alias="DEMO_IT_ADMIN_PASSWORD")

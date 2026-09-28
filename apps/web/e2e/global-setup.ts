@@ -11,7 +11,11 @@ const stateDir = path.join(webRoot, ".playwright");
 const statePath = path.join(stateDir, "worker-state.json");
 const logPath = path.join(stateDir, "worker.log");
 export const e2eStorageStatePath = path.join(stateDir, "storage-state.json");
-const apiBaseUrl = "http://localhost:8010";
+// Every browser call is routed through the web app's own /api-proxy route
+// handler (see app/api-proxy/[...path]/route.ts), so the pre-authenticated
+// session cookie must be scoped to the *web* origin, not the api's own
+// origin, or the browser won't attach it to any /api-proxy/* request.
+const webBaseUrl = "http://localhost:3100";
 
 type WorkerState = {
   pid: number;
@@ -65,9 +69,9 @@ async function ensureE2eUser(): Promise<{ email: string; password: string }> {
 async function createAuthenticatedStorageState() {
   const { email, password } = await ensureE2eUser();
 
-  const context = await playwrightRequest.newContext({ baseURL: apiBaseUrl });
+  const context = await playwrightRequest.newContext({ baseURL: webBaseUrl });
   try {
-    const response = await context.post("/auth/login", { data: { email, password } });
+    const response = await context.post("/api-proxy/auth/login", { data: { email, password } });
     if (!response.ok()) {
       throw new Error(
         `E2E login failed: ${response.status()} ${await response.text().catch(() => "")}`,

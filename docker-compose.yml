@@ -280,6 +280,10 @@ services:
       HOSTNAME: 0.0.0.0
       PORT: "3000"
       NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000"
+      # Server-side target for the /api-proxy route handler (browser calls
+      # never use this directly). Must be reachable from *inside* the web
+      # container, hence the "api" service DNS name rather than localhost.
+      API_BASE_URL: "http://api:8000"
     depends_on:
       api:
         condition: service_healthy

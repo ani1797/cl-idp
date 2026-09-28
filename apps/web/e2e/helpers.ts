@@ -89,10 +89,9 @@ export async function createProcessViaUi(
   const thresholdInput = page.locator("#confidenceThresholdPercent");
   const ownerEmailInput = page.locator("#ownerEmail");
 
-  const invoiceCheckbox = page
-    .locator("label")
-    .filter({ hasText: analyzer.name })
-    .locator('input[type="checkbox"]');
+  // The reskin's Checkbox primitive (Radix) renders a `button[role="checkbox"]`,
+  // not a native `input[type="checkbox"]`, so target it by accessible role/name.
+  const invoiceCheckbox = page.getByRole("checkbox", { name: analyzer.name, exact: true });
 
   async function fillProcessForm() {
     await expect(nameInput).toBeEditable();
@@ -113,7 +112,7 @@ export async function createProcessViaUi(
   let created = false;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await fillProcessForm();
-    await page.getByRole("button", { name: "Save process" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click();
 
     try {
       await expect(page).toHaveURL(processDetailUrlPattern, { timeout: 15_000 });

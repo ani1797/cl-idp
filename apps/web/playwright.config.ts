@@ -60,6 +60,9 @@ export default defineConfig({
       env: {
         ...process.env,
         NEXT_PUBLIC_API_BASE_URL: apiBaseUrl,
+        // Server-side target for the /api-proxy route handler; same-site
+        // here (both localhost), but exercised for parity with prod.
+        API_BASE_URL: apiBaseUrl,
       },
     },
   ],

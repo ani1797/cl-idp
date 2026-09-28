@@ -109,8 +109,18 @@ def ensure_e2e_user() -> None:
 
     existing = data_store.find_user_by_email(E2E_USER_EMAIL)
     if existing is not None:
+        changed = False
         if not existing.isActive:
             existing.isActive = True
+            changed = True
+        # The live suite and new-screens smoke tests exercise IT-Admin-only
+        # capabilities (create process, retry/review jobs, review queue,
+        # form models, integrations, user admin), so the fixed e2e user must
+        # hold the IT Admin role, not just any authenticated role.
+        if existing.roleLabel != "IT Admin":
+            existing.roleLabel = "IT Admin"
+            changed = True
+        if changed:
             existing.updatedAt = now
             data_store.update_user(existing)
         print(json.dumps({"email": E2E_USER_EMAIL, "password": E2E_USER_PASSWORD, "created": False}))
@@ -121,7 +131,7 @@ def ensure_e2e_user() -> None:
             id=str(uuid4()),
             email=E2E_USER_EMAIL,
             displayName="Playwright E2E User",
-            roleLabel="End User",
+            roleLabel="IT Admin",
             passwordHash=hash_password(E2E_USER_PASSWORD),
             isActive=True,
             createdAt=now,

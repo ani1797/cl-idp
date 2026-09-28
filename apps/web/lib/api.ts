@@ -1,7 +1,13 @@
 import type { components } from "../../../packages/shared/src/generated/api";
 import type { UserRole } from "@/lib/roles";
 
-const DEFAULT_API_BASE_URL = "http://localhost:8000";
+// All browser calls are routed through the app's own /api-proxy route
+// handler (see app/api-proxy/[...path]/route.ts) rather than fetched
+// directly against the backend's own origin. This keeps the session cookie
+// first-party from the browser's perspective, which matters once web and
+// api are deployed on different sites (e.g. separate *.azurewebsites.net
+// subdomains) — see that file for the full rationale.
+const API_PROXY_PREFIX = "/api-proxy";
 
 type Schema<Name extends keyof components["schemas"]> = components["schemas"][Name];
 
@@ -81,12 +87,9 @@ export class ApiError extends Error {
   }
 }
 
-function getBaseUrl() {
-  return (process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-}
-
 function buildUrl(path: string, query?: Record<string, unknown>) {
-  const url = new URL(`${getBaseUrl()}${path}`);
+  const base = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+  const url = new URL(`${API_PROXY_PREFIX}${path}`, base);
 
   if (query) {
     for (const [key, rawValue] of Object.entries(query)) {

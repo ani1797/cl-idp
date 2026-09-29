@@ -40,6 +40,8 @@ const baseUsers: AuthUser[] = [
     displayName: "Alex Morgan",
     roleLabel: "IT Admin",
     isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   {
     id: "user-2",
@@ -47,6 +49,8 @@ const baseUsers: AuthUser[] = [
     displayName: "Jamie Chen",
     roleLabel: "Reviewer",
     isActive: false,
+    createdAt: "2024-01-02T00:00:00Z",
+    updatedAt: "2024-01-02T00:00:00Z",
   },
 ];
 

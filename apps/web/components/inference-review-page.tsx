@@ -636,7 +636,7 @@ function ReviewPanel({
               Detected form: <span className="font-medium text-foreground">{formatDetectedForm(job)}</span>
             </p>
           </div>
-          <ReviewedIndicator reviewedAt={job.reviewedAt} />
+          <ReviewedIndicator reviewedAt={job.reviewedAt ?? undefined} />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <JobStatusBadge status={job.status} />
@@ -923,7 +923,7 @@ export function InferenceReviewPage({
     staleTime: Infinity,
   });
 
-  const leafFields = useMemo(() => collectLeafFields(jobQuery.data?.fields), [jobQuery.data?.fields]);
+  const leafFields = useMemo(() => collectLeafFields(jobQuery.data?.fields ?? undefined), [jobQuery.data?.fields]);
   const fieldsByPath = useMemo(
     () => new Map(leafFields.map((field) => [field.path, field])),
     [leafFields],
@@ -1160,7 +1160,7 @@ export function InferenceReviewPage({
         overlays={currentPageOverlays}
         focusedPath={focusedPath}
         onSelectPath={onSelectPath}
-        pages={job.pages}
+        pages={job.pages ?? undefined}
       />
     );
   }

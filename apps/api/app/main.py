@@ -4,18 +4,19 @@ import json
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
-from typing import cast
+from typing import Any, cast
 from uuid import uuid4
 
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.metrics import CallbackOptions, Observation
 
-from app.auth import SERVICE_TOKEN_HEADER, read_session_user, service_token_matches
+from app.auth import resolve_principal
 from app.authz import require_roles
 from app.config import get_settings
 from app.cu import (
@@ -55,13 +56,15 @@ API_DESCRIPTION = (
     "inference pipeline runs."
 )
 OPENAPI_TAGS = [
-    {"name": "auth", "description": "Cookie-backed authentication"},
+    {"name": "auth", "description": "Session cookie and bearer-token authentication"},
     {"name": "users", "description": "User administration"},
     {"name": "processes", "description": "Business process configuration"},
     {"name": "analyzers", "description": "Available Azure AI Content Understanding analyzers"},
     {"name": "jobs", "description": "Pipeline trigger, job polling, and review/approve"},
     {"name": "system", "description": "Service health"},
 ]
+BEARER_SECURITY_SCHEME = "bearerAuth"
+COOKIE_SECURITY_SCHEME = "cookieAuth"
 
 
 def initialize_observability(app: FastAPI) -> None:
@@ -178,7 +181,12 @@ def register_routes(application: FastAPI) -> None:
             details={"errors": json_safe(exc.errors())},
         )
 
-    @application.get("/healthz", response_model=Health, responses={503: {"model": Health}})
+    @application.get(
+        "/healthz",
+        response_model=Health,
+        responses={503: {"model": Health}},
+        openapi_extra={"security": []},
+    )
     async def healthz(response: Response) -> Health:
         dependencies = {
             "database": (
@@ -442,6 +450,52 @@ def is_auth_exempt(request: Request) -> bool:
     return (request.method == "GET" and path == "/healthz") or path.startswith("/auth/")
 
 
+def build_openapi_schema(application: FastAPI) -> dict[str, Any]:
+    """Generates the OpenAPI document with the real auth requirements attached.
+
+    FastAPI can't infer these automatically because auth is enforced by the
+    `require_authentication` middleware rather than per-route `Security(...)`
+    dependencies, so the two security schemes and the default requirement are
+    added here. Individual public routes (`/healthz`, `/auth/login`,
+    `/auth/logout`, `/auth/token`) opt out with `openapi_extra={"security": []}`
+    on their own decorator, which — per the OpenAPI spec — overrides this
+    top-level default for that operation.
+    """
+
+    schema = get_openapi(
+        title=application.title,
+        version=application.version,
+        description=application.description,
+        routes=application.routes,
+        tags=OPENAPI_TAGS,
+        servers=application.servers,
+    )
+    settings = get_settings()
+    schema.setdefault("components", {})["securitySchemes"] = {
+        BEARER_SECURITY_SCHEME: {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": (
+                "A user API token from `POST /auth/token`, or the shared "
+                "`SERVICE_API_TOKEN` service secret. Sent as "
+                "`Authorization: Bearer <token>`."
+            ),
+        },
+        COOKIE_SECURITY_SCHEME: {
+            "type": "apiKey",
+            "in": "cookie",
+            "name": settings.session_cookie_name,
+            "description": (
+                "The `httpOnly` session cookie set by `POST /auth/login`, for "
+                "first-party browser callers."
+            ),
+        },
+    }
+    schema["security"] = [{BEARER_SECURITY_SCHEME: []}, {COOKIE_SECURITY_SCHEME: []}]
+    return schema
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
@@ -454,6 +508,13 @@ def create_app() -> FastAPI:
     )
     initialize_observability(application)
 
+    def custom_openapi() -> dict[str, Any]:
+        if application.openapi_schema is None:
+            application.openapi_schema = build_openapi_schema(application)
+        return application.openapi_schema
+
+    application.openapi = custom_openapi  # type: ignore[method-assign]
+
     @application.middleware("http")
     async def require_authentication(
         request: Request,
@@ -463,15 +524,11 @@ def create_app() -> FastAPI:
             return await call_next(request)
 
         settings = application.state.settings
-        if service_token_matches(request.headers.get(SERVICE_TOKEN_HEADER), settings):
+        principal = resolve_principal(request, settings, data_store(application))
+        if principal is not None:
+            if principal.user is not None:
+                request.state.user = principal.user
             return await call_next(request)
-
-        session_token = request.cookies.get(settings.session_cookie_name)
-        if session_token is not None:
-            user = read_session_user(session_token, settings, data_store(application))
-            if user is not None:
-                request.state.user = user
-                return await call_next(request)
 
         return error_response(
             status_code=401,

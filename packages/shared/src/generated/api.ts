@@ -13,11 +13,159 @@ export interface paths {
         };
         /**
          * Liveness and readiness probe
-         * @description Reports whether the service is up and whether its dependencies (MongoDB Atlas, Blob/Queue storage, Content Understanding) are reachable. Returns 503 when a required dependency is unavailable.
+         * @description Reports whether the service is up and whether its dependencies (the document database plus Blob and Queue storage) are reachable. Returns 503 when a required dependency is unavailable.
          */
         get: operations["getHealth"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a browser session
+         * @description Validates an end user's email/password, returns their public profile, and sets the `httpOnly` `cl_idp_session` cookie used by first-party browser calls. Unlike `POST /auth/token`, the JWT is not returned in the response body.
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End a browser session
+         * @description Clears the `cl_idp_session` cookie and returns no body. It is safe to call even when no session cookie is currently present.
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mint a user bearer token
+         * @description Validates an end user's email/password and returns a short-lived `Authorization: Bearer` token for scripts, CLI calls, and ad-hoc testing. No cookie is set; the token carries the caller's own role, so RBAC stays the same as their browser session.
+         */
+        post: operations["issueToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the current authenticated user
+         * @description Resolves the caller from either the browser session cookie or a user bearer token and returns that user's public profile. Service-token callers are not associated with a user and receive `401`.
+         */
+        get: operations["getCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List users
+         * @description Returns every user account in newest-first order. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
+         */
+        get: operations["listUsers"];
+        put?: never;
+        /**
+         * Create a user
+         * @description Creates a new user account. Email addresses are normalized to lowercase before being saved. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
+         */
+        post: operations["createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a user
+         * @description Partially updates a user account. Only the supplied fields change; omitted fields are left untouched. Email addresses are normalized to lowercase before being saved. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
+         */
+        patch: operations["updateUser"];
+        trace?: never;
+    };
+    "/users/{userId}/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset a user password
+         * @description Replaces the stored password hash for an existing user while leaving every other profile field untouched. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
+         */
+        post: operations["resetUserPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -39,7 +187,7 @@ export interface paths {
         put?: never;
         /**
          * Create a business process
-         * @description Creates the process and asynchronously provisions a Content Understanding routing analyzer over the selected analyzers (see `routingAnalyzerStatus` on the returned resource).
+         * @description Creates the process and asynchronously provisions a Content Understanding routing analyzer over the selected analyzers (see `routingAnalyzerStatus` on the returned resource). Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
          */
         post: operations["createProcess"];
         delete?: never;
@@ -63,7 +211,7 @@ export interface paths {
          * Update a business process
          * @description Overwrites the existing configuration (no versioning). The routing analyzer is rebuilt (resetting `routingAnalyzerStatus` to `building`) **only if `allowedAnalyzerIds` changed** — editing other fields leaves the process immediately usable.
          *
-         *     No optimistic concurrency: concurrent updates are last-write-wins.
+         *     No optimistic concurrency: concurrent updates are last-write-wins. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
          */
         put: operations["updateProcess"];
         post?: never;
@@ -71,7 +219,7 @@ export interface paths {
          * Delete a business process
          * @description Deletes the process, all of its jobs, and all of its stored documents. Irreversible, with no confirmation beyond the client's own.
          *
-         *     The Content Understanding analyzers provisioned for this process are intentionally **not** deleted; they are left in the CU account and identifiable by their `idp_` ID prefix.
+         *     The Content Understanding analyzers provisioned for this process are intentionally **not** deleted; they are left in the CU account and identifiable by their `idp_` ID prefix. Requires `IT Admin` for user-bound callers; trusted service-token automation is also allowed.
          */
         delete: operations["deleteProcess"];
         options?: never;
@@ -233,8 +381,7 @@ export interface paths {
          * @description Persists human-reviewed/corrected field values for the job.
          *
          *     This is a **partial patch**: only the field paths present in the request are touched, and omitted fields are left alone. Each named field's `reviewedValue` is set while its originally extracted `value` is preserved for audit, and the field path is removed from `confidenceViolations` (paths are never re-added). A path that does not exist on the job is rejected with `400` rather than silently ignored.
-         *
-         *     `reviewedAt` is set on the first review call and does not move on subsequent calls, which are permitted. Review does not feed back into extraction, does not change the classification, and does not trigger any additional notification email.
+         *     `reviewedAt` is set on the first review call and does not move on subsequent calls, which are permitted. Review does not feed back into extraction, does not change the classification, and does not trigger any additional notification email. Requires `IT Admin` or `Reviewer` for user-bound callers; trusted service-token automation is also allowed.
          *
          *     No optimistic concurrency: concurrent reviews are last-write-wins.
          */
@@ -260,7 +407,7 @@ export interface paths {
         put?: never;
         /**
          * Re-run a failed job
-         * @description Creates a **new** job over the same already-uploaded document and enqueues it. The original job is left untouched in `failed` state so the failure stays visible in history; the new job records `retryOfJobId` pointing back at it.
+         * @description Creates a **new** job over the same already-uploaded document and enqueues it. The original job is left untouched in `failed` state so the failure stays visible in history; the new job records `retryOfJobId` pointing back at it. Requires `IT Admin` or `Reviewer` for user-bound callers; trusted service-token automation is also allowed.
          */
         post: operations["retryJob"];
         delete?: never;
@@ -285,16 +432,68 @@ export interface components {
             /** @description Optional structured context (e.g. the offending field path, the actual file size, the conflicting process ID). */
             details?: {
                 [key: string]: unknown;
-            };
+            } | null;
         };
         Health: {
             /** @enum {string} */
             status: "ok" | "degraded";
-            /** @description Per-dependency reachability, keyed by `database`, `blob`, `queue`, `contentUnderstanding`, `smtp`. */
+            /** @description Per-dependency reachability, keyed by `database`, `blob`, and `queue`. */
             dependencies?: {
                 [key: string]: "ok" | "unavailable";
-            };
-            version?: string;
+            } | null;
+            version?: string | null;
+        };
+        LoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        /** @description Response body for `POST /auth/token` — a short-lived bearer token. */
+        TokenResponse: {
+            accessToken: string;
+            /**
+             * @default Bearer
+             * @enum {string}
+             */
+            tokenType: "Bearer";
+            /** @description Seconds until `accessToken` expires. */
+            expiresIn: number;
+        };
+        /**
+         * @description Closed set of roles RBAC enforcement is based on.
+         * @enum {string}
+         */
+        UserRole: "IT Admin" | "Reviewer" | "End User";
+        User: {
+            id: string;
+            /** Format: email */
+            email: string;
+            displayName: string;
+            roleLabel: components["schemas"]["UserRole"];
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UserCreateRequest: {
+            /** Format: email */
+            email: string;
+            displayName: string;
+            roleLabel: components["schemas"]["UserRole"];
+            password: string;
+            /** @default true */
+            isActive: boolean;
+        };
+        UserUpdateRequest: {
+            /** Format: email */
+            email?: string | null;
+            displayName?: string | null;
+            roleLabel?: components["schemas"]["UserRole"] | null;
+            isActive?: boolean | null;
+        };
+        UserResetPasswordRequest: {
+            password: string;
         };
         BusinessProcessInput: {
             name: string;
@@ -319,7 +518,7 @@ export interface components {
              */
             routingAnalyzerStatus: "building" | "ready" | "failed";
             /** @description Human-readable failure reason, set when routingAnalyzerStatus is `failed` (including the case where a selected analyzer no longer exists in the Content Understanding account). Cleared when the next rebuild starts, so a `building` process never shows a stale error. */
-            routingAnalyzerError?: string;
+            routingAnalyzerError?: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -335,7 +534,7 @@ export interface components {
             /** @description Friendly display name. */
             name: string;
             /** @description Short description of the document type. Also used, truncated as needed, as the routing analyzer's category description. */
-            description?: string;
+            description?: string | null;
             /**
              * @description `prebuilt` for entries from the curated catalog, `custom` for analyzers found in the Content Understanding account.
              * @enum {string}
@@ -366,40 +565,40 @@ export interface components {
             /** Format: date-time */
             submittedAt: string;
             /** Format: date-time */
-            completedAt?: string;
+            completedAt?: string | null;
             /** @description Classified analyzer/form ID (set once succeeded). Null when the document matched none of the process's allowed forms — see `unclassified`. */
             detectedForm?: string | null;
             /** @description Display name for `detectedForm`. */
-            detectedFormName?: string;
+            detectedFormName?: string | null;
             /** @description True when the document did not match any form allowed by this process. The job is still `succeeded` — the pipeline worked and the answer is "this document doesn't belong here" — but there is nothing to extract or review. Distinct from `failed`, which means processing itself went wrong. */
-            unclassified?: boolean;
+            unclassified?: boolean | null;
             /** @description Set when this job was created by retrying an earlier failed job; references that job's ID. */
-            retryOfJobId?: string;
+            retryOfJobId?: string | null;
             /** @description Source page geometry, so the viewer can size pages correctly and compensate for scan skew. Returned by `getJob` only. */
-            pages?: components["schemas"]["PageInfo"][];
+            pages?: components["schemas"]["PageInfo"][] | null;
             /** @description Extracted fields. Returned by `getJob`; omitted from `listJobs` items for payload size — use `fieldCount` there instead. Empty when the job is `unclassified` or when the analyzer extracted nothing. */
-            fields?: components["schemas"]["ExtractedField"][];
+            fields?: components["schemas"]["ExtractedField"][] | null;
             /** @description Number of extracted leaf fields on the job, so list views can show a count without receiving the full `fields` array. */
-            fieldCount?: number;
+            fieldCount?: number | null;
             /**
              * Format: float
              * @description Arithmetic mean of all present confidence-bearing leaf fields on the job, shown regardless of review status. `null` when the job has no fields yet or none carry a confidence score (e.g. queued, running, failed, or unclassified jobs). This is the same aggregate used internally to gate `confidenceViolations`, but is always surfaced here so callers can see the overall confidence even when the job doesn't need review.
              */
             averageConfidence?: number | null;
             /** @description JSON Pointer paths (e.g. `/invoiceTotal`, `/items/0/description`) of leaf fields currently below the process's confidence threshold and not yet reviewed/approved, but only when the arithmetic mean of all present confidence-bearing leaf fields on the job is below that same threshold. When the aggregate is equal to or above the threshold, this list is empty even if some individual leaves are lower. Populated when the job succeeds; a path is removed once a reviewed value is saved for it (paths are never re-added). Fields with no confidence score are never included. A classified job with no confidence-bearing leaves has no aggregate and therefore an empty list. The business owner notification email is sent once, when this list first becomes non-empty on job success — it is not resent as the list shrinks. */
-            confidenceViolations?: string[];
+            confidenceViolations?: string[] | null;
             /**
              * Format: float
              * @description Estimated Azure AI Content Understanding cost, in USD, to analyze this document with a custom analyzer — derived from its page count (`pages`) and published per-page list pricing (see `app.pricing` in the API source). Best-effort estimate for cost visibility, not actual Azure billing data. `0` before the job has a known page count (e.g. still `queued`/`running`).
              */
             estimatedCostUsd?: number | null;
             /** @description Human-readable failure reason, set when status is `failed` — e.g. the Content Understanding call failed, the job exceeded its processing timeout, or its retry budget was exhausted. */
-            error?: string;
+            error?: string | null;
             /**
              * Format: date-time
-             * @description Timestamp of the first `PUT .../review` call for this job; unset if no field has ever been reviewed. There is no per-user attribution (no authentication in this demo).
+             * @description Timestamp of the first `PUT .../review` call for this job; unset if no field has ever been reviewed. There is no per-user review attribution.
              */
-            reviewedAt?: string;
+            reviewedAt?: string | null;
         };
         PageInfo: {
             page: number;
@@ -416,7 +615,7 @@ export interface components {
              * Format: float
              * @description Detected page rotation in degrees, clockwise, range (-180, 180]. Bounding polygons are expressed in this rotated frame.
              */
-            angle?: number;
+            angle?: number | null;
         };
         /** @description A recursively typed field, mirroring Content Understanding's model rather than flattening to strings. Scalar types carry a scalar `value`; `array` carries `items`; `object` carries `properties`. */
         ExtractedField: {
@@ -460,6 +659,9 @@ export interface components {
             /** @description The human-approved value, submitted as a string regardless of the field's extracted type. Submitting the unchanged extracted value is valid and meaningful: it marks a correct low-confidence field as approved, clearing its violation. */
             value: string;
         };
+        ReviewJobRequest: {
+            fields: components["schemas"]["ReviewedField"][];
+        };
     };
     responses: {
         /** @description Resource not found */
@@ -480,10 +682,29 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description Authentication is required or the supplied credentials were invalid. */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The authenticated user's role is not allowed to perform this action. */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
     };
     parameters: {
         ProcessId: string;
         JobId: string;
+        UserId: string;
     };
     requestBodies: never;
     headers: never;
@@ -520,6 +741,219 @@ export interface operations {
             };
         };
     };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Signed-in user profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session cookie cleared */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    issueToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Short-lived bearer token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current authenticated user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of users */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    createUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created user */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description A user with this email already exists. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description A different user already has this email address. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    resetUserPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     listProcesses: {
         parameters: {
             query?: never;
@@ -538,6 +972,7 @@ export interface operations {
                     "application/json": components["schemas"]["BusinessProcess"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createProcess: {
@@ -563,6 +998,8 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             /** @description A business process with this name already exists (case- insensitive match). */
             409: {
                 headers: {
@@ -603,6 +1040,7 @@ export interface operations {
                     "application/json": components["schemas"]["BusinessProcess"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -631,6 +1069,8 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             /** @description Another business process already has this name (case- insensitive match). */
             409: {
@@ -670,6 +1110,8 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -691,6 +1133,7 @@ export interface operations {
                     "application/json": components["schemas"]["Analyzer"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             /** @description Content Understanding is unreachable or returned an error */
             502: {
                 headers: {
@@ -741,6 +1184,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             /** @description The process's routing analyzer is not ready (still building or failed). */
             409: {
@@ -792,6 +1236,7 @@ export interface operations {
                     "application/json": components["schemas"]["Job"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -824,6 +1269,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobsSummary"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -848,6 +1294,7 @@ export interface operations {
                     "application/json": components["schemas"]["Job"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -874,6 +1321,7 @@ export interface operations {
                     "image/jpeg": string;
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -889,9 +1337,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": {
-                    fields: components["schemas"]["ReviewedField"][];
-                };
+                "application/json": components["schemas"]["ReviewJobRequest"];
             };
         };
         responses: {
@@ -913,6 +1359,8 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -937,6 +1385,8 @@ export interface operations {
                     "application/json": components["schemas"]["JobRef"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             /** @description The job is not in `failed` state, or the process's routing analyzer is not ready. */
             409: {

@@ -40,7 +40,7 @@ def login_as(api_client: TestClient, *, role_label: UserRole) -> None:
     user = make_user(role_label=role_label, email=email)
     app.state.data_store.create_user(user)
 
-    api_client.headers.pop("X-Service-Token", None)
+    api_client.headers.pop("Authorization", None)
     response = api_client.post("/auth/login", json={"email": email, "password": "correct-password"})
     assert response.status_code == 200
 

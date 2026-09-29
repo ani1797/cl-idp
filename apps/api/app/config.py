@@ -104,6 +104,10 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(default_factory=_ephemeral_jwt_secret, alias="JWT_SECRET")
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     jwt_expiry_minutes: int = Field(default=8 * 60, alias="JWT_EXPIRY_MINUTES")
+    # Short-lived on purpose: `POST /auth/token` mints these for scripts and
+    # ad-hoc testing, not for long-running browser sessions (that's the
+    # session cookie above, governed by `jwt_expiry_minutes`).
+    api_token_expiry_minutes: int = Field(default=60, alias="API_TOKEN_EXPIRY_MINUTES")
     session_cookie_name: str = Field(default="cl_idp_session", alias="SESSION_COOKIE_NAME")
     session_cookie_secure: bool = Field(default=False, alias="SESSION_COOKIE_SECURE")
     # "lax" works for local dev (web/api share the "localhost" site regardless

@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.config import get_settings
 from app.cu import CURATED_PREBUILT_ANALYZER_IDS, CURATED_PREBUILT_ANALYZERS, CuClient
-from tests.conftest import TEST_SERVICE_TOKEN
+from tests.conftest import TEST_SERVICE_AUTH_HEADER
 
 
 def test_list_analyzers_returns_502_when_cu_unreachable(
@@ -19,7 +19,7 @@ def test_list_analyzers_returns_502_when_cu_unreachable(
 
     app = app_main.create_app()
     with TestClient(app) as client:
-        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        client.headers.update(TEST_SERVICE_AUTH_HEADER)
         response = client.get("/analyzers")
 
     assert response.status_code == 502

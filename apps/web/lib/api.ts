@@ -1,5 +1,4 @@
 import type { components } from "../../../packages/shared/src/generated/api";
-import type { UserRole } from "@/lib/roles";
 
 // All browser calls are routed through the app's own /api-proxy route
 // handler (see app/api-proxy/[...path]/route.ts) rather than fetched
@@ -30,38 +29,19 @@ export type ReviewJobInput = {
 };
 
 /**
- * Auth contracts are hand-written until the OpenAPI schema in
- * `packages/shared` is regenerated against the new /auth and /users routes.
- * `roleLabel` is enforced server-side (see `apps/api/app/authz.py`) — the
- * closed set of values lives in `lib/roles.ts`.
+ * Auth contracts now come straight from the regenerated OpenAPI schema
+ * (`/auth` and `/users` routes) instead of being hand-written. `roleLabel`
+ * is enforced server-side (see `apps/api/app/authz.py`); `UserRole` here is
+ * the same closed set re-exported for UI capability checks in `lib/roles.ts`.
  */
-export type AuthUser = {
-  id: string;
-  email: string;
-  displayName: string;
-  roleLabel: UserRole;
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+export type AuthUser = Schema<"User">;
+export type UserRole = Schema<"UserRole">;
+export type LoginInput = Schema<"LoginRequest">;
+export type ApiToken = Schema<"TokenResponse">;
+export type CreateUserInput = Omit<Schema<"UserCreateRequest">, "isActive"> & {
+  isActive?: boolean;
 };
-
-export type LoginInput = {
-  email: string;
-  password: string;
-};
-
-export type CreateUserInput = {
-  email: string;
-  displayName: string;
-  roleLabel: UserRole;
-  password: string;
-};
-
-export type UpdateUserInput = Partial<{
-  displayName: string;
-  roleLabel: UserRole;
-  isActive: boolean;
-}>;
+export type UpdateUserInput = Schema<"UserUpdateRequest">;
 
 export type JobListFilters = {
   status?: JobStatus[];
@@ -212,6 +192,20 @@ export const api = {
   },
   getCurrentUser() {
     return request<AuthUser>("/auth/me");
+  },
+  /**
+   * Mints a short-lived `Authorization: Bearer` token for the signed-in
+   * user via `POST /auth/token` (email + password, re-collected — this is
+   * intentionally separate from the browser session so the long-lived
+   * cookie is never exposed to script/API callers). Used by the "Generate
+   * a token" affordance on the integrations screen; the returned token is
+   * shown once and never persisted client-side.
+   */
+  getAuthToken(input: LoginInput) {
+    return request<ApiToken>("/auth/token", {
+      method: "POST",
+      body: input,
+    });
   },
   listUsers() {
     return request<AuthUser[]>("/users");

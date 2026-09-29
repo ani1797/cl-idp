@@ -47,7 +47,6 @@ def resolve_repo_root() -> Path:
 REPO_ROOT = resolve_repo_root()
 SAMPLES_ROOT = REPO_ROOT / "samples"
 DEFAULT_API_BASE_URL = os.environ.get("CL_IDP_API_BASE_URL", "http://127.0.0.1:8000")
-SERVICE_TOKEN_HEADER = "X-Service-Token"
 PROCESS_READY_TIMEOUT_SECONDS = 10 * 60
 JOB_READY_TIMEOUT_SECONDS = 10 * 60
 PROCESS_POLL_SECONDS = 5
@@ -157,7 +156,7 @@ class SeedClient:
     def __init__(self, base_url: str, *, timeout: float = 30.0) -> None:
         self.base_url = base_url.rstrip("/")
         service_token = os.environ.get("SERVICE_API_TOKEN", "")
-        headers = {SERVICE_TOKEN_HEADER: service_token} if service_token else {}
+        headers = {"Authorization": f"Bearer {service_token}"} if service_token else {}
         self._client = httpx.Client(
             base_url=self.base_url,
             timeout=timeout,

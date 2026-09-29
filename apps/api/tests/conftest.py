@@ -16,6 +16,7 @@ from app.db import DataStore
 from app.storage import BlobService, QueueService
 
 TEST_SERVICE_TOKEN = "test-service-token"
+TEST_SERVICE_AUTH_HEADER = {"Authorization": f"Bearer {TEST_SERVICE_TOKEN}"}
 
 
 @pytest.fixture(autouse=True)
@@ -74,7 +75,7 @@ def api_client() -> Iterator[TestClient]:
     get_settings.cache_clear()
     app = app_main.create_app()
     with TestClient(app) as client:
-        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        client.headers.update(TEST_SERVICE_AUTH_HEADER)
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
             fastapi_app.state.data_store,
@@ -116,7 +117,7 @@ def live_api_client(live_cu_env: dict[str, str]) -> Iterator[TestClient]:
     get_settings.cache_clear()
     app = app_main.create_app()
     with TestClient(app) as client:
-        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        client.headers.update(TEST_SERVICE_AUTH_HEADER)
         fastapi_app = cast(FastAPI, client.app)
         clean_backend_state(
             fastapi_app.state.data_store,

@@ -11,13 +11,21 @@ info:
     implements it, and the TypeScript client is generated from it.
 
 
-    Note: the API is entirely unauthenticated by design for this demo. See
-    the Security Posture section of TECHNOLOGY.md.
+    Authentication supports three caller modes: the `httpOnly`
+    `cl_idp_session` browser cookie set by `POST /auth/login`, short-lived
+    per-user bearer tokens returned by `POST /auth/token`, and a shared
+    `SERVICE_API_TOKEN` bearer token for trusted workers and scripts.
   version: "0.2.0"
 servers:
   - url: /api
-security: []
+security:
+  - bearerAuth: []
+  - cookieAuth: []
 tags:
+  - name: auth
+    description: Session cookie and bearer-token authentication
+  - name: users
+    description: User administration
   - name: processes
     description: Business process configuration
   - name: analyzers
@@ -32,10 +40,11 @@ paths:
     get:
       tags: [system]
       summary: Liveness and readiness probe
+      security: []
       description: >
         Reports whether the service is up and whether its dependencies
-        (MongoDB Atlas, Blob/Queue storage, Content Understanding) are
-        reachable. Returns 503 when a required dependency is unavailable.
+        (the document database plus Blob and Queue storage) are reachable.
+        Returns 503 when a required dependency is unavailable.
       operationId: getHealth
       responses:
         "200":
@@ -50,6 +59,218 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Health"
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Start a browser session
+      security: []
+      description: >
+        Validates an end user's email/password, returns their public
+        profile, and sets the `httpOnly` `cl_idp_session` cookie used by
+        first-party browser calls. Unlike `POST /auth/token`, the JWT is
+        not returned in the response body.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Signed-in user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: End a browser session
+      security: []
+      description: >
+        Clears the `cl_idp_session` cookie and returns no body. It is safe
+        to call even when no session cookie is currently present.
+      operationId: logout
+      responses:
+        "204":
+          description: Session cookie cleared
+
+  /auth/token:
+    post:
+      tags: [auth]
+      summary: Mint a user bearer token
+      security: []
+      description: >
+        Validates an end user's email/password and returns a short-lived
+        `Authorization: Bearer` token for scripts, CLI calls, and ad-hoc
+        testing. No cookie is set; the token carries the caller's own
+        role, so RBAC stays the same as their browser session.
+      operationId: issueToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Short-lived bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: Get the current authenticated user
+      description: >
+        Resolves the caller from either the browser session cookie or a
+        user bearer token and returns that user's public profile.
+        Service-token callers are not associated with a user and receive
+        `401`.
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: Current authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /users:
+    get:
+      tags: [users]
+      summary: List users
+      description: >
+        Returns every user account in newest-first order. Requires
+        `IT Admin` for user-bound callers; trusted service-token
+        automation is also allowed.
+      operationId: listUsers
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [users]
+      summary: Create a user
+      description: >
+        Creates a new user account. Email addresses are normalized to
+        lowercase before being saved. Requires `IT Admin` for user-bound
+        callers; trusted service-token automation is also allowed.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: A user with this email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}:
+    parameters:
+      - $ref: "#/components/parameters/UserId"
+    patch:
+      tags: [users]
+      summary: Update a user
+      description: >
+        Partially updates a user account. Only the supplied fields change;
+        omitted fields are left untouched. Email addresses are normalized
+        to lowercase before being saved. Requires `IT Admin` for
+        user-bound callers; trusted service-token automation is also
+        allowed.
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: A different user already has this email address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/reset-password:
+    parameters:
+      - $ref: "#/components/parameters/UserId"
+    post:
+      tags: [users]
+      summary: Reset a user password
+      description: >
+        Replaces the stored password hash for an existing user while
+        leaving every other profile field untouched. Requires `IT Admin`
+        for user-bound callers; trusted service-token automation is also
+        allowed.
+      operationId: resetUserPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserResetPasswordRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /processes:
     get:
@@ -68,13 +289,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BusinessProcess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
     post:
       tags: [processes]
       summary: Create a business process
       description: >
         Creates the process and asynchronously provisions a Content
         Understanding routing analyzer over the selected analyzers (see
-        `routingAnalyzerStatus` on the returned resource).
+        `routingAnalyzerStatus` on the returned resource). Requires
+        `IT Admin` for user-bound callers; trusted service-token
+        automation is also allowed.
       operationId: createProcess
       requestBody:
         required: true
@@ -91,6 +316,10 @@ paths:
                 $ref: "#/components/schemas/BusinessProcess"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "409":
           description: >
             A business process with this name already exists (case-
@@ -122,6 +351,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BusinessProcess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
     put:
@@ -135,6 +366,8 @@ paths:
 
 
         No optimistic concurrency: concurrent updates are last-write-wins.
+        Requires `IT Admin` for user-bound callers; trusted service-token
+        automation is also allowed.
       operationId: updateProcess
       requestBody:
         required: true
@@ -151,6 +384,10 @@ paths:
                 $ref: "#/components/schemas/BusinessProcess"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -180,11 +417,17 @@ paths:
 
         The Content Understanding analyzers provisioned for this process are
         intentionally **not** deleted; they are left in the CU account and
-        identifiable by their `idp_` ID prefix.
+        identifiable by their `idp_` ID prefix. Requires `IT Admin` for
+        user-bound callers; trusted service-token automation is also
+        allowed.
       operationId: deleteProcess
       responses:
         "204":
           description: Process, jobs, and documents deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -211,6 +454,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Analyzer"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "502":
           description: Content Understanding is unreachable or returned an error
           content:
@@ -261,6 +506,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -380,6 +627,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Job"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -460,6 +709,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JobsSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -482,6 +733,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Job"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -520,6 +773,8 @@ paths:
               schema:
                 type: string
                 format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -542,11 +797,12 @@ paths:
         not exist on the job is rejected with `400` rather than silently
         ignored.
 
-
         `reviewedAt` is set on the first review call and does not move on
         subsequent calls, which are permitted. Review does not feed back
         into extraction, does not change the classification, and does not
-        trigger any additional notification email.
+        trigger any additional notification email. Requires `IT Admin` or
+        `Reviewer` for user-bound callers; trusted service-token
+        automation is also allowed.
 
 
         No optimistic concurrency: concurrent reviews are last-write-wins.
@@ -556,14 +812,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [fields]
-              properties:
-                fields:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: "#/components/schemas/ReviewedField"
+              $ref: "#/components/schemas/ReviewJobRequest"
       responses:
         "200":
           description: Reviewed job
@@ -579,6 +828,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -593,7 +846,9 @@ paths:
         Creates a **new** job over the same already-uploaded document and
         enqueues it. The original job is left untouched in `failed` state so
         the failure stays visible in history; the new job records
-        `retryOfJobId` pointing back at it.
+        `retryOfJobId` pointing back at it. Requires `IT Admin` or
+        `Reviewer` for user-bound callers; trusted service-token
+        automation is also allowed.
       operationId: retryJob
       responses:
         "202":
@@ -602,6 +857,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JobRef"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -627,6 +886,28 @@ components:
       required: true
       schema:
         type: string
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Send either a short-lived user token minted by `POST /auth/token`
+        or the shared `SERVICE_API_TOKEN` as `Authorization: Bearer
+        <token>`.
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: cl_idp_session
+      description: >
+        `httpOnly` browser session cookie set by `POST /auth/login`.
 
   responses:
     NotFound:
@@ -637,6 +918,18 @@ components:
             $ref: "#/components/schemas/Error"
     BadRequest:
       description: The request was invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Authentication is required or the supplied credentials were invalid.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: The authenticated user's role is not allowed to perform this action.
       content:
         application/json:
           schema:
@@ -667,6 +960,7 @@ components:
         details:
           type: object
           additionalProperties: true
+          nullable: true
           description: >
             Optional structured context (e.g. the offending field path, the
             actual file size, the conflicting process ID).
@@ -683,11 +977,112 @@ components:
           additionalProperties:
             type: string
             enum: [ok, unavailable]
+          nullable: true
           description: >
-            Per-dependency reachability, keyed by `database`, `blob`, `queue`,
-            `contentUnderstanding`, `smtp`.
+            Per-dependency reachability, keyed by `database`, `blob`, and
+            `queue`.
         version:
           type: string
+          nullable: true
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+
+    TokenResponse:
+      type: object
+      required: [accessToken, expiresIn]
+      description: >
+        Response body for `POST /auth/token` — a short-lived bearer token.
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          enum: [Bearer]
+          default: Bearer
+        expiresIn:
+          type: integer
+          description: Seconds until `accessToken` expires.
+
+    UserRole:
+      type: string
+      enum: ["IT Admin", Reviewer, "End User"]
+      description: >
+        Closed set of roles RBAC enforcement is based on.
+
+    User:
+      type: object
+      required: [id, email, displayName, roleLabel, isActive, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        roleLabel:
+          $ref: "#/components/schemas/UserRole"
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserCreateRequest:
+      type: object
+      required: [email, displayName, roleLabel, password]
+      properties:
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        roleLabel:
+          $ref: "#/components/schemas/UserRole"
+        password:
+          type: string
+          minLength: 8
+        isActive:
+          type: boolean
+          default: true
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        roleLabel:
+          allOf:
+            - $ref: "#/components/schemas/UserRole"
+          nullable: true
+        isActive:
+          type: boolean
+          nullable: true
+
+    UserResetPasswordRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+          minLength: 8
 
     BusinessProcessInput:
       type: object
@@ -755,6 +1150,7 @@ components:
                 Uploads are rejected with 409 unless this is `ready`.
             routingAnalyzerError:
               type: string
+              nullable: true
               description: >
                 Human-readable failure reason, set when
                 routingAnalyzerStatus is `failed` (including the case where
@@ -790,6 +1186,7 @@ components:
           description: Friendly display name.
         description:
           type: string
+          nullable: true
           description: >
             Short description of the document type. Also used, truncated as
             needed, as the routing analyzer's category description.
@@ -851,6 +1248,7 @@ components:
         completedAt:
           type: string
           format: date-time
+          nullable: true
         detectedForm:
           type: string
           nullable: true
@@ -860,9 +1258,11 @@ components:
             `unclassified`.
         detectedFormName:
           type: string
+          nullable: true
           description: Display name for `detectedForm`.
         unclassified:
           type: boolean
+          nullable: true
           description: >
             True when the document did not match any form allowed by this
             process. The job is still `succeeded` — the pipeline worked and
@@ -871,11 +1271,13 @@ components:
             means processing itself went wrong.
         retryOfJobId:
           type: string
+          nullable: true
           description: >
             Set when this job was created by retrying an earlier failed job;
             references that job's ID.
         pages:
           type: array
+          nullable: true
           items:
             $ref: "#/components/schemas/PageInfo"
           description: >
@@ -883,6 +1285,7 @@ components:
             compensate for scan skew. Returned by `getJob` only.
         fields:
           type: array
+          nullable: true
           items:
             $ref: "#/components/schemas/ExtractedField"
           description: >
@@ -892,6 +1295,7 @@ components:
             nothing.
         fieldCount:
           type: integer
+          nullable: true
           description: >
             Number of extracted leaf fields on the job, so list views can
             show a count without receiving the full `fields` array.
@@ -911,6 +1315,7 @@ components:
             even when the job doesn't need review.
         confidenceViolations:
           type: array
+          nullable: true
           items:
             type: string
           description: >
@@ -942,6 +1347,7 @@ components:
             has a known page count (e.g. still `queued`/`running`).
         error:
           type: string
+          nullable: true
           description: >
             Human-readable failure reason, set when status is `failed` —
             e.g. the Content Understanding call failed, the job exceeded its
@@ -949,10 +1355,11 @@ components:
         reviewedAt:
           type: string
           format: date-time
+          nullable: true
           description: >
             Timestamp of the first `PUT .../review` call for this job;
             unset if no field has ever been reviewed. There is no
-            per-user attribution (no authentication in this demo).
+            per-user review attribution.
 
     PageInfo:
       type: object
@@ -977,6 +1384,7 @@ components:
         angle:
           type: number
           format: float
+          nullable: true
           description: >
             Detected page rotation in degrees, clockwise, range (-180, 180].
             Bounding polygons are expressed in this rotated frame.
@@ -1082,3 +1490,13 @@ components:
             the field's extracted type. Submitting the unchanged extracted
             value is valid and meaningful: it marks a correct
             low-confidence field as approved, clearing its violation.
+
+    ReviewJobRequest:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ReviewedField"

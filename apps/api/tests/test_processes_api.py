@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.db import DataStore, DocumentNotFoundError
 from app.models import JobDocument, JobStatus, RoutingAnalyzerStatus
 from app.storage import BlobService
-from tests.conftest import TEST_SERVICE_TOKEN
+from tests.conftest import TEST_SERVICE_AUTH_HEADER
 
 
 def process_payload(
@@ -255,7 +255,7 @@ def test_create_process_returns_502_when_cu_unreachable(
 
     app = app_main.create_app()
     with TestClient(app) as client:
-        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        client.headers.update(TEST_SERVICE_AUTH_HEADER)
         response = client.post("/processes", json=process_payload())
 
     assert response.status_code == 502
@@ -294,7 +294,7 @@ def test_update_description_only_does_not_schedule_reprovisioning(
 
     app = app_main.create_app()
     with TestClient(app) as client:
-        client.headers.update({"X-Service-Token": TEST_SERVICE_TOKEN})
+        client.headers.update(TEST_SERVICE_AUTH_HEADER)
         created = client.post("/processes", json=process_payload())
         assert created.status_code == 201
         process_id = created.json()["id"]

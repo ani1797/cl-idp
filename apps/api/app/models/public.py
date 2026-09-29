@@ -63,6 +63,15 @@ class LoginRequest(ModelBase):
     password: str = PydanticField(min_length=1)
 
 
+class TokenResponse(ModelBase):
+    """Response body for `POST /auth/token` — a short-lived bearer token."""
+
+    accessToken: str
+    tokenType: Literal["Bearer"] = "Bearer"
+    expiresIn: int
+    """Seconds until `accessToken` expires."""
+
+
 class UserCreateRequest(ModelBase):
     email: EmailStr
     displayName: str

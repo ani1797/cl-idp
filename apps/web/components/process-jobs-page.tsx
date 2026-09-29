@@ -863,7 +863,7 @@ export function ProcessJobsPage({ processId }: { processId: string }) {
                           <NeedsReviewBadge show={needsReview} />
                         </TableCell>
                         <TableCell className="px-3 py-3">
-                          <ReviewedIndicator reviewedAt={job.reviewedAt} />
+                          <ReviewedIndicator reviewedAt={job.reviewedAt ?? undefined} />
                         </TableCell>
                       </TableRow>
                     );

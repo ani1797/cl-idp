@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { cleanupProcess, createProcessViaUi, rowForFileName, seedFailedJob, uploadSample } from "./helpers";
+import { cleanupProcess, createProcessViaUi, rowForFileName, seedFailedJob, uploadSample, uploadSamples } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -22,8 +22,12 @@ test("happy path creates, uploads, reviews, and filters reviewed jobs", async ({
   reusableReadyProcessId = process.processId;
 
   await uploadSample(page, "invoice.pdf", uploadedFileName);
+
+  const queueRow = page.getByTestId("upload-queue-row").filter({ hasText: uploadedFileName });
+  await expect(queueRow).toContainText("Succeeded", { timeout: 5 * 60 * 1000 });
+  await queueRow.getByRole("button", { name: "View review" }).click();
   await expect(page).toHaveURL(new RegExp(`/processes/${reusableReadyProcessId}/jobs/[^/?]+`), {
-    timeout: 5 * 60 * 1000,
+    timeout: 10_000,
   });
 
   const approveButton = page.getByRole("button", { name: "Approve" }).first();
@@ -52,6 +56,49 @@ test("happy path creates, uploads, reviews, and filters reviewed jobs", async ({
   await expect(reviewedRow).toContainText(uploadedFileName);
 });
 
+test("multi-file selection queues all valid documents and skips an invalid one", async ({ page, request }) => {
+  let processId: string | null = null;
+  const stamp = Date.now();
+  const fileNames = {
+    first: `invoice-batch-${stamp}-a.pdf`,
+    second: `invoice-batch-${stamp}-b.pdf`,
+    invalid: `notes-batch-${stamp}.txt`,
+  };
+
+  try {
+    const process = await createProcessViaUi(page, request, {
+      processLabel: "Playwright multi-file batch",
+    });
+    processId = process.processId;
+
+    await uploadSamples(page, [
+      { sampleFileName: "invoice.pdf", uploadedFileName: fileNames.first },
+      { sampleFileName: "invoice.pdf", uploadedFileName: fileNames.second },
+    ]);
+    await page.getByLabel("Choose documents").setInputFiles({
+      name: fileNames.invalid,
+      mimeType: "text/plain",
+      buffer: Buffer.from("not a supported document"),
+    });
+
+    const rejectedRow = page.getByTestId("upload-queue-row").filter({ hasText: fileNames.invalid });
+    await expect(rejectedRow).toContainText("Rejected");
+    await expect(rejectedRow).toContainText("Only PDF, PNG, JPG, or TIFF files are supported.");
+
+    const firstRow = page.getByTestId("upload-queue-row").filter({ hasText: fileNames.first });
+    const secondRow = page.getByTestId("upload-queue-row").filter({ hasText: fileNames.second });
+    await expect(firstRow).toContainText("Succeeded", { timeout: 5 * 60 * 1000 });
+    await expect(secondRow).toContainText("Succeeded", { timeout: 5 * 60 * 1000 });
+
+    // Uploading never auto-navigates away from the process detail screen.
+    await expect(page).toHaveURL(new RegExp(`/processes/${processId}$`));
+  } finally {
+    if (processId) {
+      cleanupProcess(processId);
+    }
+  }
+});
+
 test("unclassified path shows explanatory guidance instead of an error", async ({ page, request }) => {
   let processId: string | null = null;
   const uploadedFileName = `unrelated-${Date.now()}.pdf`;
@@ -64,9 +111,9 @@ test("unclassified path shows explanatory guidance instead of an error", async (
 
     await uploadSample(page, "unrelated.pdf", uploadedFileName);
 
-    await expect(page.getByText(/didn.?t match any configured form/i)).toBeVisible({
-      timeout: 5 * 60 * 1000,
-    });
+    const queueRow = page.getByTestId("upload-queue-row").filter({ hasText: uploadedFileName });
+    await expect(queueRow).toContainText("No matching form", { timeout: 5 * 60 * 1000 });
+    await expect(page).toHaveURL(new RegExp(`/processes/${processId}$`));
     await expect(rowForFileName(page, uploadedFileName).first()).toContainText("No matching form");
     await expect(page.getByText(/processing failed/i)).toHaveCount(0);
   } finally {

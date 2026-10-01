@@ -34,26 +34,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { UploadQueuePanel } from "@/components/upload-queue";
 import { api, type BusinessProcess, type Job } from "@/lib/api";
 import { getErrorMessage, showErrorToast } from "@/lib/errors";
 import { confidenceThresholdFloatToPercent } from "@/lib/process-threshold";
 import { getPollingInterval, pollingIntervals } from "@/lib/query";
 import { queryKeys } from "@/lib/query-keys";
 import { hasCapability } from "@/lib/roles";
+import {
+  createPendingQueueItem,
+  createQueueItemId,
+  FILE_INPUT_ACCEPT,
+  isTerminalStatus,
+  mapJobToQueueUpdate,
+  MAX_FILES_PER_SELECTION,
+  partitionSelection,
+  UPLOAD_CONCURRENCY,
+  type UploadQueueItem,
+} from "@/lib/upload-queue";
 import { cn } from "@/lib/utils";
 
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 const RECENT_JOBS_LIMIT = 5;
-const ACCEPTED_EXTENSIONS = [".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"];
-const ACCEPTED_MIME_TYPES = [
-  "application/pdf",
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/tiff",
-  "image/x-tiff",
-] as const;
-const FILE_INPUT_ACCEPT = ".pdf,.png,.jpg,.jpeg,.tif,.tiff";
 
 const processStatusStyles: Record<BusinessProcess["routingAnalyzerStatus"], string> = {
   building: "border-warning-border bg-warning-surface text-warning",
@@ -83,33 +84,6 @@ function getProcessPollingMessage(process: BusinessProcess) {
   }
 
   return null;
-}
-
-function validateUpload(files: FileList | File[] | null) {
-  if (!files || files.length === 0) {
-    return "Select a file to upload.";
-  }
-
-  if (files.length > 1) {
-    return "Upload exactly one PDF, PNG, JPG, or TIFF document at a time.";
-  }
-
-  const [file] = Array.from(files);
-  const normalizedName = file.name.toLowerCase();
-  const hasValidExtension = ACCEPTED_EXTENSIONS.some((extension) => normalizedName.endsWith(extension));
-  const hasValidMimeType =
-    file.type.length === 0 ||
-    ACCEPTED_MIME_TYPES.includes(file.type.toLowerCase() as (typeof ACCEPTED_MIME_TYPES)[number]);
-
-  if (!hasValidExtension || !hasValidMimeType) {
-    return "Only PDF, PNG, JPG, or TIFF files are supported.";
-  }
-
-  if (file.size > MAX_UPLOAD_BYTES) {
-    return "Files must be 20 MB or smaller.";
-  }
-
-  return undefined;
 }
 
 function DeleteProcessDialog({
@@ -184,12 +158,10 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
 
   const [processPollingStartedAt, setProcessPollingStartedAt] = useState<string | null>(null);
   const [showAnalyzerManualRefresh, setShowAnalyzerManualRefresh] = useState(false);
+  const [showQueueManualRefresh, setShowQueueManualRefresh] = useState(false);
   const [processToDelete, setProcessToDelete] = useState<BusinessProcess | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
-  const [activeJobId, setActiveJobId] = useState<string | null>(null);
-  const [jobPollingStartedAt, setJobPollingStartedAt] = useState<string | null>(null);
-  const [showJobManualRefresh, setShowJobManualRefresh] = useState(false);
+  const [selectionNotice, setSelectionNotice] = useState<string | null>(null);
+  const [queueItems, setQueueItems] = useState<UploadQueueItem[]>([]);
   const [needsReviewOnly, setNeedsReviewOnly] = useState(false);
 
   const processQuery = useQuery({
@@ -220,29 +192,38 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
     enabled: processQuery.isSuccess,
   });
 
-  const activeJobQuery = useQuery({
-    queryKey: activeJobId ? queryKeys.jobs.detail(processId, activeJobId) : ["processes", processId, "jobs", "active"],
-    queryFn: async () => {
-      if (!activeJobId) {
-        throw new Error("Active job ID is required.");
+  const inFlightQueueItems = useMemo(
+    () => queueItems.filter((item) => item.jobId !== null && !isTerminalStatus(item.status)),
+    [queueItems],
+  );
+
+  const earliestInFlightStartedAt = useMemo(() => {
+    return inFlightQueueItems.reduce<string | null>((earliest, item) => {
+      if (!item.startedAt) {
+        return earliest;
       }
 
-      return api.getJob(processId, activeJobId);
-    },
-    enabled: activeJobId !== null,
-    refetchInterval: (query) => {
-      if (!activeJobId || query.state.error) {
-        return false;
+      if (!earliest || new Date(item.startedAt).getTime() < new Date(earliest).getTime()) {
+        return item.startedAt;
       }
 
-      const job = query.state.data as Job | undefined;
+      return earliest;
+    }, null);
+  }, [inFlightQueueItems]);
 
-      if (job && (job.status === "succeeded" || job.status === "failed")) {
+  const queueStatusLimit = Math.min(500, Math.max(inFlightQueueItems.length + 10, RECENT_JOBS_LIMIT));
+
+  const queueStatusQuery = useQuery({
+    queryKey: [...queryKeys.jobs.all(processId), "queue-status"],
+    queryFn: () => api.listJobs(processId, { limit: queueStatusLimit }),
+    enabled: inFlightQueueItems.length > 0,
+    refetchInterval: () => {
+      if (inFlightQueueItems.length === 0) {
         return false;
       }
 
       return getPollingInterval({
-        startedAt: jobPollingStartedAt,
+        startedAt: earliestInFlightStartedAt,
         fastMs: pollingIntervals.jobs.fastMs,
         slowMs: pollingIntervals.jobs.slowMs,
       });
@@ -286,78 +267,135 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
     return () => window.clearTimeout(timeoutId);
   }, [processPollingStartedAt, processQuery.data?.routingAnalyzerStatus]);
 
+  // Reconciles every in-flight queue item against the aggregated
+  // `listJobs` poll above (one request covers the whole batch, instead of
+  // a per-job poll per queued item). Only invalidates the recent-jobs
+  // preview when something actually reached a terminal state, so a large
+  // batch doesn't force that query to refetch on every tick.
   useEffect(() => {
-    if (activeJobId !== null && jobPollingStartedAt === null) {
-      const timeoutId = window.setTimeout(() => {
-        setJobPollingStartedAt(new Date().toISOString());
-        setShowJobManualRefresh(false);
-      }, 0);
+    const jobs = queueStatusQuery.data;
 
-      return () => window.clearTimeout(timeoutId);
-    }
-
-    if (activeJobId === null && jobPollingStartedAt !== null) {
-      const timeoutId = window.setTimeout(() => {
-        setJobPollingStartedAt(null);
-        setShowJobManualRefresh(false);
-      }, 0);
-
-      return () => window.clearTimeout(timeoutId);
-    }
-  }, [activeJobId, jobPollingStartedAt]);
-
-  useEffect(() => {
-    if (!activeJobId || !jobPollingStartedAt) {
+    if (!jobs) {
       return;
     }
 
-    const elapsedMs = Date.now() - new Date(jobPollingStartedAt).getTime();
+    const jobById = new Map(jobs.map((job) => [job.id, job]));
+
+    const timeoutId = window.setTimeout(() => {
+      let hasTerminalTransition = false;
+
+      setQueueItems((previousItems) =>
+        previousItems.map((item) => {
+          if (!item.jobId || isTerminalStatus(item.status)) {
+            return item;
+          }
+
+          const job = jobById.get(item.jobId);
+
+          if (!job) {
+            return item;
+          }
+
+          const update = mapJobToQueueUpdate(job);
+
+          if (update.status && update.status !== item.status && isTerminalStatus(update.status)) {
+            hasTerminalTransition = true;
+          }
+
+          return { ...item, ...update };
+        }),
+      );
+
+      if (hasTerminalTransition) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all(processId) });
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [queueStatusQuery.data, processId, queryClient]);
+
+  useEffect(() => {
+    if (inFlightQueueItems.length === 0) {
+      if (showQueueManualRefresh) {
+        const timeoutId = window.setTimeout(() => {
+          setShowQueueManualRefresh(false);
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
+      }
+      return;
+    }
+
+    if (!earliestInFlightStartedAt) {
+      return;
+    }
+
+    const elapsedMs = Date.now() - new Date(earliestInFlightStartedAt).getTime();
     const remainingMs = pollingIntervals.timeoutMs - elapsedMs;
 
     const timeoutId = window.setTimeout(() => {
-      setShowJobManualRefresh(true);
+      setShowQueueManualRefresh(true);
     }, Math.max(remainingMs, 0));
 
     return () => window.clearTimeout(timeoutId);
-  }, [activeJobId, jobPollingStartedAt]);
+  }, [inFlightQueueItems.length, earliestInFlightStartedAt, showQueueManualRefresh]);
 
+  // Concurrency-limited upload scheduler: promotes up to
+  // UPLOAD_CONCURRENCY "pending" items to "uploading" at a time. Marking
+  // the chosen items as "uploading" synchronously (before the async
+  // triggerJob call resolves) ensures the next run of this effect
+  // (triggered by that same state update) doesn't re-select them.
   useEffect(() => {
-    const job = activeJobQuery.data;
+    const uploadingCount = queueItems.filter((item) => item.status === "uploading").length;
+    const availableSlots = UPLOAD_CONCURRENCY - uploadingCount;
 
-    if (!job || !activeJobId) {
+    if (availableSlots <= 0) {
       return;
     }
 
-    let timeoutId: number | undefined;
+    const toStart = queueItems.filter((item) => item.status === "pending").slice(0, availableSlots);
 
-    if (job.status === "succeeded") {
-      timeoutId = window.setTimeout(() => {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all(processId) });
+    if (toStart.length === 0) {
+      return;
+    }
 
-        if (job.unclassified) {
-          setUploadNotice(`“${job.fileName}” didn't match any configured form for this business process.`);
-          setActiveJobId(null);
-          return;
+    const timeoutId = window.setTimeout(() => {
+      const toStartIds = new Set(toStart.map((item) => item.id));
+      setQueueItems((previousItems) =>
+        previousItems.map((item) => (toStartIds.has(item.id) ? { ...item, status: "uploading" } : item)),
+      );
+
+      for (const item of toStart) {
+        if (!item.file) {
+          continue;
         }
 
-        router.push(`/processes/${processId}/jobs/${job.id}`);
-      }, 0);
-    }
-
-    if (job.status === "failed") {
-      timeoutId = window.setTimeout(() => {
-        setUploadError(job.error ?? `Processing failed for “${job.fileName}”.`);
-        void queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all(processId) });
-        setActiveJobId(null);
-      }, 0);
-    }
-
-    return () => {
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
+        const file = item.file;
+        void api
+          .triggerJob(processId, file, file.name)
+          .then(({ jobId }) => {
+            setQueueItems((previousItems) =>
+              previousItems.map((queueItem) =>
+                queueItem.id === item.id
+                  ? { ...queueItem, status: "queued", jobId, startedAt: new Date().toISOString(), error: null }
+                  : queueItem,
+              ),
+            );
+          })
+          .catch((error: unknown) => {
+            setQueueItems((previousItems) =>
+              previousItems.map((queueItem) =>
+                queueItem.id === item.id
+                  ? { ...queueItem, status: "failed", error: getErrorMessage(error) }
+                  : queueItem,
+              ),
+            );
+          });
       }
-    };
-  }, [activeJobId, activeJobQuery.data, processId, queryClient, router]);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [queueItems, processId]);
 
   const deleteMutation = useMutation({
     mutationFn: api.deleteProcess,
@@ -370,30 +408,24 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
     },
   });
 
-  const triggerMutation = useMutation({
-    mutationFn: ({ file }: { file: File }) => api.triggerJob(processId, file, file.name),
-    onSuccess: async ({ jobId }) => {
-      setJobPollingStartedAt(new Date().toISOString());
-      setShowJobManualRefresh(false);
-      setUploadError(null);
-      setUploadNotice(`Processing started. Polling status for the uploaded document.`);
-      setActiveJobId(jobId);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all(processId) });
-    },
-    onError: (error) => {
-      setUploadNotice(null);
-      showErrorToast(error, "Unable to upload document");
-    },
-  });
-
   const retryMutation = useMutation({
-    mutationFn: ({ jobId }: { jobId: string }) => api.retryJob(processId, jobId),
-    onSuccess: async ({ jobId }) => {
-      setJobPollingStartedAt(new Date().toISOString());
-      setShowJobManualRefresh(false);
-      setUploadError(null);
-      setUploadNotice("Retry accepted. Polling the new job now.");
-      setActiveJobId(jobId);
+    mutationFn: ({ job }: { job: Job }) => api.retryJob(processId, job.id),
+    onSuccess: async ({ jobId }, { job }) => {
+      setQueueItems((previousItems) => [
+        ...previousItems,
+        {
+          id: createQueueItemId(),
+          file: null,
+          fileName: job.fileName,
+          sizeBytes: 0,
+          status: "queued",
+          jobId,
+          error: null,
+          detectedFormName: null,
+          needsReview: false,
+          startedAt: new Date().toISOString(),
+        },
+      ]);
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all(processId) });
     },
     onError: (error) => {
@@ -404,10 +436,6 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
   const process = processQuery.data;
   const uploadDisabledReason = process ? getProcessPollingMessage(process) : null;
   const uploadBlocked = !process || process.routingAnalyzerStatus !== "ready";
-  const activeJob = activeJobQuery.data;
-  const isPollingJob =
-    activeJobId !== null &&
-    (!activeJob || activeJob.status === "queued" || activeJob.status === "running");
 
   const viewAllJobsHref = useMemo(() => {
     const basePath = `/processes/${processId}/jobs`;
@@ -438,24 +466,37 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
   const allowAnalyzerNames = process.allowedAnalyzers.length > 0 ? process.allowedAnalyzers : [];
 
   function submitFiles(files: FileList | File[] | null) {
-    setUploadNotice(null);
-    setUploadError(null);
+    const { accepted, rejected, overflowCount } = partitionSelection(files, {
+      maxFiles: MAX_FILES_PER_SELECTION,
+    });
 
-    const validationError = validateUpload(files);
-
-    if (validationError) {
-      setUploadError(validationError);
+    if (accepted.length === 0 && rejected.length === 0) {
       return;
     }
 
-    const [file] = Array.from(files as FileList | File[]);
-    triggerMutation.mutate({ file });
+    const acceptedItems = accepted.map((file) => createPendingQueueItem(file));
+    const rejectedItems: UploadQueueItem[] = rejected.map(({ file, reason }) => ({
+      ...createPendingQueueItem(file),
+      status: "rejected",
+      error: reason,
+    }));
+
+    setQueueItems((previousItems) => [...previousItems, ...acceptedItems, ...rejectedItems]);
+
+    if (overflowCount > 0) {
+      setSelectionNotice(
+        `Only the first ${MAX_FILES_PER_SELECTION} files were queued; ${overflowCount} additional ` +
+          `file${overflowCount === 1 ? " was" : "s were"} not added.`,
+      );
+    } else {
+      setSelectionNotice(null);
+    }
   }
 
   function onDrop(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault();
 
-    if (uploadBlocked || triggerMutation.isPending || isPollingJob) {
+    if (uploadBlocked) {
       return;
     }
 
@@ -465,6 +506,37 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
   function onFileInputChange(event: ChangeEvent<HTMLInputElement>) {
     submitFiles(event.target.files);
     event.target.value = "";
+  }
+
+  function onQueueItemRetry(item: UploadQueueItem) {
+    if (!item.file) {
+      return;
+    }
+
+    setQueueItems((previousItems) =>
+      previousItems.map((queueItem) =>
+        queueItem.id === item.id
+          ? { ...queueItem, status: "pending", error: null, jobId: null, startedAt: null }
+          : queueItem,
+      ),
+    );
+  }
+
+  function onQueueItemReview(item: UploadQueueItem) {
+    if (!item.jobId) {
+      return;
+    }
+
+    router.push(`/processes/${processId}/jobs/${item.jobId}`);
+  }
+
+  function onClearCompletedQueueItems() {
+    setQueueItems((previousItems) => previousItems.filter((item) => !isTerminalStatus(item.status)));
+  }
+
+  function onClearAllQueueItems() {
+    setQueueItems([]);
+    setSelectionNotice(null);
   }
 
   function onJobRowActivate(job: Job) {
@@ -576,8 +648,9 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                 <p className="text-label-caps text-muted-foreground">Primary action</p>
                 <CardTitle className="text-headline-md">Upload documents</CardTitle>
                 <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Drop a PDF, PNG, JPG, or TIFF document to trigger extraction for this process.
-                  Files must be 20 MB or smaller; page-count checks still happen on the backend.
+                  Drop up to {MAX_FILES_PER_SELECTION} PDF, PNG, JPG, or TIFF documents to queue them for
+                  extraction. Files must be 20 MB or smaller; page-count checks still happen on the backend.
+                  Documents are processed up to {UPLOAD_CONCURRENCY} at a time.
                 </p>
               </div>
               <Badge variant="outline">PDF, TIFF, PNG, JPEG</Badge>
@@ -587,7 +660,7 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
             <label
               className={cn(
                 "group flex min-h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 text-center transition-colors",
-                uploadBlocked || triggerMutation.isPending || isPollingJob
+                uploadBlocked
                   ? "cursor-not-allowed border-border bg-muted/30 text-muted-foreground"
                   : "border-primary/40 bg-card hover:border-primary hover:bg-primary/5",
               )}
@@ -599,7 +672,7 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
               </span>
               <div className="space-y-1">
                 <p className="font-heading text-base font-semibold text-foreground">
-                  Drag and drop a document here, or <span className="text-primary underline">browse computer</span>
+                  Drag and drop documents here, or <span className="text-primary underline">browse computer</span>
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Automated classification, extraction, and review routing starts immediately.
@@ -607,10 +680,11 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
               </div>
               <input
                 type="file"
+                multiple
                 accept={FILE_INPUT_ACCEPT}
-                aria-label="Choose document"
+                aria-label="Choose documents"
                 className="sr-only"
-                disabled={uploadBlocked || triggerMutation.isPending || isPollingJob}
+                disabled={uploadBlocked}
                 onChange={onFileInputChange}
               />
             </label>
@@ -621,50 +695,37 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
               </div>
             ) : null}
 
-            {triggerMutation.isPending || isPollingJob ? (
+            {selectionNotice ? (
+              <div className="rounded-lg border border-warning-border bg-warning-surface p-3 text-sm text-warning">
+                {selectionNotice}
+              </div>
+            ) : null}
+
+            {queueStatusQuery.isError && inFlightQueueItems.length > 0 ? (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                {getErrorMessage(queueStatusQuery.error)}
+              </div>
+            ) : null}
+
+            {showQueueManualRefresh && inFlightQueueItems.length > 0 ? (
               <div className="rounded-lg border border-info-border bg-info-surface p-3 text-sm text-info">
-                <div className="flex items-center gap-2 font-medium">
-                  <Icon name="progress_activity" size={16} className="animate-spin" />
-                  {triggerMutation.isPending ? "Uploading document…" : "Processing document…"}
+                Processing is taking longer than expected. Refresh manually to check the latest status.
+                <div className="mt-3">
+                  <Button type="button" variant="outline" size="sm" onClick={() => void queueStatusQuery.refetch()}>
+                    <Icon name="refresh" size={14} />
+                    Refresh status
+                  </Button>
                 </div>
-                <p className="mt-2 text-sm">
-                  {activeJob?.status === "running"
-                    ? "Extraction is running now."
-                    : "Waiting for the job to complete."}
-                </p>
-                {showJobManualRefresh && activeJobId ? (
-                  <div className="mt-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => void activeJobQuery.refetch()}
-                    >
-                      <Icon name="refresh" size={14} />
-                      Refresh job status
-                    </Button>
-                  </div>
-                ) : null}
               </div>
             ) : null}
 
-            {activeJobQuery.isError && activeJobId ? (
-              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
-                {getErrorMessage(activeJobQuery.error)}
-              </div>
-            ) : null}
-
-            {uploadError ? (
-              <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
-                {uploadError}
-              </div>
-            ) : null}
-
-            {uploadNotice ? (
-              <div className="rounded-lg border border-success-border bg-success-surface p-3 text-sm text-success">
-                {uploadNotice}
-              </div>
-            ) : null}
+            <UploadQueuePanel
+              items={queueItems}
+              onRetry={onQueueItemRetry}
+              onReview={onQueueItemReview}
+              onClearCompleted={onClearCompletedQueueItems}
+              onClearAll={onClearAllQueueItems}
+            />
           </CardContent>
         </Card>
 
@@ -766,7 +827,7 @@ export function ProcessDetailPage({ processId }: { processId: string }) {
                                     disabled={retryMutation.isPending}
                                     onClick={(event) => {
                                       event.stopPropagation();
-                                      retryMutation.mutate({ jobId: job.id });
+                                      retryMutation.mutate({ job });
                                     }}
                                   >
                                     {retryMutation.isPending ? "Retrying…" : "Retry"}

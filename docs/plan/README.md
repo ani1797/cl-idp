@@ -249,6 +249,7 @@ that file for how to sequence it without blocking the tracks above.
 | 26 | [Full-Stack Containerization](./26-full-stack-containerization.md) | shared | 00, 02, 06, 09 |
 | 29 | [Enforce roleLabel-based RBAC & Fix Analyzer Picker](./29-rbac-enforcement-and-analyzer-picker-fix.md) | shared | 03, 08, 09, 10, 13, 17 |
 | 30 | [Fix Misconfigured CU_ENDPOINT](./30-fix-cu-endpoint-misconfiguration.md) | shared | 01, 04 — corrects a wrong "no network egress" assumption in 29 |
+| 31 | [Multi-Document Upload Queue](./31-multi-document-upload-queue.md) | frontend | 11, 13 |
 
 ## Conventions Used In Every Task File
 

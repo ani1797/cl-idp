@@ -39,8 +39,11 @@ confidence violations.
     extension).
   - **Size** — at most 20 MB.
   - **Page count** — at most 20 pages.
-  - **Single file** — exactly one file per request; batch upload is out of
-    scope.
+  - **Single file** — exactly one file per request; the API itself has no
+    batch/multi-file upload endpoint. The process-detail screen's
+    multi-document upload queue fans a multi-file selection out into one
+    `POST /processes/{processId}/trigger` request per file (client-managed
+    concurrency), rather than this endpoint accepting multiple files.
 
   These app-level limits are much stricter than Content Understanding's own
   (200 MB / 300 pages), chosen to keep demo runs fast and inexpensive.

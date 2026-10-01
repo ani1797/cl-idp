@@ -129,7 +129,7 @@ export async function createProcessViaUi(
   expect(processId).toBeTruthy();
 
   if (waitForUploadReady) {
-    await expect(page.getByLabel("Choose document")).toBeEnabled({ timeout: 3 * 60 * 1000 });
+    await expect(page.getByLabel("Choose documents")).toBeEnabled({ timeout: 3 * 60 * 1000 });
   }
 
   return {
@@ -139,11 +139,24 @@ export async function createProcessViaUi(
 }
 
 export async function uploadSample(page: Page, sampleFileName: string, uploadedFileName: string) {
-  await page.getByLabel("Choose document").setInputFiles({
+  await page.getByLabel("Choose documents").setInputFiles({
     name: uploadedFileName,
     mimeType: getContentType(sampleFileName),
     buffer: getSampleBuffer(sampleFileName),
   });
+}
+
+export async function uploadSamples(
+  page: Page,
+  files: Array<{ sampleFileName: string; uploadedFileName: string }>,
+) {
+  await page.getByLabel("Choose documents").setInputFiles(
+    files.map(({ sampleFileName, uploadedFileName }) => ({
+      name: uploadedFileName,
+      mimeType: getContentType(sampleFileName),
+      buffer: getSampleBuffer(sampleFileName),
+    })),
+  );
 }
 
 export function cleanupProcess(processId: string) {

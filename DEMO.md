@@ -229,14 +229,17 @@ samples/invoice/invoice.pdf
 ```
 
 You can keep the default filename or rename it while uploading; either is
-fine.
+fine. You can also select multiple files at once (up to 100) — each
+queues as its own row and uploads with up to 5 files in flight at a time.
 
 Expected behavior:
 
-- the upload panel shows an uploading/processing state
-- after the job succeeds, the app auto-navigates to the
-  [`inference-review`](docs/spec/screen/inference-review.md) screen for the
-  new job
+- the upload adds a row to the **upload queue** panel showing its live
+  status (uploading → queued → processing → a terminal state)
+- the screen never auto-navigates away; once the job succeeds, its row
+  shows a **View review** action that opens the
+  [`inference-review`](docs/spec/screen/inference-review.md) screen for
+  that job
 
 ## 6. Review the job on `inference-review`
 
@@ -306,6 +309,6 @@ At this point you have verified:
 
 - seeded processes are visible on `process-list`
 - a seeded process is ready on `process-detail`
-- upload → poll → auto-navigation works
+- upload queue → polling → per-row review links works
 - the right-hand review flow works even with the known left-pane viewer bug
 - saved review state is visible through `process-jobs` filters

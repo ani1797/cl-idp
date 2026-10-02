@@ -230,7 +230,26 @@ and confirmed gone (404).
 - [x] Live-tested end-to-end against the real running Docker stack and a
       real browser session, not just unit/integration tests.
 - [x] This task file created and registered in `docs/plan/README.md`.
-- [ ] Deployed to the live Azure production environment — **not done as
-      part of this task**; the feature is implemented, tested, and
-      validated against the live dev Foundry resource, but no production
-      deployment/rollout was requested or performed.
+- [x] Deployed to the live Azure production environment
+      (`rg-cl-idp-prod-eus2`): `infra/main.bicep` wires `JUDGE_*` app
+      settings into the worker Function App only, a new
+      `infra/modules/rbac-ai-agents.bicep` grants the worker identity the
+      `Foundry User` role on the existing Foundry account/project (needed
+      for the Agents SDK, distinct from `Cognitive Services User`), and
+      `judgeEnabled=true` is set in `main.parameters.json`. Deployed via
+      `az deployment sub create` after a clean `what-if`; confirmed live
+      that `clidpprod-worker` has the new app settings and the `Foundry
+      User` role assignment resolves to the worker's service principal.
+- [x] Post-deploy suggestion-accuracy re-verification: re-ran
+      `scripts/live_judge_smoke2.py` against the live
+      `clidpprod-foundry`/`clidpprod-project` (the same project now backing
+      production) with a deliberately corrupted `VendorName` value
+      ("Globex Industrial" vs. the document's "Contoso Supplies"). The
+      judge correctly returned `verdict=fix` with
+      `suggestedValue="Contoso Supplies"` for the corrupted field and
+      `verdict=ok` for the untouched `InvoiceId`. Re-seeded a job with
+      this review via `scripts/seed_judge_job.py` and confirmed in the
+      browser (Playwright) that the "Use suggestion" button on the
+      `VendorName` row replaces the input's "Globex Industrial" with the
+      judge's "Contoso Supplies" suggestion. Test process/job cleaned up
+      afterward.

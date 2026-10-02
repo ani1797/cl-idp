@@ -87,12 +87,15 @@ TAG=$(date +%Y%m%d%H%M%S)   # always a unique tag — see note below
 az acr build --registry "$ACR" --image "clidp-api:$TAG" apps/api
 
 # web: needs the shared package as an extra build context, which
-# `az acr build` cannot pass through — build locally and push instead
+# `az acr build` cannot pass through — build locally and push instead.
+# Build context must be apps/web (the Dockerfile's COPY paths are relative
+# to it) — NOT the repo root, which fails at "COPY package.json" with a
+# "not found" error. apiAppUrl already includes the https:// scheme.
 docker build \
   --build-context shared=./packages/shared \
-  --build-arg NEXT_PUBLIC_API_BASE_URL="https://$(az deployment sub show --name cl-idp-prod-eus2 --query properties.outputs.apiAppUrl.value -o tsv)" \
+  --build-arg NEXT_PUBLIC_API_BASE_URL="$(az deployment sub show --name cl-idp-prod-eus2 --query properties.outputs.apiAppUrl.value -o tsv)" \
   -t "$ACR.azurecr.io/clidp-web:$TAG" \
-  -f apps/web/Dockerfile .
+  -f apps/web/Dockerfile apps/web
 az acr login --name "$ACR"   # requires admin user or an ACR RBAC push role temporarily
 docker push "$ACR.azurecr.io/clidp-web:$TAG"
 ```

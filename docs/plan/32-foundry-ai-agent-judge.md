@@ -96,12 +96,18 @@ implementation:
 - **`inference-review-page.tsx`**: `JudgeFindingBadge` next to each flagged
   field's confidence badge, with the finding's `rationale` surfaced as a
   hover tooltip rather than inline clutter. On a `fix` finding with a
-  `suggestedValue`, an adjacent "Use suggestion" button applies it through
-  the existing `onValueChange` path — same as typing a correction by hand,
-  so it flows into the normal review payload and audit trail and is never
-  auto-applied. `JudgeReviewBadge` next to the job status in the header
-  (`ReviewPanel` and `JobHeaderStrip`, including the nothing-to-review/
-  already-reviewed states).
+  `suggestedValue`, the suggested value itself is shown explicitly as
+  `Suggested: <value>` text next to an adjacent "Use suggestion" button, so
+  the reviewer sees exactly what will be filled in before clicking anything
+  — not just inferred from the rationale tooltip's prose. Clicking "Use
+  suggestion" applies it through the existing `onValueChange` path — same
+  as typing a correction by hand, so it's still a plain draft edit (visible
+  in the field's input, reversible via "Reset") that only flows into the
+  normal review payload and audit trail once the reviewer clicks "Apply &
+  Approve" — never auto-applied or silently persisted. `JudgeReviewBadge`
+  next to the job status in the header (`ReviewPanel` and
+  `JobHeaderStrip`, including the nothing-to-review/already-reviewed
+  states).
 - **`review-queue-page.tsx`**: `JudgeReviewBadge` next to each row's
   "needs review" badge in the queue table.
 

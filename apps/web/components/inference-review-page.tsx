@@ -506,20 +506,25 @@ function FieldTree({
               <ConfidenceBadge value={field.confidence} />
               <JudgeFindingBadge judge={judge} path={field.path} />
               {judgeSuggestion && !approved ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={!canReview}
-                  className="text-confidence-critical hover:bg-confidence-critical-surface h-auto px-2 py-0.5 text-label-caps"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onValueChange(field, judgeSuggestion);
-                  }}
-                >
-                  <Icon name="edit" size={14} />
-                  Use suggestion
-                </Button>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground">
+                    Suggested: <span className="font-medium text-foreground">{judgeSuggestion}</span>
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={!canReview}
+                    className="text-confidence-critical hover:bg-confidence-critical-surface h-auto px-2 py-0.5 text-label-caps"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onValueChange(field, judgeSuggestion);
+                    }}
+                  >
+                    <Icon name="edit" size={14} />
+                    Use suggestion
+                  </Button>
+                </span>
               ) : null}
               {approved ? (
                 <Badge variant="success" className="text-label-caps h-auto px-2 py-0.5">

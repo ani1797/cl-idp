@@ -242,6 +242,52 @@ ArrayField.model_rebuild()
 ObjectField.model_rebuild()
 
 
+class JudgeVerdict(StrEnum):
+    """A judge's per-field (or rolled-up) recommendation.
+
+    `OK` means the judge independently read the document and believes the
+    extracted value matches it — i.e. the low-confidence flag was a false
+    positive. `FIX` means the judge believes the value does not match the
+    document and is offering `suggestedValue` as a correction. `UNKNOWN`
+    means the judge could not determine an answer (illegible, absent, or
+    ambiguous evidence) and the field falls back to full human judgement.
+
+    This is advisory only: it never clears a confidence violation, never
+    auto-applies a value, and never gates the human review action.
+    """
+
+    OK = "ok"
+    FIX = "fix"
+    UNKNOWN = "unknown"
+
+
+class JudgeStatus(StrEnum):
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class JudgeFinding(ModelBase):
+    path: str
+    verdict: JudgeVerdict
+    extractedValue: str | None = None
+    suggestedValue: str | None = None
+    """Populated when `verdict` is `fix`; the value the judge read from the
+    source document, offered as a one-click correction suggestion."""
+    rationale: str
+    judgeConfidence: float | None = PydanticField(default=None, ge=0, le=1)
+
+
+class JudgeReview(ModelBase):
+    status: JudgeStatus
+    recommendation: JudgeVerdict
+    """Rollup across `findings`: `fix` if any finding is `fix`, else
+    `unknown` if any finding is `unknown`, else `ok`."""
+    findings: list[JudgeFinding]
+    evaluatedAt: datetime
+    model: str | None = None
+    error: str | None = None
+
+
 class Job(ModelBase):
     id: str
     processId: str
@@ -261,6 +307,7 @@ class Job(ModelBase):
     estimatedCostUsd: float | None = None
     error: str | None = None
     reviewedAt: datetime | None = None
+    judge: JudgeReview | None = None
 
 
 class ReviewedField(ModelBase):

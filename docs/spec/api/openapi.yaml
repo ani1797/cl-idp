@@ -1360,6 +1360,90 @@ components:
             Timestamp of the first `PUT .../review` call for this job;
             unset if no field has ever been reviewed. There is no
             per-user review attribution.
+        judge:
+          $ref: "#/components/schemas/JudgeReview"
+          nullable: true
+          description: >
+            Best-effort Foundry AI Agent Judge pre-judgement, computed once
+            by the worker right after extraction when `confidenceViolations`
+            is non-empty and the judge is enabled (`JUDGE_ENABLED`). Acts as
+            a pre-judgement before human review: it tells reviewers,
+            field-by-field, whether a flagged low-confidence value looks
+            like a false positive (`ok`) or really is wrong (`fix`, with a
+            `suggestedValue`). Advisory only — it never clears
+            `confidenceViolations`, never auto-applies a value, and never
+            gates the human review action. `null` when the judge is
+            disabled, there was nothing to judge, or adjudication failed.
+
+    JudgeReview:
+      type: object
+      required: [status, recommendation, findings, evaluatedAt]
+      properties:
+        status:
+          $ref: "#/components/schemas/JudgeStatus"
+        recommendation:
+          $ref: "#/components/schemas/JudgeVerdict"
+          description: >
+            Rollup across `findings`: `fix` if any finding is `fix`, else
+            `unknown` if any finding is `unknown`, else `ok`. This is the
+            value the UI pill shows at the job level.
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/JudgeFinding"
+          description: One finding per field in `confidenceViolations` that the judge adjudicated.
+        evaluatedAt:
+          type: string
+          format: date-time
+        model:
+          type: string
+          nullable: true
+          description: Foundry model deployment used for this adjudication.
+        error:
+          type: string
+          nullable: true
+          description: Set when `status` is `failed` (e.g. the agent run failed or timed out).
+
+    JudgeStatus:
+      type: string
+      enum: [completed, failed]
+
+    JudgeVerdict:
+      type: string
+      enum: [ok, fix, unknown]
+      description: >
+        `ok` — the judge independently read the document and the extracted
+        value matches (the low-confidence flag was a false positive). `fix`
+        — the judge believes the value is wrong and offers `suggestedValue`
+        as a correction. `unknown` — the judge could not determine an
+        answer; falls back to full human judgement.
+
+    JudgeFinding:
+      type: object
+      required: [path, verdict, rationale]
+      properties:
+        path:
+          type: string
+          description: Same JSON Pointer path convention as `confidenceViolations`.
+        verdict:
+          $ref: "#/components/schemas/JudgeVerdict"
+        extractedValue:
+          type: string
+          nullable: true
+          description: The value as originally extracted, which the judge was asked to check.
+        suggestedValue:
+          type: string
+          nullable: true
+          description: Populated when `verdict` is `fix`; a one-click correction suggestion.
+        rationale:
+          type: string
+          description: Short human-readable explanation for the verdict.
+        judgeConfidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          nullable: true
 
     PageInfo:
       type: object

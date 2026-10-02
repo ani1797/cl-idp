@@ -169,6 +169,37 @@ describe("ReviewQueuePage", () => {
     expect(reviewLinks[2]).toHaveAttribute("href", "/processes/process-1/jobs/job-newer");
   });
 
+  it("shows the judge recommendation pill when a job has a completed judge review", async () => {
+    mockedApi.listProcesses.mockResolvedValue([baseProcess]);
+    mockedApi.listJobs.mockResolvedValue([
+      {
+        ...baseJob,
+        judge: {
+          status: "completed",
+          recommendation: "fix",
+          findings: [],
+          evaluatedAt: "2026-01-03T09:00:00Z",
+          model: "gpt-4.1-mini",
+        },
+      },
+    ]);
+
+    renderWithQueryClient(<ReviewQueuePage />);
+
+    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(screen.getByText("FIX")).toBeInTheDocument();
+  });
+
+  it("omits the judge pill when no judge review is present", async () => {
+    mockedApi.listProcesses.mockResolvedValue([baseProcess]);
+    mockedApi.listJobs.mockResolvedValue([baseJob]);
+
+    renderWithQueryClient(<ReviewQueuePage />);
+
+    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(screen.queryByText(/Judge recommends/i)).not.toBeInTheDocument();
+  });
+
   it("shows the queue-clear state when no process has pending review work", async () => {
     mockedApi.listProcesses.mockResolvedValue([baseProcess]);
     mockedApi.listJobs.mockResolvedValue([]);

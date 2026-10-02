@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 
 import { confidenceBandForPercent } from "@/components/brand/confidence-badge";
+import { JudgeReviewBadge } from "@/components/brand/judge-badge";
 import { KpiCard, SectionHeader } from "@/components/brand/primitives";
 import {
   AverageConfidenceValue,
@@ -390,6 +391,7 @@ export function ReviewQueuePage() {
                       <TableCell className="px-3 py-3 align-top">
                         <div className="space-y-2">
                           <NeedsReviewBadge show={flaggedCount > 0} />
+                          <JudgeReviewBadge judge={item.job.judge} />
                           <p className="text-xs text-muted-foreground">
                             {flaggedCount > 0 ? formatReviewCount(flaggedCount) : "No active violations"}
                           </p>

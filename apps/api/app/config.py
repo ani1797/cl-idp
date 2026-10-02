@@ -141,6 +141,22 @@ class Settings(BaseSettings):
     cu_api_key: str | None = Field(default=None, alias="CU_API_KEY")
     cu_model_deployment: str = Field(default="", alias="CU_MODEL_DEPLOYMENT")
 
+    # Foundry AI Agent Judge: a best-effort pre-judgement that runs after
+    # extraction, immediately before a job becomes human-reviewable. It only
+    # ever adjudicates fields already flagged by `confidenceViolations`
+    # (low-confidence) and never blocks or fails the job itself.
+    judge_enabled: bool = Field(default=False, alias="JUDGE_ENABLED")
+    # Defaults to deriving from `cu_endpoint` (same Foundry account, different
+    # API surface: `*.cognitiveservices.azure.com` -> `*.services.ai.azure.com
+    # /api/projects/{project}`) when unset — see `app.judge.client`.
+    judge_project_endpoint: str | None = Field(default=None, alias="JUDGE_PROJECT_ENDPOINT")
+    judge_model_deployment: str = Field(default="gpt-4.1-mini", alias="JUDGE_MODEL_DEPLOYMENT")
+    judge_agent_name: str = Field(default="cl-idp-review-judge", alias="JUDGE_AGENT_NAME")
+    judge_timeout_seconds: float = Field(default=45.0, alias="JUDGE_TIMEOUT_SECONDS")
+    # Upper bound on how many flagged fields are sent to the judge per job,
+    # to bound latency/cost on pathological documents with many violations.
+    judge_max_fields: int = Field(default=25, alias="JUDGE_MAX_FIELDS")
+
     @field_validator("jwt_secret", mode="before")
     @classmethod
     def generate_jwt_secret_when_blank(cls, value: object) -> object:

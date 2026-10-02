@@ -43,6 +43,10 @@ class MappedJobResult:
     pages: list[PageInfo]
     fields: list[Field]
     confidence_violations: list[str]
+    markdown: str | None = None
+    """OCR/markdown text of the extraction content, when available. Carried
+    through purely as evidence for the judge (`app.judge`) — nothing else in
+    the pipeline consumes it."""
 
 
 @dataclass(frozen=True)
@@ -87,6 +91,7 @@ def map_analysis_result(
     analyzer_names = {item.id: item.name for item in allowed_analyzers}
     if detected_form is None:
         raise ResultMappingError("Matched result did not include a detected form category.")
+    markdown = extraction_content.get("markdown") if extraction_content else None
     return MappedJobResult(
         detected_form=detected_form,
         detected_form_name=analyzer_names.get(detected_form),
@@ -94,6 +99,7 @@ def map_analysis_result(
         pages=pages,
         fields=top_level_fields,
         confidence_violations=confidence_violations,
+        markdown=markdown if isinstance(markdown, str) else None,
     )
 
 

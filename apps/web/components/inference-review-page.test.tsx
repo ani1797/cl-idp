@@ -278,6 +278,63 @@ describe("InferenceReviewPage", () => {
     expect(screen.getAllByText("/vendor/name")[0]).toBeInTheDocument();
   });
 
+  it("shows the judge rollup pill and per-field finding pill when a completed review is present", async () => {
+    renderPage({
+      ...baseJob,
+      judge: {
+        status: "completed",
+        recommendation: "fix",
+        findings: [
+          {
+            path: "/items/0/description",
+            extractedValue: "Consulting services",
+            rationale: "The document shows an additional word.",
+            verdict: "fix",
+            suggestedValue: "Consulting services",
+          },
+        ],
+        evaluatedAt: "2026-01-02T00:30:00Z",
+        model: "gpt-4.1-mini",
+      },
+    });
+
+    expect((await screen.findAllByText("FIX")).length).toBeGreaterThan(0);
+  });
+
+  it("omits the judge pill entirely when the job has no judge review", async () => {
+    renderPage();
+
+    await screen.findByText("Low confidence and still unreviewed");
+    expect(screen.queryByText(/Judge recommends/i)).not.toBeInTheDocument();
+  });
+
+  it("applies the judge's suggested value to the field input when 'Use suggestion' is clicked", async () => {
+    renderPage({
+      ...baseJob,
+      judge: {
+        status: "completed",
+        recommendation: "fix",
+        findings: [
+          {
+            path: "/items/0/description",
+            extractedValue: "Consulting servies",
+            rationale: "The document reads 'Consulting services', not 'servies'.",
+            verdict: "fix",
+            suggestedValue: "Consulting services",
+          },
+        ],
+        evaluatedAt: "2026-01-02T00:30:00Z",
+        model: "gpt-4.1-mini",
+      },
+    });
+
+    const useSuggestionButton = await screen.findByRole("button", { name: "Use suggestion" });
+    fireEvent.click(useSuggestionButton);
+
+    const input = screen.getByLabelText("/items/0/description") as HTMLInputElement;
+    expect(input.value).toBe("Consulting services");
+  });
+
   it("navigates to the field page when a field is focused", async () => {
     renderPage();
 

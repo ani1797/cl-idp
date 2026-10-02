@@ -16,6 +16,15 @@ from pydantic import ValidationError
 from app.config import Settings, get_settings
 from app.cu import ContentUnderstandingError, CuClient
 from app.db import DataStore, DocumentNotFoundError, create_data_store
+from app.judge import (
+    JUDGE_INSTRUCTIONS,
+    JudgeClient,
+    JudgeError,
+    JudgeNotConfiguredError,
+    build_judge_review,
+    build_user_message,
+    collect_flagged_fields,
+)
 from app.mail import MailMessage, get_mail_sender
 from app.models import (
     ArrayField,
@@ -24,6 +33,7 @@ from app.models import (
     JobDocument,
     JobQueueMessage,
     JobStatus,
+    JudgeReview,
     ObjectField,
 )
 from app.observability import correlation_scope, init_observability, set_span_attributes
@@ -125,6 +135,7 @@ class WorkerDependencies:
     blob: BlobService
     queue: QueueService
     cu_client: AnalysisClient
+    judge_client: JudgeClient | None = None
 
 
 def create_dependencies(settings: Settings | None = None) -> WorkerDependencies:
@@ -133,6 +144,16 @@ def create_dependencies(settings: Settings | None = None) -> WorkerDependencies:
     blob = BlobService(resolved_settings)
     queue = QueueService(resolved_settings)
     cu_client = CuClient(resolved_settings)
+    judge_client: JudgeClient | None = None
+    if resolved_settings.judge_enabled:
+        try:
+            judge_client = JudgeClient(resolved_settings)
+        except JudgeNotConfiguredError:
+            logger.warning(
+                "JUDGE_ENABLED is true but the judge could not be configured; "
+                "continuing without judge pre-judgements.",
+                exc_info=True,
+            )
     store.ensure_schema()
     blob.ensure_container()
     queue.ensure_queue()
@@ -142,11 +163,14 @@ def create_dependencies(settings: Settings | None = None) -> WorkerDependencies:
         blob=blob,
         queue=queue,
         cu_client=cu_client,
+        judge_client=judge_client,
     )
 
 
 def close_dependencies(dependencies: WorkerDependencies) -> None:
     dependencies.cu_client.close()
+    if dependencies.judge_client is not None:
+        dependencies.judge_client.close()
 
 
 def run_worker(*, once: bool = False, config: WorkerConfig | None = None) -> int:
@@ -492,6 +516,12 @@ def finalize_success(
             )
 
     field_summaries = summarize_fields_for_logging(mapped_result.fields)
+    judge_review = run_judge(
+        dependencies,
+        job=job,
+        payload=payload,
+        mapped_result=mapped_result,
+    )
     with tracer.start_as_current_span("job.persist") as span:
         set_span_attributes(
             span,
@@ -511,6 +541,7 @@ def finalize_success(
                     "fields": mapped_result.fields,
                     "confidenceViolations": mapped_result.confidence_violations,
                     "notificationSent": notification_sent,
+                    "judge": judge_review,
                     "error": None,
                     "attempts": max(job.attempts, 1),
                 }
@@ -541,6 +572,76 @@ def finalize_success(
         _jobs_needs_review_counter.add(1, form_labels)
     if mapped_result.unclassified:
         _jobs_unclassified_counter.add(1, {"process_id": job.processId})
+
+
+def run_judge(
+    dependencies: WorkerDependencies,
+    *,
+    job: JobDocument,
+    payload: JobQueueMessage,
+    mapped_result: MappedJobResult,
+) -> JudgeReview | None:
+    """Best-effort Foundry AI Agent Judge pre-judgement for low-confidence
+    fields. Returns `None` whenever there is nothing to judge or the judge
+    is unavailable/disabled; any judge failure is caught here and never
+    fails the job or blocks the pipeline — the job proceeds exactly as it
+    would without a judge, just without a recommendation pill."""
+    if dependencies.judge_client is None or not mapped_result.confidence_violations:
+        return None
+    if not mapped_result.markdown:
+        logger.info("Skipping judge for job %s: no OCR/markdown evidence available.", job.id)
+        return None
+
+    flagged_fields = collect_flagged_fields(
+        mapped_result.fields,
+        confidence_violations=mapped_result.confidence_violations,
+        max_fields=dependencies.settings.judge_max_fields,
+    )
+    if not flagged_fields:
+        return None
+
+    with tracer.start_as_current_span("judge.adjudicate") as span:
+        set_span_attributes(
+            span,
+            correlation_id=payload.correlationId,
+            job_id=job.id,
+            process_id=job.processId,
+        )
+        span.set_attribute("judge.field_count", len(flagged_fields))
+        try:
+            user_message = build_user_message(mapped_result.markdown, flagged_fields)
+            raw_reply = dependencies.judge_client.adjudicate(
+                instructions=JUDGE_INSTRUCTIONS, user_message=user_message
+            )
+            review = build_judge_review(
+                raw_reply,
+                flagged_fields={field.path: field.value for field in flagged_fields},
+                model=dependencies.settings.judge_model_deployment,
+                evaluated_at=datetime.now(UTC),
+            )
+        except JudgeError as exc:
+            logger.warning("Judge adjudication failed for job %s: %s", job.id, exc, exc_info=True)
+            span.set_attribute("judge.status", "failed")
+            return JudgeReview(
+                status="failed",
+                recommendation="unknown",
+                findings=[],
+                evaluatedAt=datetime.now(UTC),
+                model=dependencies.settings.judge_model_deployment,
+                error=str(exc),
+            )
+        span.set_attribute("judge.status", review.status.value)
+        span.set_attribute("judge.recommendation", review.recommendation.value)
+        logger.info(
+            "Judge adjudicated job %s process %s status=%s recommendation=%s finding_count=%s",
+            job.id,
+            job.processId,
+            review.status.value,
+            review.recommendation.value,
+            len(review.findings),
+        )
+        return review
+
 
 
 def mark_terminal_failure(

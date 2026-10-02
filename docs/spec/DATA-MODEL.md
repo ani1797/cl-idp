@@ -209,7 +209,32 @@ This is a documented trade-off, not an oversight.
   "confidenceViolations": ["/invoiceTotal", "/items/0/description"],
   "notificationSent": true,
   "reviewedAt": null,
-  "error": null
+  "error": null,
+  "judge": {
+    "status": "completed",
+    "recommendation": "fix",
+    "findings": [
+      {
+        "path": "/invoiceTotal",
+        "verdict": "ok",
+        "extractedValue": "1024.50",
+        "suggestedValue": null,
+        "rationale": "The document clearly shows a total of 1024.50.",
+        "judgeConfidence": 0.92
+      },
+      {
+        "path": "/items/0/description",
+        "verdict": "fix",
+        "extractedValue": "2 Surface Pro 6",
+        "suggestedValue": "3 Surface Pro 6",
+        "rationale": "The line item quantity in the document reads 3, not 2.",
+        "judgeConfidence": 0.81
+      }
+    ],
+    "evaluatedAt": "2026-01-03T12:00:09Z",
+    "model": "gpt-4.1-mini",
+    "error": null
+  }
 }
 ```
 
@@ -339,6 +364,34 @@ is rejected with `400`, as is one naming a path that does not exist.
   job **keeps the original job's `blobPath`** — the document is not copied,
   so a retry job's blob path contains the *original* job's ID. This is the
   one deliberate exception to the path convention below.
+
+### Judge Pre-Judgement (`judge`)
+
+`judge` (`JudgeReview | null`) is the Foundry AI Agent Judge's best-effort
+pre-judgement, computed once by the worker right after a classified job
+succeeds, **only** when `confidenceViolations` is non-empty and the judge
+is enabled (`JUDGE_ENABLED`) — see
+[`TECHNOLOGY.md`](./TECHNOLOGY.md#azure-foundry-ai-agent-judge-pre-judgement)
+for the full integration contract. It is `null` whenever there was nothing
+to judge (no violations), the judge is disabled/not configured, or the
+judge call failed to even parse a reply.
+
+- `status`: `completed` | `failed`. `failed` means the agent call or reply
+  parsing errored — never used to fail the job itself.
+- `recommendation`: the job-level rollup across `findings` — `fix` if any
+  finding is `fix`, else `unknown` if any is `unknown`, else `ok`. This is
+  what the header-level `JUDGE RECOMMENDS: OK | FIX` pill shows.
+- `findings`: one entry per path in `confidenceViolations` that was
+  actually adjudicated (capped at `JUDGE_MAX_FIELDS`), each with its own
+  `verdict` (`ok` | `fix` | `unknown`), the `extractedValue` the judge was
+  asked to check, a `suggestedValue` (only populated for `fix`), a
+  `rationale`, and an optional `judgeConfidence`. This is what the
+  per-field pill in the review screen shows.
+- Advisory only, by design: it never clears a path from
+  `confidenceViolations`, never auto-applies `suggestedValue`, and never
+  gates `PUT .../review` — a human must still act. It is not recomputed on
+  re-review; it reflects the judge's read of the document at extraction
+  time only.
 
 ## Querying for Low-Confidence / Reviewed Cases
 

@@ -24,6 +24,10 @@ export type ExtractedFieldType = ExtractedField["type"];
 export type ExtractedField = Schema<"ExtractedField">;
 export type ReviewedField = Schema<"ReviewedField">;
 export type Job = Schema<"Job">;
+export type JudgeReview = Schema<"JudgeReview">;
+export type JudgeFinding = Schema<"JudgeFinding">;
+export type JudgeVerdict = Schema<"JudgeVerdict">;
+export type JudgeStatus = Schema<"JudgeStatus">;
 export type ReviewJobInput = {
   fields: ReviewedField[];
 };

@@ -12,6 +12,7 @@ import {
   confidenceBandForPercent,
   type ConfidenceBand,
 } from "@/components/brand/confidence-badge";
+import { JudgeFindingBadge, JudgeReviewBadge, findJudgeFinding } from "@/components/brand/judge-badge";
 import { ErrorCard } from "@/components/error-card";
 import {
   AverageConfidenceValue,
@@ -29,6 +30,7 @@ import {
   api,
   type ExtractedField,
   type Job,
+  type JudgeReview,
   type PageInfo,
   type ReviewedField,
 } from "@/lib/api";
@@ -450,6 +452,7 @@ function FieldTree({
   values,
   approvals,
   confidenceViolations,
+  judge,
   focusedPath,
   onSelectField,
   onValueChange,
@@ -461,6 +464,7 @@ function FieldTree({
   values: Map<string, string>;
   approvals: Set<string>;
   confidenceViolations: Set<string>;
+  judge?: JudgeReview | null;
   focusedPath: string | null;
   onSelectField: (field: LeafField) => void;
   onValueChange: (field: LeafField, value: string) => void;
@@ -473,6 +477,9 @@ function FieldTree({
     const value = values.get(field.path) ?? "";
     const approved = approvals.has(field.path);
     const violation = confidenceViolations.has(field.path) && !approved;
+    const judgeFinding = findJudgeFinding(judge, field.path);
+    const judgeSuggestion =
+      judgeFinding?.verdict === "fix" && judgeFinding.suggestedValue ? judgeFinding.suggestedValue : null;
 
     return (
       <div
@@ -497,6 +504,23 @@ function FieldTree({
               <p className="font-medium text-foreground">{label}</p>
               <FieldTypeBadge type={field.type} />
               <ConfidenceBadge value={field.confidence} />
+              <JudgeFindingBadge judge={judge} path={field.path} />
+              {judgeSuggestion && !approved ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={!canReview}
+                  className="text-confidence-critical hover:bg-confidence-critical-surface h-auto px-2 py-0.5 text-label-caps"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onValueChange(field, judgeSuggestion);
+                  }}
+                >
+                  <Icon name="edit" size={14} />
+                  Use suggestion
+                </Button>
+              ) : null}
               {approved ? (
                 <Badge variant="success" className="text-label-caps h-auto px-2 py-0.5">
                   Approved
@@ -578,6 +602,7 @@ function FieldTree({
             values={values}
             approvals={approvals}
             confidenceViolations={confidenceViolations}
+            judge={judge}
             focusedPath={focusedPath}
             onSelectField={onSelectField}
             onValueChange={onValueChange}
@@ -640,6 +665,7 @@ function ReviewPanel({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <JobStatusBadge status={job.status} />
+          <JudgeReviewBadge judge={job.judge} />
           <span className="text-sm text-muted-foreground">{job.fileName}</span>
           {job.averageConfidence !== null && job.averageConfidence !== undefined ? (
             <span className="text-sm text-muted-foreground">
@@ -675,6 +701,7 @@ function ReviewPanel({
             values={values}
             approvals={approvals}
             confidenceViolations={confidenceViolations}
+            judge={job.judge}
             focusedPath={focusedPath}
             onSelectField={onSelectField}
             onValueChange={onValueChange}
@@ -843,6 +870,7 @@ function JobHeaderStrip({
             </div>
           </div>
           <JobStatusBadge status={job.status} />
+          <JudgeReviewBadge judge={job.judge} />
         </div>
         <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2 lg:min-w-[28rem]">
           <div className="min-w-0">

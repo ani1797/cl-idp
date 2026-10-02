@@ -59,6 +59,18 @@ filtered table) — the screen and its behavior are identical either way.
 
   Both keep the document viewer, since seeing the document is the fastest
   way to understand why. Neither offers a Save action.
+- **Judge pill (pre-judgement)**: when the Foundry AI Agent Judge ran for
+  this job (`job.judge`, populated only when `confidenceViolations` was
+  non-empty and the judge is enabled), a `JUDGE RECOMMENDS: OK | FIX` pill
+  renders next to each flagged field's confidence badge (per-field
+  `judge.findings[].verdict`) and once more in the header next to the job
+  status (rollup `judge.recommendation`: `fix` if any finding is `fix`,
+  else `ok`). It is purely advisory — a pre-judgement shown *before* the
+  human reviews, never a gate: it never clears a violation, pre-fills a
+  value, or disables Approve/Save. When the judge is disabled, found
+  nothing to adjudicate, or failed, no pill renders at all (an `unknown`
+  verdict or `status: "failed"` is treated the same as "no judge" in the
+  UI, since there is nothing actionable to show).
 - **Not-reviewable states**: a `queued`/`running` job shows a processing
   state and polls every 2 seconds, backing off to 10 seconds after the first
   minute and stopping after 10 minutes with a manual-refresh prompt; a

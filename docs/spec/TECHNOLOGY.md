@@ -58,6 +58,71 @@ technology-level choices are:
   incurs real (small) cost. `.env.example` documents the required
   `CU_ENDPOINT`, optional `CU_API_KEY`, and the model deployment name.
 
+## Azure Foundry AI Agent Judge (Pre-Judgement)
+
+A best-effort, advisory LLM pre-judgement that runs in the worker right
+after a successful extraction, immediately before the job is handed to a
+human reviewer. It never blocks, gates, or fails the pipeline — a judge
+failure is caught and logged, and the job completes exactly as it would
+without a judge.
+
+- **Scope**: only runs when the job has a non-empty `confidenceViolations`
+  list (i.e. there is something a human would need to review) and
+  `JUDGE_ENABLED` is true. It only adjudicates the flagged fields, capped
+  at `JUDGE_MAX_FIELDS` (truncates, does not error, if a job has more
+  violations than that) — never the full field set.
+- **SDK**: **`azure-ai-agents`** (`AgentsClient`), talking to a
+  **Microsoft Foundry project** (`JUDGE_PROJECT_ENDPOINT`, shape
+  `https://{account}.services.ai.azure.com/api/projects/{project}` — a
+  different endpoint shape than the CU resource's
+  `https://{account}.cognitiveservices.azure.com/`). A single persistent
+  agent (`JUDGE_AGENT_NAME`, default `cl-idp-review-judge`) is resolved by
+  name or created once via `list_agents()`/`create_agent()`, not
+  recreated per run. Authentication is `DefaultAzureCredential`, matching
+  CU.
+- **Evidence**: Content Understanding's own OCR/markdown text for the page
+  (`MappedJobResult.markdown`) is passed as the document evidence — not
+  page images — alongside each flagged field's name, extracted value, and
+  confidence. No judge run occurs for a job whose CU result carries no
+  markdown.
+- **Timeout**: `runs.create_and_process()` blocks with no external timeout
+  knob, so the client instead does `runs.create()` + a manual poll loop
+  against `JUDGE_TIMEOUT_SECONDS`, raising rather than hanging forever if
+  the agent run stalls.
+- **Response contract**: a strict JSON schema
+  (`apps/api/app/judge/schema.py::JUDGE_RESPONSE_SCHEMA`) with one finding
+  per flagged field: `path`, `extractedValue` (echoed back), `matches`
+  (boolean), `rationale`, `verdict` (`ok` | `fix` | `unknown`), then
+  `suggestedValue`. The field order in the schema
+  (`extractedValue→matches→rationale→verdict→suggestedValue`) is
+  deliberate — asking the model to commit to `matches`/`rationale` before
+  `verdict` was found (via `scripts/spikes/judge_spike.py`) to eliminate
+  self-inconsistent replies where `verdict` contradicted `rationale`.
+- **Tolerant parsing**: `parse_judge_findings()` never raises except when
+  the whole reply is unparseable JSON (→ `status: "failed"`, no findings).
+  Individual malformed findings degrade silently instead of failing the
+  whole review: a hallucinated path is dropped, a flagged path missing
+  from the reply is backfilled as `unknown`, an invalid verdict string is
+  coerced to `unknown`, and a `fix` verdict with no usable
+  `suggestedValue` is downgraded to `unknown`.
+- **Persistence**: the result is stored as `Job.judge` (`JudgeReview`):
+  `status` (`completed` | `failed`), `recommendation` (rollup across
+  `findings`: `fix` if any finding is `fix`, else `unknown` if any is
+  `unknown`, else `ok`), `findings[]`, `evaluatedAt`, `model`, and an
+  optional `error`. `null` when the judge is disabled, had nothing to
+  adjudicate (no violations, or no markdown evidence), or wasn't
+  configured. Computed once by the worker and never recomputed on
+  re-review.
+- **UI**: `JUDGE RECOMMENDS: OK | FIX` pill — see
+  [`screen/inference-review.md`](./screen/inference-review.md). An
+  `unknown`/`failed` outcome intentionally renders no pill at all (there
+  is nothing actionable to show the reviewer).
+- **Config** (`.env.example`): `JUDGE_ENABLED` (default `false`),
+  `JUDGE_PROJECT_ENDPOINT`, `JUDGE_MODEL_DEPLOYMENT`, `JUDGE_AGENT_NAME`,
+  `JUDGE_TIMEOUT_SECONDS`, `JUDGE_MAX_FIELDS`. No emulator; like CU, this
+  requires a real Foundry project and incurs real (small) cost whenever it
+  runs.
+
 ## Frontend
 
 - **Framework**: **Next.js** (React, SSR-capable).

@@ -1,30 +1,35 @@
 """Foundry AI Agent Judge client.
 
-Wraps `azure.ai.agents.AgentsClient` the same way `app.cu.client.CuClient`
-wraps the Content Understanding SDK: one lazily-constructed, reusable
-client per process, a narrow error hierarchy, and no leakage of SDK types
-past this module's boundary.
+Wraps the Foundry Agent Service's current (non-classic) surface the same
+way `app.cu.client.CuClient` wraps the Content Understanding SDK: one
+lazily-constructed, reusable client per process, a narrow error hierarchy,
+and no leakage of SDK types past this module's boundary.
 
-Note on the Azure SDK surface: `azure-ai-projects`' `AIProjectClient` does
-NOT expose `.agents` in the version used here — the real, current API is
-the standalone `AgentsClient(endpoint, credential)` from `azure-ai-agents`,
-confirmed via `scripts/spikes/judge_spike.py`. Only `azure-ai-agents` is a
-dependency; `azure-ai-projects` is intentionally not used.
+Note on the Azure SDK surface: this talks to the **versioned Agents API**
+(`azure-ai-projects>=2.3.0`'s `AIProjectClient.agents.create_version(...)`),
+not the deprecating classic Assistants-API-style surface
+(`azure-ai-agents`'s `AgentsClient.create_agent`/threads/runs). Agents
+created this way show up under the Foundry portal's "Agents" tab as
+versioned resources (`object: "agent.version"`), not classic
+`asst_`-prefixed assistants. Conversations/Responses replace
+threads/runs: each judge call is a single, stateless Responses API call
+scoped to the agent via `project.get_openai_client(agent_name=...)` — no
+conversation object is created since every adjudication is a one-shot,
+independent turn (mirrors the old implementation's "new thread per job,
+delete after" behaviour, just without a thread to delete).
 """
 
 from __future__ import annotations
 
 import logging
-import time
-from typing import Any, ClassVar
+from typing import Any
 
-from azure.ai.agents import AgentsClient
-from azure.ai.agents.models import (
-    Agent,
-    ResponseFormatJsonSchema,
-    ResponseFormatJsonSchemaType,
-    RunStatus,
-    ThreadRun,
+import openai
+from azure.ai.projects import AIProjectClient
+from azure.ai.projects.models import (
+    PromptAgentDefinition,
+    PromptAgentDefinitionTextOptions,
+    TextResponseFormatJsonSchema,
 )
 from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential
@@ -97,11 +102,17 @@ class JudgeClient:
         self._agent_name = settings.judge_agent_name
         self._timeout_seconds = settings.judge_timeout_seconds
         self._credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
-        self._client = AgentsClient(endpoint=endpoint, credential=self._credential)
-        self._agent_id: str | None = None
+        # allow_preview=True is required for the agent-scoped OpenAI client
+        # (`get_openai_client(agent_name=...)`) used below — the versioned
+        # Agents/Responses surface is still a preview capability of the SDK.
+        self._project = AIProjectClient(
+            endpoint=endpoint, credential=self._credential, allow_preview=True
+        )
+        self._openai: openai.OpenAI | None = None
+        self._agent_ensured = False
 
     def close(self) -> None:
-        self._client.close()
+        self._project.close()
         self._credential.close()
 
     def adjudicate(self, *, instructions: str, user_message: str) -> str:
@@ -110,82 +121,59 @@ class JudgeClient:
         Raises `JudgeError` on any failure; never returns a partial/invalid
         reply silently — parsing tolerance belongs to `app.judge.schema`,
         not this transport layer."""
-        agent_id = self._resolve_agent(instructions)
-        thread = self._client.threads.create()
+        openai_client = self._ensure_agent(instructions)
+
         try:
-            self._client.messages.create(thread_id=thread.id, role="user", content=user_message)
-            try:
-                run = self._client.runs.create(
-                    thread_id=thread.id,
-                    agent_id=agent_id,
-                    response_format=ResponseFormatJsonSchemaType(
-                        json_schema=ResponseFormatJsonSchema(
+            response = openai_client.responses.create(
+                input=user_message,
+                timeout=self._timeout_seconds,
+            )
+        except openai.OpenAIError as exc:
+            raise JudgeRunFailedError(f"Judge agent response failed: {exc}") from exc
+        except AzureError as exc:
+            raise JudgeRunFailedError(f"Judge agent response failed: {exc}") from exc
+
+        if response.status not in (None, "completed"):
+            raise JudgeRunFailedError(
+                f"Judge agent response ended in status {response.status}.",
+                last_error=response.error,
+            )
+
+        text = response.output_text
+        if not text:
+            raise JudgeRunFailedError("Judge agent response completed with no reply message.")
+        return text
+
+    def _ensure_agent(self, instructions: str) -> openai.OpenAI:
+        if self._agent_ensured and self._openai is not None:
+            return self._openai
+
+        try:
+            self._project.agents.create_version(
+                agent_name=self._agent_name,
+                definition=PromptAgentDefinition(
+                    model=self._model,
+                    instructions=instructions,
+                    # Structured output must be configured on the agent
+                    # definition itself, not per-response-call: the
+                    # Responses API rejects a `text` override once an
+                    # `agent_reference` is specified ("Not allowed when
+                    # agent is specified"), discovered via the live smoke
+                    # test against the real Foundry project.
+                    text=PromptAgentDefinitionTextOptions(
+                        format=TextResponseFormatJsonSchema(
                             name=JUDGE_RESPONSE_SCHEMA_NAME,
                             description="Per-field judge verdicts",
                             schema=JUDGE_RESPONSE_SCHEMA,
+                            strict=True,
                         )
                     ),
-                )
-                run = self._poll_until_done(thread_id=thread.id, run_id=run.id)
-            except AzureError as exc:
-                raise JudgeRunFailedError(f"Judge agent run failed: {exc}") from exc
-
-            if run.status != RunStatus.COMPLETED:
-                raise JudgeRunFailedError(
-                    f"Judge agent run ended in status {run.status}.", last_error=run.last_error
-                )
-
-            for message in self._client.messages.list(thread_id=thread.id):
-                if str(message.role).endswith("AGENT"):
-                    return message.content[0]["text"]["value"]
-            raise JudgeRunFailedError("Judge agent run completed with no reply message.")
-        finally:
-            try:
-                self._client.threads.delete(thread.id)
-            except AzureError:
-                logger.warning("Failed to delete judge thread %s", thread.id, exc_info=True)
-
-    _TERMINAL_STATUSES: ClassVar[set[RunStatus]] = {
-        RunStatus.COMPLETED,
-        RunStatus.FAILED,
-        RunStatus.CANCELLED,
-        RunStatus.EXPIRED,
-    }
-
-    def _poll_until_done(
-        self, *, thread_id: str, run_id: str, poll_interval_seconds: float = 1.0
-    ) -> ThreadRun:
-        deadline = time.monotonic() + self._timeout_seconds
-        run = self._client.runs.get(thread_id=thread_id, run_id=run_id)
-        while run.status not in self._TERMINAL_STATUSES:
-            if time.monotonic() >= deadline:
-                raise JudgeTimeoutError(
-                    f"Judge agent run exceeded the {self._timeout_seconds}s timeout."
-                )
-            time.sleep(poll_interval_seconds)
-            run = self._client.runs.get(thread_id=thread_id, run_id=run_id)
-        return run
-
-    def _resolve_agent(self, instructions: str) -> str:
-        if self._agent_id is not None:
-            return self._agent_id
-
-        try:
-            for agent in self._client.list_agents():
-                if agent.name == self._agent_name:
-                    self._agent_id = agent.id
-                    return self._agent_id
-        except AzureError as exc:
-            raise JudgeError(f"Failed to list Foundry agents: {exc}") from exc
-
-        try:
-            agent: Agent = self._client.create_agent(
-                model=self._model,
-                name=self._agent_name,
-                instructions=instructions,
+                ),
                 metadata={"created-by": CREATED_BY_TAG},
             )
         except AzureError as exc:
-            raise JudgeError(f"Failed to create the judge agent: {exc}") from exc
-        self._agent_id = agent.id
-        return self._agent_id
+            raise JudgeError(f"Failed to create/version the judge agent: {exc}") from exc
+
+        self._openai = self._project.get_openai_client(agent_name=self._agent_name)
+        self._agent_ensured = True
+        return self._openai

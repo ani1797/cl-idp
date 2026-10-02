@@ -7,10 +7,16 @@ design system — see `docs/spec/design-system.md`.
 
 ## Repository layout
 
-- `apps/api` — uv-managed FastAPI skeleton
-- `apps/web` — Next.js App Router skeleton with Tailwind + shadcn/ui
-- `packages/shared` — placeholder for generated/shared contracts
-- `infra` — placeholder for future Bicep
+- `apps/api` — uv-managed FastAPI backend (trigger/query API) and the queue
+  worker (`app/worker`), shared by the standalone worker process and the
+  Azure Functions `apps/worker` wrapper
+- `apps/web` — Next.js App Router frontend with Tailwind + shadcn/ui
+- `packages/shared` — generated OpenAPI TypeScript client, shared by `apps/web`
+- `infra` — Bicep infrastructure-as-code for the Azure production deployment
+  (see `infra/README.md`)
+
+See [`docs/ENV.md`](./docs/ENV.md) for every environment variable each app
+reads, in local dev, Docker Compose, and Azure production.
 
 ## Quickstart
 

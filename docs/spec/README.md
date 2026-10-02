@@ -45,6 +45,9 @@ same human review UI.
 - [`api/`](./api) — the REST API contract as an OpenAPI 3.0 spec. This
   document is hand-written and authoritative; the backend implements it and
   the frontend client is generated from it.
+- [`../ENV.md`](../ENV.md) — every environment variable read by the `api`,
+  `worker`, and `web` apps (local dev, Docker Compose, and Azure
+  production), including the Foundry AI Agent Judge's `JUDGE_*` config.
 
 ## Prerequisite
 

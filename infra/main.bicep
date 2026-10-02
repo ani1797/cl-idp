@@ -38,8 +38,11 @@ param cuModelVersion string = '2025-04-14'
 @description('Enable the Foundry AI Agent Judge pre-judgement feature in the worker. The judge reuses this same Foundry account/project — no extra resources are provisioned when enabled.')
 param judgeEnabled bool = false
 
-@description('Model deployment used by the judge agent. Defaults to the same completion model deployed for Content Understanding.')
-param judgeModelDeployment string = cuModelName
+@description('Model deployed for the judge agent. Deliberately different from `cuModelName` (and given its own dedicated deployment/capacity by the content-understanding module) so judge calls never compete with Content Understanding analysis calls for the same deployment RPM/TPM quota.')
+param judgeModelName string = 'gpt-5-mini'
+
+@description('Model deployment name used by the judge agent (the deployment resource name, which equals `judgeModelName` unless it collides with `cuModelName`). Wired from the content-understanding module output below.')
+param judgeModelDeployment string = judgeModelName
 
 @description('Persistent Foundry agent name the judge resolves/creates on first use.')
 param judgeAgentName string = 'cl-idp-review-judge'
@@ -168,6 +171,9 @@ module contentUnderstanding 'modules/content-understanding.bicep' = {
     namePrefix: namePrefix
     modelName: cuModelName
     modelVersion: cuModelVersion
+    judgeModelName: judgeModelName
+    appInsightsId: observability.outputs.appInsightsId
+    appInsightsConnectionString: observability.outputs.appInsightsConnectionString
   }
 }
 

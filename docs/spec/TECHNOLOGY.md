@@ -71,26 +71,50 @@ without a judge.
   `JUDGE_ENABLED` is true. It only adjudicates the flagged fields, capped
   at `JUDGE_MAX_FIELDS` (truncates, does not error, if a job has more
   violations than that) — never the full field set.
-- **SDK**: **`azure-ai-agents`** (`AgentsClient`), talking to a
+- **SDK**: **`azure-ai-projects`** (`AIProjectClient`), talking to a
   **Microsoft Foundry project** (`JUDGE_PROJECT_ENDPOINT`, shape
   `https://{account}.services.ai.azure.com/api/projects/{project}` — a
   different endpoint shape than the CU resource's
-  `https://{account}.cognitiveservices.azure.com/`). A single persistent
-  agent (`JUDGE_AGENT_NAME`, default `cl-idp-review-judge`) is resolved by
-  name or created once via `list_agents()`/`create_agent()`, not
-  recreated per run. Authentication is `DefaultAzureCredential`, matching
-  CU.
+  `https://{account}.cognitiveservices.azure.com/`). This uses the newer
+  **Foundry Agent Service** "prompt agent" surface
+  (`project.agents.create_version(agent_name=..., definition=PromptAgentDefinition(...))`),
+  not the deprecating classic Assistants API (`azure-ai-agents`/
+  `AgentsClient`/threads/runs) — a versioned agent created this way shows
+  up under the project's **Agents** tab in the Foundry portal. A single
+  named agent (`JUDGE_AGENT_NAME`, default `cl-idp-review-judge`) is
+  resolved-or-versioned once per process and cached, not recreated per
+  run. Calls are made through an agent-scoped OpenAI client
+  (`project.get_openai_client(agent_name=...)`, which requires
+  `allow_preview=True` on the `AIProjectClient`) using
+  `openai_client.responses.create(input=...)` — a single stateless call
+  per adjudication, with no thread/run/poll lifecycle to manage or clean
+  up. Authentication is `DefaultAzureCredential`, matching CU.
+- **Model**: `JUDGE_MODEL_DEPLOYMENT` (default `gpt-5-mini`) is
+  deliberately a **separate deployment** from CU's
+  `CU_MODEL_DEPLOYMENT` (`gpt-4.1-mini`), provisioned by
+  `infra/modules/content-understanding.bicep`'s `judgeModelDeployment`
+  resource (only created when the judge model differs from the CU model).
+  This isolates the two workloads' RPM/TPM quota pools so a burst of
+  extraction traffic can never starve a judge run (or vice versa) — the
+  two were previously found to share one deployment's capacity, which was
+  the likely cause of intermittent judge failures under load.
 - **Evidence**: Content Understanding's own OCR/markdown text for the page
   (`MappedJobResult.markdown`) is passed as the document evidence — not
   page images — alongside each flagged field's name, extracted value, and
   confidence. No judge run occurs for a job whose CU result carries no
   markdown.
-- **Timeout**: `runs.create_and_process()` blocks with no external timeout
-  knob, so the client instead does `runs.create()` + a manual poll loop
-  against `JUDGE_TIMEOUT_SECONDS`, raising rather than hanging forever if
-  the agent run stalls.
+- **Timeout**: `responses.create(..., timeout=JUDGE_TIMEOUT_SECONDS)` is
+  passed straight through to the underlying OpenAI client's per-request
+  timeout — simpler than the classic Assistants API's manual
+  create-then-poll loop, since the Responses API's `responses.create` call
+  is itself synchronous/blocking with a native timeout parameter.
 - **Response contract**: a strict JSON schema
-  (`apps/api/app/judge/schema.py::JUDGE_RESPONSE_SCHEMA`) with one finding
+  (`apps/api/app/judge/schema.py::JUDGE_RESPONSE_SCHEMA`) is bound to the
+  agent **at version-creation time**
+  (`PromptAgentDefinition.text=PromptAgentDefinitionTextOptions(format=TextResponseFormatJsonSchema(...))`),
+  not passed per-call — the Responses API rejects a per-call `text`
+  format override with `400 invalid_payload` once a request is bound to an
+  agent (`agent_reference`/agent-scoped client). The schema has one finding
   per flagged field: `path`, `extractedValue` (echoed back), `matches`
   (boolean), `rationale`, `verdict` (`ok` | `fix` | `unknown`), then
   `suggestedValue`. The field order in the schema
@@ -105,6 +129,17 @@ without a judge.
   from the reply is backfilled as `unknown`, an invalid verdict string is
   coerced to `unknown`, and a `fix` verdict with no usable
   `suggestedValue` is downgraded to `unknown`.
+- **Tracing**: the Foundry account and project are wired to the shared
+  Application Insights instance via an `AppInsights`-category connection
+  (`infra/modules/content-understanding.bicep`'s
+  `accountAppInsightsConnection`/`projectAppInsightsConnection` resources),
+  the same mechanism and pattern as Microsoft's own Foundry samples. This
+  enables zero-code OpenTelemetry tracing for every agent run (prompts,
+  tool calls, latency, errors) — judge traces land in the *same*
+  Application Insights instance used by the api/worker/web services, so a
+  judge run correlates with the worker invocation that triggered it. See
+  [RBAC Permissions](#rbac-permissions) for the read-access grant this
+  requires.
 - **Persistence**: the result is stored as `Job.judge` (`JudgeReview`):
   `status` (`completed` | `failed`), `recommendation` (rollup across
   `findings`: `fix` if any finding is `fix`, else `unknown` if any is
@@ -408,7 +443,7 @@ for the visual resource-group layout.
 |---|---|
 | **Azure Cosmos DB for MongoDB (RU API)** | Production database — see [Data Storage](#data-storage). |
 | **Storage account** | `documents` blob container (uploaded files) + `jobs` queue (async job dispatch) + Function App content storage. |
-| **Azure AI Foundry** (`AIServices` account + project + `gpt-4.1-mini` deployment) | Content Understanding — see [Azure AI Content Understanding](#azure-ai-content-understanding). Provisioned inside this resource group so the whole stack is independently deployable. |
+| **Azure AI Foundry** (`AIServices` account + project + `gpt-4.1-mini` + `gpt-5-mini` deployments) | Content Understanding and the Foundry AI Agent Judge — see [Azure AI Content Understanding](#azure-ai-content-understanding) and [Azure Foundry AI Agent Judge](#azure-foundry-ai-agent-judge-pre-judgement). Provisioned inside this resource group so the whole stack is independently deployable. The project also holds an `AppInsights` connection into the Log Analytics/Application Insights resource below, for agent tracing. |
 | **Key Vault** (RBAC-authorized, no access policies) | Holds the Cosmos Mongo connection string; App Service/Function App read it via Key Vault references. |
 | **Log Analytics + Application Insights** | Centralized logs/traces/metrics for all three compute tiers — see [Observability](#observability). |
 
@@ -439,7 +474,8 @@ fallback in production).
 | **worker** Function App | `Storage Blob Data Contributor` | Storage account | Reads the uploaded document from the `documents` container to submit for analysis. |
 | **worker** Function App | `Storage Queue Data Contributor` | Storage account | Consumes (dequeues/deletes) messages from the `jobs` queue — this is also the Function App's queue *trigger* binding. |
 | **worker** Function App | `Key Vault Secrets User` | Key Vault | Resolves the Cosmos Mongo connection string to persist job/review records. |
-| **worker** Function App | `Cognitive Services User` | AI Foundry account | Submits documents to Content Understanding and polls for results — the actual pipeline call. |
+| **worker** Function App | `Cognitive Services User` | AI Foundry account | Submits documents to Content Understanding and polls for results — the actual pipeline call; also backs the judge's calls to the Foundry project when `JUDGE_ENABLED` is true. |
+| **AI Foundry project** (system-assigned identity, not a compute tier) | `Log Analytics Reader` + `Privileged Monitoring Data Reader` | Application Insights component | Lets the Foundry project's own managed identity (distinct from api/worker's identities) read back the GenAI/agent traces it just wrote, which is what the Foundry portal's **Tracing** view and evaluation tooling need — `Privileged Monitoring Data Reader` specifically is required to read GenAI trace *content* (prompts/completions), not just metadata. |
 | **web** App Service | `Key Vault Secrets User` | Key Vault | Reserved for future secrets (e.g. auth provider config) — the web tier has no direct Azure data-plane access today; it calls the API over HTTPS, never Azure resources directly. |
 | *(none)* | — | — | Nothing is granted `Contributor`/`Owner` on the resource group; all access is scoped to the single resource each identity needs, at the resource level. |
 

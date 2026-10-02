@@ -232,7 +232,7 @@ This is a documented trade-off, not an oversight.
       }
     ],
     "evaluatedAt": "2026-01-03T12:00:09Z",
-    "model": "gpt-4.1-mini",
+    "model": "gpt-5-mini",
     "error": null
   }
 }

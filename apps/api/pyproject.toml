@@ -25,7 +25,8 @@ dependencies = [
     "pypdf>=6.16.2",
     "python-multipart>=0.0.32",
     "uvicorn>=0.35.0",
-    "azure-ai-agents>=1.2.0b6",
+    "azure-ai-projects>=2.3.0",
+    "openai>=1.0",
 ]
 
 [dependency-groups]

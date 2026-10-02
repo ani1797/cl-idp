@@ -22,9 +22,13 @@ and RBAC design behind each step.
 
 Everything lands in **one resource group** (default `rg-cl-idp-prod-eus2`) —
 web, api, worker, Cosmos DB for MongoDB, Storage, Key Vault, AI
-Foundry/Content Understanding, Container Registry, and Log
-Analytics/Application Insights. Nothing is shared with or depends on another
-resource group.
+Foundry/Content Understanding (plus the optional Foundry AI Agent Judge, its
+own isolated model deployment, and its Application Insights tracing
+connection — see [`spec/TECHNOLOGY.md`](spec/TECHNOLOGY.md#azure-foundry-ai-agent-judge-pre-judgement)),
+Container Registry, and Log Analytics/Application Insights. Nothing is
+shared with or depends on another resource group. See
+[`docs/ENV.md`](ENV.md) for the full list of environment variables/app
+settings each app reads, including the judge's `JUDGE_*` config.
 
 ### Prerequisites
 

@@ -66,7 +66,7 @@ def main() -> int:
     flagged = collect_flagged_fields(fields, confidence_violations=confidence_violations, max_fields=25)
     user_message = build_user_message(markdown, flagged)
 
-    print("\n--- Calling REAL Foundry Agents Judge (azure-ai-agents, live network call) ---")
+    print("\n--- Calling REAL Foundry Agent Judge (azure-ai-projects versioned agent, live network call) ---")
     judge_client = JudgeClient(settings)
     try:
         raw_reply = judge_client.adjudicate(instructions=JUDGE_INSTRUCTIONS, user_message=user_message)

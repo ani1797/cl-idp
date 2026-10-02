@@ -15,26 +15,32 @@ infra/
     ├── key-vault.bicep              # Key Vault (RBAC authorization mode)
     ├── storage.bicep                # Storage account: "documents" blob container, "jobs" queue
     ├── cosmos-mongo.bicep           # Azure Cosmos DB for MongoDB (RU API) — db + collections
-    ├── content-understanding.bicep  # AI Foundry account + project + model deployment
+    ├── content-understanding.bicep  # AI Foundry account + project + CU/judge model deployments
+    │                                 #   + the project's Application Insights connections
+    ├── container-registry.bicep     # Azure Container Registry for the web/api Docker images
+    ├── communication-email.bicep    # Optional Azure Communication Services email (ACS demo path)
     ├── kv-secret.bicep              # Writes a secret into an existing Key Vault
     ├── app-service.bicep            # Generic Linux App Service (plan + site) — used for web and api
     ├── function-app.bicep           # Linux Consumption Function App (worker)
     ├── rbac-local.bicep             # Role assignments on storage + Key Vault (same RG)
-    └── rbac-cognitive-services.bicep # Role assignment on the Content Understanding account
+    ├── rbac-cognitive-services.bicep # Role assignment on the Content Understanding account
+    ├── rbac-ai-agents.bicep         # `Foundry User` role for the worker identity (Agent Service calls)
+    └── rbac-acr.bicep               # `AcrPull` role for the web/api App Services on the registry
 ```
 
 ## Topology
 
 | Component | Azure service | Notes |
 |---|---|---|
-| web    | App Service (Linux, Node 20) | Next.js frontend |
-| api    | App Service (Linux, Python 3.12) | FastAPI trigger/query API |
+| web    | App Service (Linux, Node 20, container) | Next.js frontend |
+| api    | App Service (Linux, Python 3.12, container) | FastAPI trigger/query API |
 | worker | Function App (Linux, Python 3.12, Consumption) | Queue-triggered pipeline worker, replaces `apps/api/app/worker/main.py`'s standalone loop |
 | db     | Azure Cosmos DB for MongoDB (RU API) | Same `pymongo`/`mongodb://` code path as local dev (`DB_BACKEND=mongo`) — **not** MongoDB Atlas, since Atlas isn't ARM/Bicep-deployable |
 | blob/queue | Storage account | "documents" container, "jobs" queue |
-| AI    | Azure AI Foundry (`AIServices` account + project + `gpt-4.1-mini` deployment) | Content Understanding — provisioned in this RG, not shared/reused |
-| secrets | Key Vault (RBAC-authorized) | Holds the Cosmos Mongo connection string; apps read it via Key Vault references |
-| observability | Log Analytics + Application Insights | Diagnostic settings on every App Service/Function App |
+| AI    | Azure AI Foundry (`AIServices` account + project + `gpt-4.1-mini` CU deployment + `gpt-5-mini` judge deployment) | Content Understanding and the Foundry AI Agent Judge — provisioned in this RG, not shared/reused. The judge gets its own model deployment (isolated RPM/TPM quota) whenever it's configured to use a model different from CU's. The project also has an `AppInsights` connection (see below) for agent tracing. |
+| registry | Azure Container Registry | Hosts the `web`/`api` Docker images referenced by `webImageTag`/`apiImageTag` |
+| secrets | Key Vault (RBAC-authorized) | Holds the Cosmos Mongo connection string, JWT secret, service API token, and (if configured) SMTP credentials; apps read them via Key Vault references |
+| observability | Log Analytics + Application Insights | Diagnostic settings on every App Service/Function App, **plus** an `AppInsights`-category connection on the Foundry account/project so Foundry Agent Service traces (the judge agent's runs) land in the same instance — see [RBAC Permissions](../docs/spec/TECHNOLOGY.md#rbac-permissions) for the read-access role grant this requires. |
 
 See [`docs/spec/TECHNOLOGY.md`](../docs/spec/TECHNOLOGY.md) ("Azure
 Production Architecture" and "RBAC Permissions") for the full narrative and
@@ -88,7 +94,7 @@ documented exemption tag for exactly this case (checked at resource **or**
 resource-group scope). A real production deployment would instead add VNet
 integration + private endpoints and drop this tag.
 
-### Content Understanding
+### Content Understanding and the Foundry AI Agent Judge
 
 Provisioned fresh in this resource group (`AIServices` account + project +
 a `gpt-4.1-mini` `GlobalStandard` deployment) rather than reused from any
@@ -96,6 +102,25 @@ other environment, per the "everything self-sufficient and enclosed in the
 resource group" requirement. `disableLocalAuth: true` — the API and worker
 managed identities are the *only* way to call it (RBAC `Cognitive Services
 User`, no API key fallback).
+
+The Foundry AI Agent Judge (`JUDGE_ENABLED`) is **optional and off by
+default** (`main.parameters.json` currently sets it to `true` in this
+environment) but, when enabled, is provisioned in the same Foundry
+account/project — `infra/modules/content-understanding.bicep` adds a
+second, isolated `gpt-5-mini` model deployment (`judgeModelDeployment`,
+only created when the judge's model differs from CU's `gpt-4.1-mini`) so
+the two workloads never compete for the same deployment's RPM/TPM quota.
+The judge uses the Foundry **Agent Service** (versioned "prompt agents",
+visible under the project's **Agents** tab), not the classic Assistants
+API.
+
+The account and project also each have an `AppInsights`-category
+connection (`accountAppInsightsConnection`/`projectAppInsightsConnection`)
+pointed at the shared Log Analytics/Application Insights resource, with
+the project's managed identity granted `Log Analytics Reader` +
+`Privileged Monitoring Data Reader` on it — this is what makes judge agent
+runs show up in the Foundry portal's **Tracing** view and in Application
+Insights alongside the rest of the stack's telemetry.
 
 ## Outputs
 
@@ -108,6 +133,7 @@ User`, no API key fallback).
 | `cosmosMongoAccountName` | Cosmos Mongo API account name |
 | `storageAccountName` | Storage account name |
 | `contentUnderstandingEndpoint` | AI Foundry / Content Understanding endpoint |
+| `containerRegistryLoginServer` | Azure Container Registry login server (for `az acr build`/image pushes) |
 
 ## Status
 

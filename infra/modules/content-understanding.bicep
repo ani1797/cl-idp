@@ -15,6 +15,16 @@ param embeddingModelName string = 'text-embedding-3-small'
 param embeddingModelVersion string = '1'
 param embeddingModelCapacity int = 120
 
+@description('Resource ID of the shared Application Insights component (from modules/log-analytics.bicep). Wired into this account/project as an AppInsights connection so Foundry Agent Service traces (the judge agent runs) land in the same Application Insights used by the rest of the stack, enabling zero-code agent tracing.')
+param appInsightsId string
+@description('Connection string of the shared Application Insights component, used as the connection credential below.')
+param appInsightsConnectionString string
+
+@description('Model deployed for the Foundry AI Agent Judge. Deliberately a separate model/deployment from `modelName` (Content Understanding) so the two workloads never compete for the same per-deployment RPM/TPM capacity — the root cause of intermittent judge run failures observed when both shared one deployment. Set equal to `modelName` to intentionally share a deployment instead; no judge-specific deployment resource is created in that case.')
+param judgeModelName string = 'gpt-5-mini'
+param judgeModelVersion string = '2025-08-07'
+param judgeModelCapacity int = 50
+
 resource foundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
   name: '${namePrefix}-foundry'
   location: location
@@ -87,6 +97,99 @@ resource embeddingModelDeployment 'Microsoft.CognitiveServices/accounts/deployme
   ]
 }
 
+// Only provisioned when the judge is configured to use a model distinct
+// from the Content Understanding completion model above (the default and
+// recommended configuration — see the `judgeModelName` description).
+resource judgeModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = if (judgeModelName != modelName) {
+  parent: foundry
+  name: judgeModelName
+  sku: {
+    name: 'GlobalStandard'
+    capacity: judgeModelCapacity
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: judgeModelName
+      version: judgeModelVersion
+    }
+  }
+  dependsOn: [
+    embeddingModelDeployment
+  ]
+}
+
+// Existing resource reference (not a new deployment): the shared App
+// Insights component, used below as the `scope` for RBAC role assignments
+// that let the project's managed identity push agent traces into it.
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: last(split(appInsightsId, '/'))
+}
+
+// Account-level AppInsights connection, mirroring the official Foundry
+// samples pattern (microsoft-foundry/foundry-samples,
+// 01-connections/connection-application-insights.bicep). Lets every
+// project under this account send OpenTelemetry traces to Application
+// Insights.
+resource accountAppInsightsConnection 'Microsoft.CognitiveServices/accounts/connections@2025-04-01-preview' = {
+  parent: foundry
+  name: '${namePrefix}-foundry-appinsights'
+  properties: {
+    category: 'AppInsights'
+    target: appInsightsId
+    authType: 'ApiKey'
+    isSharedToAll: true
+    credentials: {
+      key: appInsightsConnectionString
+    }
+    metadata: {
+      ApiType: 'Azure'
+      ResourceId: appInsightsId
+    }
+  }
+}
+
+// Project-level AppInsights connection. This is what actually enables
+// zero-code Foundry Agent Service tracing (prompts, tool calls, errors) for
+// the judge agent — traces land in the same Application Insights instance
+// used by the api/worker/web services, so everything correlates together.
+resource projectAppInsightsConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview' = {
+  parent: project
+  name: '${namePrefix}-project-appinsights'
+  properties: {
+    category: 'AppInsights'
+    target: appInsightsId
+    authType: 'ApiKey'
+    isSharedToAll: true
+    credentials: {
+      key: appInsightsConnectionString
+    }
+    metadata: {
+      ApiType: 'Azure'
+      ResourceId: appInsightsId
+    }
+  }
+}
+
+// Log Analytics Reader + Privileged Monitoring Data Reader (the latter is
+// required to read GenAI trace content, per Microsoft's own Foundry
+// samples) — grants the project's system-assigned identity the read access
+// needed for the Foundry portal's "Tracing" view to surface agent runs.
+var appInsightsReaderRoleGuids = [
+  '73c42c96-874c-492b-b04d-ab87d138a893'
+  'dbc9c667-e97f-4491-aee6-90b9cf960190'
+]
+
+resource projectAppInsightsRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleGuid in appInsightsReaderRoleGuids: {
+  name: guid(project.id, roleGuid, appInsightsId)
+  scope: appInsights
+  properties: {
+    principalId: project.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleGuid)
+    principalType: 'ServicePrincipal'
+  }
+}]
+
 output accountId string = foundry.id
 output accountName string = foundry.name
 output endpoint string = 'https://${foundry.name}.cognitiveservices.azure.com/'
@@ -96,3 +199,4 @@ output projectEndpoint string = 'https://${foundry.name}.services.ai.azure.com/a
 output principalId string = foundry.identity.principalId
 output modelDeploymentName string = modelDeployment.name
 output embeddingModelDeploymentName string = embeddingModelDeployment.name
+output judgeModelDeploymentName string = judgeModelName != modelName ? judgeModelDeployment.name : modelDeployment.name

@@ -150,7 +150,7 @@ class Settings(BaseSettings):
     # API surface: `*.cognitiveservices.azure.com` -> `*.services.ai.azure.com
     # /api/projects/{project}`) when unset — see `app.judge.client`.
     judge_project_endpoint: str | None = Field(default=None, alias="JUDGE_PROJECT_ENDPOINT")
-    judge_model_deployment: str = Field(default="gpt-4.1-mini", alias="JUDGE_MODEL_DEPLOYMENT")
+    judge_model_deployment: str = Field(default="gpt-5-mini", alias="JUDGE_MODEL_DEPLOYMENT")
     judge_agent_name: str = Field(default="cl-idp-review-judge", alias="JUDGE_AGENT_NAME")
     judge_timeout_seconds: float = Field(default=45.0, alias="JUDGE_TIMEOUT_SECONDS")
     # Upper bound on how many flagged fields are sent to the judge per job,

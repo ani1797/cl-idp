@@ -65,13 +65,24 @@ implementation:
   `confidenceViolations` paths against the job's field tree (capped at
   `JUDGE_MAX_FIELDS`) and `build_user_message()` assembles the markdown +
   flagged-field evidence sent to the agent.
-- **`app/judge/client.py`**: `JudgeClient` wraps `azure-ai-agents`'
-  `AgentsClient` (the Foundry **project** endpoint, a different shape
-  than the CU **account** endpoint — derived via
-  `project_endpoint_from_cu_endpoint()`), resolves-or-creates a single
-  persistent agent, and enforces `JUDGE_TIMEOUT_SECONDS` via manual
-  polling (`runs.create()` + a deadline loop) since
-  `runs.create_and_process()` has no external timeout parameter.
+- **`app/judge/client.py`**: `JudgeClient` wraps `azure-ai-projects`'
+  `AIProjectClient` against the Foundry **project** endpoint (a different
+  shape than the CU **account** endpoint, derived via
+  `project_endpoint_from_cu_endpoint()`). It uses the newer **Foundry
+  Agent Service** "prompt agent" surface
+  (`project.agents.create_version(agent_name=..., definition=
+  PromptAgentDefinition(...))`) rather than the classic Assistants API —
+  a versioned agent created this way is visible under the Foundry
+  portal's **Agents** tab, unlike a classic `Assistant` object. Calls go
+  through an agent-scoped OpenAI client
+  (`project.get_openai_client(agent_name=..., allow_preview=True)`) using
+  a single stateless `openai_client.responses.create(input=...,
+  timeout=JUDGE_TIMEOUT_SECONDS)` call per adjudication — no
+  thread/run/poll lifecycle and nothing to clean up afterward. The
+  response JSON schema is bound to the agent at `create_version` time
+  (`PromptAgentDefinition.text`), not passed per-call, because the
+  Responses API rejects a per-call `text` format override once a request
+  is agent-scoped (`400 invalid_payload`).
 - **Worker** (`app/worker/main.py`): `run_judge()` — best-effort, called
   from `finalize_success()` only when `confidenceViolations` is non-empty
   and markdown evidence exists; any `JudgeError` is caught and turned into
@@ -302,3 +313,67 @@ and confirmed gone (404).
       `infra/scripts/deploy-worker.sh`, and confirming via Application
       Insights that `Functions.jobs_worker` now indexes and executes
       successfully, with the `jobs` queue back to empty.
+- [x] **Migrated the judge agent from the classic Assistants API to the
+      Foundry Agent Service** (per explicit user request: "migrate the
+      classic assistants to new agents so we can see them in my
+      foundry"). Rewrote `app/judge/client.py` to use `azure-ai-projects`'
+      `AIProjectClient`/`project.agents.create_version(... ,
+      PromptAgentDefinition(...))` and an agent-scoped OpenAI client
+      (`project.get_openai_client(agent_name=..., allow_preview=True)`
+      + `openai_client.responses.create(input=...)`) instead of
+      `azure-ai-agents`'s `AgentsClient`/threads/runs — the versioned
+      agent this creates is visible under the Foundry portal's **Agents**
+      tab, unlike the old classic `Assistant` object. Key discovery: the
+      Responses API rejects a per-call `text` JSON-schema override once a
+      request is agent-scoped (`400 invalid_payload: "Not allowed when
+      agent is specified"`), so the schema moved onto
+      `PromptAgentDefinition.text` at `create_version` time instead.
+      `pyproject.toml`/`uv.lock`/`apps/worker/requirements.txt` updated:
+      `azure-ai-agents` removed, `azure-ai-projects`+`openai` added.
+      Validated live against `clidpprod-foundry`/`clidpprod-project` via
+      `scripts/live_judge_smoke2.py` (correct `ok`/`fix` verdicts with
+      accurate `suggestedValue`); the old classic agent
+      (`asst_q5RaHZpcz5vbr9KU7D6TZE9N`, `cl-idp-review-judge`) was left in
+      place as a harmless orphan rather than force-deleted through a
+      non-`infra/` script, per the "deployments only via infra/"
+      constraint.
+- [x] **Switched the judge off `gpt-4.1-mini`** (per explicit user
+      request: "use model other than gpt-4.1-mini as the judge"), onto
+      **`gpt-5-mini`** (`2025-08-07`, GA, supports Responses/agents). Real
+      subscription quota was confirmed via `az cognitiveservices usage
+      list -l eastus2` (not the misleading `maxCapacity` field from
+      `list-models`) before choosing it. `infra/modules/content-
+      understanding.bicep` gained `judgeModelName`/`judgeModelVersion`/
+      `judgeModelCapacity` params and a conditional `judgeModelDeployment`
+      resource (created only when the judge model differs from CU's
+      `modelName`), giving the judge its own isolated RPM/TPM deployment
+      so it can never compete with Content Understanding's deployment for
+      capacity — the suspected root cause of earlier intermittent judge
+      failures. `JUDGE_MODEL_DEPLOYMENT` default updated to `gpt-5-mini`
+      in `app/config.py` and `.env.example`. Deployed through the
+      documented `az deployment sub create` mechanism (not a direct `az
+      cognitiveservices` CLI call); confirmed `provisioningState:
+      Succeeded` with no drift against an earlier one-off manual
+      deployment of the same model/SKU/capacity.
+- [x] **Wired Foundry agent tracing into Application Insights** (per
+      explicit user request: "the foundry isn't yet connected with app
+      insights... agent traces should be saved as well"). Added an
+      `AppInsights`-category connection at both the Foundry **account**
+      and **project** level
+      (`accountAppInsightsConnection`/`projectAppInsightsConnection` in
+      `infra/modules/content-understanding.bicep`, mirroring Microsoft's
+      own `foundry-samples` Bicep pattern), pointed at the same shared
+      Application Insights component the api/worker/web tiers already use
+      (`modules/log-analytics.bicep`, now exposing an `appInsightsId`
+      output). Granted the project's system-assigned identity
+      `Log Analytics Reader` + `Privileged Monitoring Data Reader` on that
+      Application Insights component (the latter specifically required to
+      read GenAI trace *content*, not just metadata) so the Foundry
+      portal's **Tracing** view can surface the judge agent's runs. This
+      enables zero-code OpenTelemetry tracing for every judge agent call —
+      judge traces now land in the same Application Insights instance as
+      the rest of the stack's telemetry. Deployed via `az deployment sub
+      create`; confirmed live via `az rest` that both
+      `clidpprod-foundry-appinsights` and `clidpprod-project-appinsights`
+      connections exist. Documented in `TECHNOLOGY.md`'s judge section and
+      RBAC Permissions table.

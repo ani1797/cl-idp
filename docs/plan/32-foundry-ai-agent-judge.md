@@ -259,3 +259,30 @@ and confirmed gone (404).
       `VendorName` row replaces the input's "Globex Industrial" with the
       judge's "Contoso Supplies" suggestion. Test process/job cleaned up
       afterward.
+- [x] UI clarity follow-up: added an explicit `Suggested: <value>` label
+      next to the "Use suggestion" button in `inference-review-page.tsx`
+      so the proposed correction is visible before a reviewer clicks
+      anything (previously only inferable from the free-form rationale
+      tooltip). Verified via `inference-review-page.test.tsx` (14/14),
+      full frontend suite (115/115), `tsc --noEmit`/`eslint` clean, and a
+      live Playwright check against the rebuilt local dev stack showing
+      `"Suggested: Contoso Supplies"` rendered next to the button while
+      the input still held the wrong value.
+- [x] Production rebuild/redeploy pass (the `web`/`api` images and the
+      worker's Bicep-managed settings had been updated earlier, but the
+      live App Services were still serving container images built
+      *before* the judge feature, and the worker Function App's actual
+      zip-deployed code package had never been refreshed at all — only
+      its app settings had). Rebuilt and pushed fresh, uniquely-tagged
+      images (`clidp-web:20261002104000` via local `docker build
+      --build-context shared=./packages/shared` + push, `clidp-api
+      :20261002104000` via `az acr build`) to `clidpprodacr`, confirmed
+      the web image's compiled bundle contains the new "Suggested:"
+      label, updated `webImageTag`/`apiImageTag` in
+      `infra/main.parameters.json`, redeployed via `az deployment sub
+      create` after a clean `what-if`, redeployed the worker's code via
+      `infra/scripts/deploy-worker.sh` (zip-deploy, status 4/success),
+      restarted `clidpprod-web`/`clidpprod-api` to force a fresh image
+      pull, and confirmed live: both App Services report the new image
+      tag via `az webapp config container show`, both return HTTP 200,
+      and `clidpprod-worker` reports `state=Running`.

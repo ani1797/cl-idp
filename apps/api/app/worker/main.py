@@ -620,7 +620,14 @@ def run_judge(
                 evaluated_at=datetime.now(UTC),
             )
         except JudgeError as exc:
-            logger.warning("Judge adjudication failed for job %s: %s", job.id, exc, exc_info=True)
+            last_error = getattr(exc, "last_error", None)
+            logger.warning(
+                "Judge adjudication failed for job %s: %s (last_error=%s)",
+                job.id,
+                exc,
+                last_error,
+                exc_info=True,
+            )
             span.set_attribute("judge.status", "failed")
             return JudgeReview(
                 status="failed",
@@ -628,7 +635,7 @@ def run_judge(
                 findings=[],
                 evaluatedAt=datetime.now(UTC),
                 model=dependencies.settings.judge_model_deployment,
-                error=str(exc),
+                error=f"{exc} (last_error={last_error})" if last_error else str(exc),
             )
         span.set_attribute("judge.status", review.status.value)
         span.set_attribute("judge.recommendation", review.recommendation.value)

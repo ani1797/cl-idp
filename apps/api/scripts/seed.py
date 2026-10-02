@@ -107,7 +107,7 @@ SCENARIOS: tuple[ProcessScenario, ...] = (
         name="Canada Life Group Benefits Administration",
         description="Canada Life group benefits application intake routed only to the trained group benefits analyzer.",
         allowed_analyzer_ids=("group_benefits_application",),
-        confidence_threshold=0.7,
+        confidence_threshold=0.9,
         owner_email="group-benefits-owner@example.com",
         sample_dirs=(SAMPLES_ROOT / "group-benefits",),
     ),

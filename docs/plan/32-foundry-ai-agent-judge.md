@@ -286,3 +286,19 @@ and confirmed gone (404).
       pull, and confirmed live: both App Services report the new image
       tag via `az webapp config container show`, both return HTTP 200,
       and `clidpprod-worker` reports `state=Running`.
+- [x] Post-redeploy incident found and fixed: a user-uploaded job sat in
+      the `jobs` queue indefinitely (`dequeueCount: 0`). Root cause:
+      `apps/worker/requirements.txt` was a stale snapshot predating the
+      judge feature, so it lacked `azure-ai-agents` (and `argon2-cffi`,
+      added for auth around the same time) — the Function App's Python
+      worker failed to index `jobs_worker` entirely
+      (`ModuleNotFoundError: No module named 'azure.ai.agents'`,
+      confirmed via an Application Insights trace/exception query), so
+      the queue trigger never fired for anyone, not just judge-related
+      jobs. Fixed by regenerating `apps/worker/requirements.txt` via `uv
+      export --no-dev --no-hashes --format requirements-txt` from
+      `apps/api/pyproject.toml`/`uv.lock` (the same mechanism noted in
+      the file's own header comment), redeploying via
+      `infra/scripts/deploy-worker.sh`, and confirming via Application
+      Insights that `Functions.jobs_worker` now indexes and executes
+      successfully, with the `jobs` queue back to empty.

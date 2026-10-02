@@ -90,6 +90,9 @@ resource embeddingModelDeployment 'Microsoft.CognitiveServices/accounts/deployme
 output accountId string = foundry.id
 output accountName string = foundry.name
 output endpoint string = 'https://${foundry.name}.cognitiveservices.azure.com/'
+// Azure AI Foundry Agent Service (used by the judge feature) addresses the
+// project, not the raw Cognitive Services endpoint above.
+output projectEndpoint string = 'https://${foundry.name}.services.ai.azure.com/api/projects/${project.name}'
 output principalId string = foundry.identity.principalId
 output modelDeploymentName string = modelDeployment.name
 output embeddingModelDeploymentName string = embeddingModelDeployment.name

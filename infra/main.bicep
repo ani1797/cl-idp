@@ -35,6 +35,15 @@ param resourceGroupName string = 'rg-cl-idp-prod-eus2'
 param cuModelName string = 'gpt-4.1-mini'
 param cuModelVersion string = '2025-04-14'
 
+@description('Enable the Foundry AI Agent Judge pre-judgement feature in the worker. The judge reuses this same Foundry account/project — no extra resources are provisioned when enabled.')
+param judgeEnabled bool = false
+
+@description('Model deployment used by the judge agent. Defaults to the same completion model deployed for Content Understanding.')
+param judgeModelDeployment string = cuModelName
+
+@description('Persistent Foundry agent name the judge resolves/creates on first use.')
+param judgeAgentName string = 'cl-idp-review-judge'
+
 @description('App Service plan SKU for the web and api tiers.')
 param appServicePlanSku string = 'B1'
 
@@ -440,6 +449,22 @@ module workerApp 'modules/function-app.bicep' = {
         name: 'CU_ENDPOINT'
         value: contentUnderstanding.outputs.endpoint
       }
+      {
+        name: 'JUDGE_ENABLED'
+        value: string(judgeEnabled)
+      }
+      {
+        name: 'JUDGE_PROJECT_ENDPOINT'
+        value: contentUnderstanding.outputs.projectEndpoint
+      }
+      {
+        name: 'JUDGE_MODEL_DEPLOYMENT'
+        value: judgeModelDeployment
+      }
+      {
+        name: 'JUDGE_AGENT_NAME'
+        value: judgeAgentName
+      }
     ], mailAppSettings)
   }
 }
@@ -471,6 +496,18 @@ module rbacCu 'modules/rbac-cognitive-services.bicep' = {
     cognitiveServicesAccountName: contentUnderstanding.outputs.accountName
     callerPrincipalIds: [
       apiApp.outputs.principalId
+      workerApp.outputs.principalId
+    ]
+  }
+}
+
+// --- RBAC: Foundry Agent Service (judge feature, worker only) ---------------
+module rbacAiAgents 'modules/rbac-ai-agents.bicep' = {
+  name: 'rbac-ai-agents'
+  scope: rg
+  params: {
+    cognitiveServicesAccountName: contentUnderstanding.outputs.accountName
+    callerPrincipalIds: [
       workerApp.outputs.principalId
     ]
   }

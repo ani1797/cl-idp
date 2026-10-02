@@ -7,6 +7,7 @@
     "resourceGroupName": { "value": "rg-cl-idp-prod-eus2" },
     "cuModelName": { "value": "gpt-4.1-mini" },
     "cuModelVersion": { "value": "2025-04-14" },
+    "judgeEnabled": { "value": true },
     "appServicePlanSku": { "value": "B1" },
     "enableAcsEmailDemo": { "value": true },
     "smtpEntraApplicationId": { "value": "0425390a-3148-4904-8699-242c2f78e175" },

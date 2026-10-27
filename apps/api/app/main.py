@@ -10,8 +10,9 @@ from uuid import uuid4
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.metrics import CallbackOptions, Observation
@@ -447,7 +448,9 @@ def is_auth_exempt(request: Request) -> bool:
     if request.method == "OPTIONS":
         return True
     path = request.url.path
-    return (request.method == "GET" and path == "/healthz") or path.startswith("/auth/")
+    return (
+        request.method == "GET" and path in {"/healthz", "/openapi.json", "/docs"}
+    ) or path.startswith("/auth/")
 
 
 def build_openapi_schema(application: FastAPI) -> dict[str, Any]:
@@ -504,9 +507,17 @@ def create_app() -> FastAPI:
         version=API_VERSION,
         lifespan=lifespan,
         openapi_tags=OPENAPI_TAGS,
-        servers=[{"url": "/api"}],
+        docs_url=None,
+        servers=[{"url": "."}],
     )
     initialize_observability(application)
+
+    @application.get("/docs", include_in_schema=False)
+    async def swagger_ui() -> HTMLResponse:
+        return get_swagger_ui_html(
+            openapi_url="./openapi.json",
+            title=f"{application.title} - Swagger UI",
+        )
 
     def custom_openapi() -> dict[str, Any]:
         if application.openapi_schema is None:

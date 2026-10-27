@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import urljoin
 
+import pytest
 import yaml
+from fastapi.testclient import TestClient
 
 from app.main import build_openapi_schema, create_app
 
@@ -47,6 +50,38 @@ def explicit_public_operations(schema: dict[str, object]) -> set[str]:
 
 def format_path_set(paths: set[str]) -> str:
     return ", ".join(sorted(paths)) or "<none>"
+
+
+def test_openapi_schema_is_public_but_documents_authenticated_operations() -> None:
+    client = TestClient(create_app())
+
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    schema = response.json()
+    assert schema["servers"] == [{"url": "."}]
+    assert schema["security"] == [{"bearerAuth": []}, {"cookieAuth": []}]
+    assert schema["paths"]["/auth/token"]["post"]["security"] == []
+    assert "security" not in schema["paths"]["/processes/{processId}/trigger"]["post"]
+
+
+@pytest.mark.parametrize("prefix", ["", "/api"])
+def test_swagger_ui_is_public_and_resolves_schema_and_operations_under_its_prefix(
+    prefix: str,
+) -> None:
+    client = TestClient(create_app())
+
+    response = client.get("/docs")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert "SwaggerUIBundle" in response.text
+    assert "url: './openapi.json'" in response.text
+    docs_url = f"https://idp.example{prefix}/docs"
+    schema_url = urljoin(docs_url, "./openapi.json")
+    schema = client.get("/openapi.json").json()
+    server_url = urljoin(schema_url, schema["servers"][0]["url"])
+    assert urljoin(server_url, "healthz") == f"https://idp.example{prefix}/healthz"
 
 
 def test_handwritten_openapi_tracks_live_contract_shape() -> None:

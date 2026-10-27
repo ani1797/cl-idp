@@ -17,7 +17,7 @@ info:
     `SERVICE_API_TOKEN` bearer token for trusted workers and scripts.
   version: "0.2.0"
 servers:
-  - url: /api
+  - url: .
 security:
   - bearerAuth: []
   - cookieAuth: []

@@ -4,8 +4,7 @@ from datetime import UTC, datetime
 from typing import cast
 from uuid import uuid4
 
-from fastapi import FastAPI
-from fastapi import Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.auth import hash_password
@@ -42,7 +41,7 @@ def data_store(application: FastAPI) -> DataStore:
 
 def register_user_routes(application: FastAPI) -> None:
     @application.get("/users", response_model=list[User], tags=["users"])
-    async def list_users_endpoint(request: Request) -> list[User] | JSONResponse:
+    def list_users_endpoint(request: Request) -> list[User] | JSONResponse:
         if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
             return forbidden
         return [public_user(user) for user in data_store(application).list_users()]
@@ -54,9 +53,7 @@ def register_user_routes(application: FastAPI) -> None:
         responses={403: {"model": Error}, 409: {"model": Error}},
         tags=["users"],
     )
-    async def create_user_endpoint(
-        payload: UserCreateRequest, request: Request
-    ) -> User | JSONResponse:
+    def create_user_endpoint(payload: UserCreateRequest, request: Request) -> User | JSONResponse:
         if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
             return forbidden
         now = datetime.now(UTC)
@@ -82,7 +79,7 @@ def register_user_routes(application: FastAPI) -> None:
         responses={403: {"model": Error}, 404: {"model": Error}, 409: {"model": Error}},
         tags=["users"],
     )
-    async def update_user_endpoint(
+    def update_user_endpoint(
         userId: str, payload: UserUpdateRequest, request: Request
     ) -> User | JSONResponse:
         if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
@@ -109,7 +106,7 @@ def register_user_routes(application: FastAPI) -> None:
         responses={403: {"model": Error}, 404: {"model": Error}},
         tags=["users"],
     )
-    async def reset_user_password_endpoint(
+    def reset_user_password_endpoint(
         userId: str,
         payload: UserResetPasswordRequest,
         request: Request,

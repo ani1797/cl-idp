@@ -39,7 +39,7 @@ def register_auth_routes(application: FastAPI) -> None:
         tags=["auth"],
         openapi_extra={"security": []},
     )
-    async def login_endpoint(payload: LoginRequest, response: Response) -> User | JSONResponse:
+    def login_endpoint(payload: LoginRequest, response: Response) -> User | JSONResponse:
         user = data_store(application).find_user_by_email(str(payload.email))
         if user is None or not user.isActive or not verify_password(payload.password, user.passwordHash):
             return error_response(
@@ -65,7 +65,7 @@ def register_auth_routes(application: FastAPI) -> None:
         tags=["auth"],
         openapi_extra={"security": []},
     )
-    async def logout_endpoint(response: Response) -> Response:
+    def logout_endpoint(response: Response) -> Response:
         settings = application.state.settings
         response.delete_cookie(
             key=settings.session_cookie_name,
@@ -83,7 +83,7 @@ def register_auth_routes(application: FastAPI) -> None:
         tags=["auth"],
         openapi_extra={"security": []},
     )
-    async def issue_token_endpoint(payload: LoginRequest) -> TokenResponse | JSONResponse:
+    def issue_token_endpoint(payload: LoginRequest) -> TokenResponse | JSONResponse:
         """Mints a short-lived `Authorization: Bearer` token for scripts and
         ad-hoc testing. Unlike `/auth/login`, this sets no cookie — the token
         is returned directly in the response body, since it is meant to be
@@ -109,7 +109,7 @@ def register_auth_routes(application: FastAPI) -> None:
         responses={401: {"model": Error}},
         tags=["auth"],
     )
-    async def me_endpoint(request: Request) -> User | JSONResponse:
+    def me_endpoint(request: Request) -> User | JSONResponse:
         settings = application.state.settings
         principal = resolve_principal(request, settings, data_store(application))
         if principal is None or principal.user is None:

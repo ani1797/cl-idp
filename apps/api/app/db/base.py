@@ -27,6 +27,15 @@ class JobFilters:
     submitted_to: datetime | None = None
 
 
+@dataclass(slots=True)
+class JobSummaryCounts:
+    total: int = 0
+    needs_review: int = 0
+    failed: int = 0
+    unclassified: int = 0
+    total_pages: int = 0
+
+
 class DataStore(Protocol):
     """Persistence contract shared by every backend implementation.
 
@@ -118,6 +127,10 @@ class DataStore(Protocol):
         ...
 
     def count_jobs(self, process_id: str, *, filters: JobFilters) -> int: ...
+
+    def summarize_jobs(self, process_id: str, *, filters: JobFilters) -> JobSummaryCounts:
+        """Aggregate all matching jobs in one database query, without a list limit."""
+        ...
 
     def sum_pages(self, process_id: str, *, filters: JobFilters) -> int:
         """Sum of `len(pages)` across matching jobs."""

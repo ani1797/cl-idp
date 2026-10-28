@@ -17,7 +17,7 @@ import pytest
 from pymongo import MongoClient
 
 from app.config import AZURITE_ACCOUNT_KEY, COSMOS_EMULATOR_KEY, Settings
-from app.db.base import DataStore, JobFilters
+from app.db.base import DataStore, JobFilters, JobSummaryCounts
 from app.db.cosmos import CosmosService
 from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
 from app.db.mongo import MongoService
@@ -494,6 +494,34 @@ class TestJobQuerying:
 
         assert data_store.sum_pages(process.id, filters=JobFilters(statuses=[JobStatus.SUCCEEDED])) == 3
         assert data_store.sum_pages(process.id, filters=JobFilters(statuses=[JobStatus.FAILED])) == 0
+
+    @pytest.mark.parametrize(
+        ("filters", "expected"),
+        [
+            (JobFilters(), JobSummaryCounts(3, 1, 1, 1, 3)),
+            (
+                JobFilters(statuses=[JobStatus.SUCCEEDED], has_violations=False),
+                JobSummaryCounts(1, 0, 0, 0, 2),
+            ),
+            (JobFilters(unclassified=False), JobSummaryCounts(2, 1, 0, 0, 3)),
+            (JobFilters(reviewed=True), JobSummaryCounts(1, 1, 0, 0, 1)),
+            (
+                JobFilters(detected_forms=["prebuilt-invoice"], file_name="ALPHA"),
+                JobSummaryCounts(1, 0, 0, 0, 2),
+            ),
+            (JobFilters(file_name="missing"), JobSummaryCounts()),
+        ],
+    )
+    def test_summary_aggregates_only_matching_jobs(
+        self,
+        process_with_jobs: tuple[DataStore, BusinessProcessDocument],
+        filters: JobFilters,
+        expected: JobSummaryCounts,
+    ) -> None:
+        data_store, process = process_with_jobs
+        data_store.upsert_job(make_job("another-process", unclassified=True))
+
+        assert data_store.summarize_jobs(process.id, filters=filters) == expected
 
     def test_list_jobs_scoped_to_process(self, data_store: DataStore) -> None:
         process_a = make_process()

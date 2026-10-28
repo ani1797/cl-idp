@@ -11,7 +11,7 @@ from pymongo.collation import Collation
 from pymongo.errors import DuplicateKeyError, OperationFailure, PyMongoError
 
 from app.config import Settings
-from app.db.base import JobFilters
+from app.db.base import JobFilters, JobSummaryCounts
 from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
 from app.models import BusinessProcessDocument, JobDocument, UserDocument
 
@@ -245,6 +245,51 @@ class MongoService:
 
     def count_jobs(self, process_id: str, *, filters: JobFilters) -> int:
         return self._jobs.count_documents(self._build_filter(process_id, filters))
+
+    def summarize_jobs(self, process_id: str, *, filters: JobFilters) -> JobSummaryCounts:
+        results = list(
+            self._jobs.aggregate(
+                [
+                    {"$match": self._build_filter(process_id, filters)},
+                    {
+                        "$group": {
+                            "_id": None,
+                            "total": {"$sum": 1},
+                            "needs_review": {
+                                "$sum": {
+                                    "$cond": [
+                                        {
+                                            "$gt": [
+                                                {
+                                                    "$size": {
+                                                        "$ifNull": ["$confidenceViolations", []]
+                                                    }
+                                                },
+                                                0,
+                                            ]
+                                        },
+                                        1,
+                                        0,
+                                    ]
+                                }
+                            },
+                            "failed": {"$sum": {"$cond": [{"$eq": ["$status", "failed"]}, 1, 0]}},
+                            "unclassified": {
+                                "$sum": {"$cond": [{"$eq": ["$unclassified", True]}, 1, 0]}
+                            },
+                            "total_pages": {
+                                "$sum": {"$cond": [{"$isArray": "$pages"}, {"$size": "$pages"}, 0]}
+                            },
+                        }
+                    },
+                ]
+            )
+        )
+        if not results:
+            return JobSummaryCounts()
+        return JobSummaryCounts(
+            **{key: int(value) for key, value in results[0].items() if key != "_id"}
+        )
 
     def sum_pages(self, process_id: str, *, filters: JobFilters) -> int:
         pipeline: list[dict[str, Any]] = [

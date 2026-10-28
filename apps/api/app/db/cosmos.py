@@ -10,7 +10,7 @@ from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError
 
 from app.config import Settings
-from app.db.base import JobFilters
+from app.db.base import JobFilters, JobSummaryCounts
 from app.db.exceptions import DocumentNotFoundError, DuplicateDocumentError
 from app.models import BusinessProcessDocument, JobDocument, UserDocument
 
@@ -283,6 +283,29 @@ class CosmosService:
             self._jobs.query_items(query=query, parameters=parameters, partition_key=process_id)
         )
         return int(cast(int | float | str, results[0])) if results else 0
+
+    def summarize_jobs(self, process_id: str, *, filters: JobFilters) -> JobSummaryCounts:
+        where_clauses, parameters = self._build_where_clauses(process_id, filters)
+        query = (
+            "SELECT COUNT(1) AS total, "
+            "SUM((IS_ARRAY(c.confidenceViolations) ? "
+            "ARRAY_LENGTH(c.confidenceViolations) > 0 : false) ? 1 : 0) AS needs_review, "
+            "SUM(c.status = 'failed' ? 1 : 0) AS failed, "
+            "SUM(c.unclassified = true ? 1 : 0) AS unclassified, "
+            "SUM(IS_ARRAY(c.pages) ? ARRAY_LENGTH(c.pages) : 0) AS total_pages "
+            f"FROM c WHERE {' AND '.join(where_clauses)}"
+        )
+        results = list(
+            self._jobs.query_items(query=query, parameters=parameters, partition_key=process_id)
+        )
+        row = results[0] if results else {}
+        return JobSummaryCounts(
+            total=int(row.get("total") or 0),
+            needs_review=int(row.get("needs_review") or 0),
+            failed=int(row.get("failed") or 0),
+            unclassified=int(row.get("unclassified") or 0),
+            total_pages=int(row.get("total_pages") or 0),
+        )
 
     def sum_pages(self, process_id: str, *, filters: JobFilters) -> int:
         where_clauses, parameters = self._build_where_clauses(process_id, filters)

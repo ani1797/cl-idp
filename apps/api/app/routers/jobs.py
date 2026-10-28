@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from contextlib import suppress
-from dataclasses import replace
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -89,37 +88,6 @@ def queue_service(application: FastAPI) -> QueueService:
     return cast(QueueService, application.state.queue_service)
 
 
-def _narrow_statuses(filters: JobFilters, required_status: JobStatus) -> JobFilters | None:
-    """AND a required status onto the existing status filter.
-
-    Mirrors the old raw-SQL `extra_clause` behavior, which ANDed the extra
-    condition onto whatever the caller already requested. If the caller
-    already narrowed to a set of statuses that excludes `required_status`,
-    the combination is unsatisfiable, so this returns `None` (count is 0).
-    """
-    if filters.statuses and required_status not in filters.statuses:
-        return None
-    return replace(filters, statuses=[required_status])
-
-
-def _narrow_bool_filter(filters: JobFilters, field_name: str, value: bool = True) -> JobFilters | None:
-    """AND a required boolean filter onto the existing value for that field.
-
-    If the caller already requested a contradictory value for the same
-    field, the combination is unsatisfiable, so this returns `None`.
-    """
-    current = getattr(filters, field_name)
-    if current is not None and current != value:
-        return None
-    if field_name == "has_violations":
-        return replace(filters, has_violations=value)
-    if field_name == "reviewed":
-        return replace(filters, reviewed=value)
-    if field_name == "unclassified":
-        return replace(filters, unclassified=value)
-    raise ValueError(f"Unsupported boolean filter: {field_name}")
-
-
 def register_jobs_routes(application: FastAPI) -> None:
     @application.get(
         "/processes/{processId}/jobs",
@@ -128,7 +96,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={404: {"model": Error}},
         tags=["jobs"],
     )
-    async def list_jobs_endpoint(
+    def list_jobs_endpoint(
         processId: str,
         status: StatusQuery = None,
         detectedForm: DetectedFormQuery = None,
@@ -165,7 +133,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={404: {"model": Error}},
         tags=["jobs"],
     )
-    async def get_jobs_summary_endpoint(
+    def get_jobs_summary_endpoint(
         processId: str,
         status: StatusQuery = None,
         detectedForm: DetectedFormQuery = None,
@@ -189,23 +157,13 @@ def register_jobs_routes(application: FastAPI) -> None:
             submitted_from=submittedFrom,
             submitted_to=submittedTo,
         )
-        store = data_store(application)
-        total_pages = store.sum_pages(processId, filters=filters)
-
-        def count_with_status(required_status: JobStatus) -> int:
-            narrowed = _narrow_statuses(filters, required_status)
-            return store.count_jobs(processId, filters=narrowed) if narrowed is not None else 0
-
-        def count_with_bool(field_name: str) -> int:
-            narrowed = _narrow_bool_filter(filters, field_name)
-            return store.count_jobs(processId, filters=narrowed) if narrowed is not None else 0
-
+        summary = data_store(application).summarize_jobs(processId, filters=filters)
         return JobsSummary(
-            total=store.count_jobs(processId, filters=filters),
-            needsReview=count_with_bool("has_violations"),
-            failed=count_with_status(JobStatus.FAILED),
-            unclassified=count_with_bool("unclassified"),
-            totalEstimatedCostUsd=estimate_document_cost_usd(total_pages),
+            total=summary.total,
+            needsReview=summary.needs_review,
+            failed=summary.failed,
+            unclassified=summary.unclassified,
+            totalEstimatedCostUsd=estimate_document_cost_usd(summary.total_pages),
         )
 
     @application.get(
@@ -214,7 +172,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={404: {"model": Error}},
         tags=["jobs"],
     )
-    async def get_job_endpoint(processId: str, jobId: str) -> Job | JSONResponse:
+    def get_job_endpoint(processId: str, jobId: str) -> Job | JSONResponse:
         try:
             job = data_store(application).read_job(processId, jobId)
         except DocumentNotFoundError:
@@ -231,7 +189,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={404: {"model": Error}},
         tags=["jobs"],
     )
-    async def get_job_document_endpoint(processId: str, jobId: str) -> Response | JSONResponse:
+    def get_job_document_endpoint(processId: str, jobId: str) -> Response | JSONResponse:
         try:
             job = data_store(application).read_job(processId, jobId)
         except DocumentNotFoundError:
@@ -261,7 +219,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={400: {"model": Error}, 403: {"model": Error}, 404: {"model": Error}},
         tags=["jobs"],
     )
-    async def review_job_endpoint(
+    def review_job_endpoint(
         processId: str,
         jobId: str,
         payload: ReviewJobRequest,
@@ -350,7 +308,7 @@ def register_jobs_routes(application: FastAPI) -> None:
         responses={403: {"model": Error}, 404: {"model": Error}, 409: {"model": Error}},
         tags=["jobs"],
     )
-    async def retry_job_endpoint(processId: str, jobId: str, request: Request) -> JobRef | JSONResponse:
+    def retry_job_endpoint(processId: str, jobId: str, request: Request) -> JobRef | JSONResponse:
         if (forbidden := require_roles(request, UserRole.IT_ADMIN, UserRole.REVIEWER)) is not None:
             return forbidden
         try:

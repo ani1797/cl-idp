@@ -16,6 +16,7 @@ from opentelemetry import metrics, trace
 from opentelemetry.metrics import Counter
 from PIL import Image, UnidentifiedImageError
 from pypdf import PdfReader
+from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
 from app.db import DataStore, DataStoreError, DocumentNotFoundError
@@ -158,7 +159,7 @@ async def validate_upload(request: Request) -> ValidatedUpload | JSONResponse:
         )
 
     try:
-        page_count = count_pages(file_extension, content)
+        page_count = await run_in_threadpool(count_pages, file_extension, content)
     except InvalidDocumentError as exc:
         return error_response(
             status_code=400,
@@ -192,7 +193,7 @@ def register_trigger_routes(application: FastAPI) -> None:
     )
     async def trigger_job_endpoint(processId: str, request: Request) -> JobRef | JSONResponse:
         try:
-            process = data_store(application).read_process(processId)
+            process = await run_in_threadpool(data_store(application).read_process, processId)
         except DocumentNotFoundError:
             return error_response(
                 status_code=404,
@@ -273,7 +274,8 @@ def register_trigger_routes(application: FastAPI) -> None:
                         job_id=job_id,
                         process_id=processId,
                     )
-                    blob_service(application).upload_bytes(
+                    await run_in_threadpool(
+                        blob_service(application).upload_bytes,
                         blob_path,
                         validated_upload.content,
                         validated_upload.content_type,
@@ -294,7 +296,7 @@ def register_trigger_routes(application: FastAPI) -> None:
                         job_id=job_id,
                         process_id=processId,
                     )
-                    data_store(application).upsert_job(job)
+                    await run_in_threadpool(data_store(application).upsert_job, job)
                     job_created = True
                     logger.info(
                         "Persisted job %s for process %s status=%s",
@@ -310,7 +312,9 @@ def register_trigger_routes(application: FastAPI) -> None:
                         job_id=job_id,
                         process_id=processId,
                     )
-                    queue_service(application).send_message(queue_message.model_dump_json())
+                    await run_in_threadpool(
+                        queue_service(application).send_message, queue_message.model_dump_json()
+                    )
                     _jobs_triggered_counter.add(1, {"process_id": processId})
                     logger.info(
                         "Enqueued job %s for process %s routing_analyzer_id=%s",
@@ -321,10 +325,12 @@ def register_trigger_routes(application: FastAPI) -> None:
             except Exception:
                 if job_created:
                     with suppress(DataStoreError):
-                        data_store(application).delete_job(processId, job_id)
+                        await run_in_threadpool(
+                            data_store(application).delete_job, processId, job_id
+                        )
                 if blob_created:
                     with suppress(AzureError):
-                        blob_service(application).delete_blob(blob_path)
+                        await run_in_threadpool(blob_service(application).delete_blob, blob_path)
                 raise
 
         return JobRef(jobId=job_id)

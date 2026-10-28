@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.metrics import CallbackOptions, Observation
+from starlette.concurrency import run_in_threadpool
 
 from app.auth import resolve_principal
 from app.authz import require_roles
@@ -188,7 +189,7 @@ def register_routes(application: FastAPI) -> None:
         responses={503: {"model": Health}},
         openapi_extra={"security": []},
     )
-    async def healthz(response: Response) -> Health:
+    def healthz(response: Response) -> Health:
         dependencies = {
             "database": (
                 DependencyStatus.OK
@@ -221,7 +222,7 @@ def register_routes(application: FastAPI) -> None:
         responses={502: {"model": Error}},
         tags=["analyzers"],
     )
-    async def list_analyzers_endpoint() -> list[Analyzer] | JSONResponse:
+    def list_analyzers_endpoint() -> list[Analyzer] | JSONResponse:
         try:
             return list_available_analyzers(cu_client(application))
         except ContentUnderstandingError:
@@ -232,7 +233,7 @@ def register_routes(application: FastAPI) -> None:
             )
 
     @application.get("/processes", response_model=list[BusinessProcess], tags=["processes"])
-    async def list_processes_endpoint() -> list[BusinessProcess]:
+    def list_processes_endpoint() -> list[BusinessProcess]:
         return cast(list[BusinessProcess], data_store(application).list_processes())
 
     @application.post(
@@ -247,7 +248,7 @@ def register_routes(application: FastAPI) -> None:
         },
         tags=["processes"],
     )
-    async def create_process_endpoint(
+    def create_process_endpoint(
         payload: BusinessProcessInput,
         background_tasks: BackgroundTasks,
         request: Request,
@@ -312,7 +313,7 @@ def register_routes(application: FastAPI) -> None:
         responses={404: {"model": Error}},
         tags=["processes"],
     )
-    async def get_process_endpoint(processId: str) -> BusinessProcess | JSONResponse:
+    def get_process_endpoint(processId: str) -> BusinessProcess | JSONResponse:
         try:
             return data_store(application).read_process(processId)
         except DocumentNotFoundError:
@@ -334,7 +335,7 @@ def register_routes(application: FastAPI) -> None:
         },
         tags=["processes"],
     )
-    async def update_process_endpoint(
+    def update_process_endpoint(
         processId: str,
         payload: BusinessProcessInput,
         background_tasks: BackgroundTasks,
@@ -417,7 +418,7 @@ def register_routes(application: FastAPI) -> None:
         responses={403: {"model": Error}, 404: {"model": Error}},
         tags=["processes"],
     )
-    async def delete_process_endpoint(processId: str, request: Request) -> Response:
+    def delete_process_endpoint(processId: str, request: Request) -> Response:
         if (forbidden := require_roles(request, UserRole.IT_ADMIN)) is not None:
             return forbidden
         try:
@@ -535,7 +536,9 @@ def create_app() -> FastAPI:
             return await call_next(request)
 
         settings = application.state.settings
-        principal = resolve_principal(request, settings, data_store(application))
+        principal = await run_in_threadpool(
+            resolve_principal, request, settings, data_store(application)
+        )
         if principal is not None:
             if principal.user is not None:
                 request.state.user = principal.user

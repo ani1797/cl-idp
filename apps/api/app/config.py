@@ -80,6 +80,7 @@ class Settings(BaseSettings):
     )
     blob_container_name: str = Field(default="documents", alias="BLOB_CONTAINER_NAME")
     queue_name: str = Field(default="jobs", alias="QUEUE_NAME")
+    azure_storage_account_name: str = Field(default="", alias="AZURE_STORAGE_ACCOUNT_NAME")
     smtp_host: str = Field(default="127.0.0.1", alias="SMTP_HOST")
     smtp_port: int = Field(default=1025, alias="SMTP_PORT")
     # Mail relay auth/TLS mode. Defaults reproduce the historical

@@ -36,7 +36,12 @@ from app.models import (
     JudgeReview,
     ObjectField,
 )
-from app.observability import correlation_scope, init_observability, set_span_attributes
+from app.observability import (
+    correlation_scope,
+    init_observability,
+    record_duration_span,
+    set_span_attributes,
+)
 from app.pricing import estimate_document_cost_usd
 from app.storage import BlobService, QueueService
 from app.worker.result_mapping import MappedJobResult, ResultMappingError, map_analysis_result
@@ -567,6 +572,19 @@ def finalize_success(
     _pages_processed_counter.add(len(mapped_result.pages), form_labels)
     _pipeline_duration_histogram.record(
         (datetime.now(UTC) - job.submittedAt).total_seconds(), form_labels
+    )
+    # Also recorded as a span with the job's real elapsed wall-clock
+    # interval (submittedAt -> now), not just an OTel histogram: Azure
+    # Monitor's custom-metrics exporter drops histogram bucket boundaries,
+    # so true p50/p95 cannot be reconstructed from the metric above in
+    # production — this span's `DurationMs` can be percentile-queried
+    # directly in Application Insights (see docs/spec/TECHNOLOGY.md
+    # "Dashboards").
+    record_duration_span(
+        tracer,
+        "job.pipeline",
+        start_time=job.submittedAt,
+        attributes=form_labels,
     )
     if mapped_result.confidence_violations:
         _jobs_needs_review_counter.add(1, form_labels)

@@ -4,6 +4,7 @@ import logging
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
+from datetime import datetime
 from typing import Any, Protocol, cast
 
 from opentelemetry import metrics
@@ -26,7 +27,8 @@ from opentelemetry.sdk.trace.export import (
     SimpleSpanProcessor,
     SpanExporter,
 )
-from opentelemetry.trace import Span, set_tracer_provider
+from opentelemetry.trace import Span, Tracer, set_tracer_provider
+
 
 from app.config import Settings
 
@@ -40,6 +42,14 @@ _log_record_factory_installed = False
 
 class AzureMonitorTraceExporterFactory(Protocol):
     def __call__(self, *, connection_string: str) -> SpanExporter: ...
+
+
+class AzureMonitorMetricExporterFactory(Protocol):
+    def __call__(self, *, connection_string: str) -> MetricExporter: ...
+
+
+class AzureMonitorLogExporterFactory(Protocol):
+    def __call__(self, *, connection_string: str) -> LogRecordExporter: ...
 
 
 def configure_logging(*, level: int = logging.INFO) -> None:
@@ -91,6 +101,31 @@ def set_span_attributes(
         span.set_attribute("process_id", process_id)
 
 
+def record_duration_span(
+    tracer: Tracer,
+    name: str,
+    *,
+    start_time: datetime,
+    attributes: dict[str, str],
+) -> None:
+    """Record a span whose duration is an already-elapsed wall-clock interval
+    (e.g. "time since this job was first triggered"), rather than the
+    duration of code that just ran synchronously under `tracer`.
+
+    Exported as a real dependency/request span with an accurate `Duration`,
+    this is queryable with exact `percentile(DurationMs, 50|95|99)` KQL in
+    Application Insights — unlike an OTel histogram metric recording the
+    same interval, whose bucket boundaries Azure Monitor's custom-metrics
+    exporter does not preserve (only sum/count/min/max survive), making true
+    percentiles unrecoverable for histogram-based durations in production.
+    """
+    start_time_ns = int(start_time.timestamp() * 1_000_000_000)
+    span = tracer.start_span(name, start_time=start_time_ns)
+    for key, value in attributes.items():
+        span.set_attribute(key, value)
+    span.end()
+
+
 def create_span_exporter(settings: Settings) -> SpanExporter:
     # Precedence: a local OTLP collector (docker-compose dev stack) wins over
     # the production Azure Monitor exporter, which wins over the console
@@ -113,13 +148,20 @@ def create_metric_reader(settings: Settings) -> MetricReader:
     # the OTLP collector case, which feeds a live Grafana dashboard), and a
     # short-lived process (e.g. a test run) can otherwise race the exporter's
     # background export thread against interpreter shutdown. Export rarely
-    # in that case; export promptly when a real collector is configured.
+    # in that case; export promptly when a real collector or Azure Monitor
+    # is configured. Precedence mirrors `create_span_exporter`: local OTLP
+    # collector wins over Azure Monitor, which wins over the console
+    # fallback.
     if settings.otel_exporter_otlp_endpoint:
         from opentelemetry.exporter.otlp.proto.http.metric_exporter import (
             OTLPMetricExporter,
         )
 
         exporter = OTLPMetricExporter(endpoint=_otlp_signal_endpoint(settings, "metrics"))
+        export_interval_millis = METRIC_EXPORT_INTERVAL_MILLIS
+    elif settings.applicationinsights_connection_string:
+        exporter_class = _load_azure_monitor_metric_exporter()
+        exporter = exporter_class(connection_string=settings.applicationinsights_connection_string)
         export_interval_millis = METRIC_EXPORT_INTERVAL_MILLIS
     else:
         exporter = ConsoleMetricExporter()
@@ -131,16 +173,19 @@ def create_metric_reader(settings: Settings) -> MetricReader:
 
 
 def create_log_exporter(settings: Settings) -> LogRecordExporter | None:
-    # There is no OTLP log exporter equivalent for Azure Monitor/console in
-    # this codebase; local structured logs are already visible on stdout via
-    # `configure_logging`. Only wire OTLP log export when a collector (e.g.
-    # the docker-compose Grafana LGTM stack) is actually configured to
-    # receive it.
-    if not settings.otel_exporter_otlp_endpoint:
-        return None
-    from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
+    # Precedence mirrors `create_span_exporter`: local OTLP collector (e.g.
+    # the docker-compose Grafana LGTM stack) wins over the production Azure
+    # Monitor exporter. With neither configured, local structured logs are
+    # already visible on stdout via `configure_logging`, so no exporter is
+    # wired (returns None).
+    if settings.otel_exporter_otlp_endpoint:
+        from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 
-    return OTLPLogExporter(endpoint=_otlp_signal_endpoint(settings, "logs"))
+        return OTLPLogExporter(endpoint=_otlp_signal_endpoint(settings, "logs"))
+    if settings.applicationinsights_connection_string:
+        exporter_class = _load_azure_monitor_log_exporter()
+        return exporter_class(connection_string=settings.applicationinsights_connection_string)
+    return None
 
 
 def _otlp_signal_endpoint(settings: Settings, signal: str) -> str:
@@ -159,6 +204,32 @@ def _load_azure_monitor_trace_exporter() -> AzureMonitorTraceExporterFactory:
             "azure-monitor-opentelemetry-exporter is not installed."
         ) from exc
     return cast(AzureMonitorTraceExporterFactory, AzureMonitorTraceExporter)
+
+
+def _load_azure_monitor_metric_exporter() -> AzureMonitorMetricExporterFactory:
+    try:
+        from azure.monitor.opentelemetry.exporter import (
+            AzureMonitorMetricExporter,
+        )
+    except ModuleNotFoundError as exc:  # pragma: no cover - import failure path is configuration-only
+        raise RuntimeError(
+            "APPLICATIONINSIGHTS_CONNECTION_STRING is set but "
+            "azure-monitor-opentelemetry-exporter is not installed."
+        ) from exc
+    return cast(AzureMonitorMetricExporterFactory, AzureMonitorMetricExporter)
+
+
+def _load_azure_monitor_log_exporter() -> AzureMonitorLogExporterFactory:
+    try:
+        from azure.monitor.opentelemetry.exporter import (
+            AzureMonitorLogExporter,
+        )
+    except ModuleNotFoundError as exc:  # pragma: no cover - import failure path is configuration-only
+        raise RuntimeError(
+            "APPLICATIONINSIGHTS_CONNECTION_STRING is set but "
+            "azure-monitor-opentelemetry-exporter is not installed."
+        ) from exc
+    return cast(AzureMonitorLogExporterFactory, AzureMonitorLogExporter)
 
 
 _initialized_services: set[str] = set()

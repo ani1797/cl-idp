@@ -22,6 +22,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
     enablePurgeProtection: true
+    // App Service and Consumption Functions have no VNet/private endpoint
+    // path in this demo topology, so Key Vault references require public
+    // reachability. Production private networking should remove this and add
+    // VNet integration/private endpoints instead.
+    publicNetworkAccess: 'Enabled'
   }
 }
 

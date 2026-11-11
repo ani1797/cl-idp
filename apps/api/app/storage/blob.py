@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from azure.core.exceptions import AzureError, ResourceExistsError
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ContentSettings
 
 from app.config import Settings
@@ -15,10 +16,17 @@ class BlobService:
     settings: Settings
 
     def __post_init__(self) -> None:
-        self._service = BlobServiceClient.from_connection_string(
-            self.settings.azurite_blob_connection_string,
-            api_version=AZURITE_BLOB_API_VERSION,
-        )
+        if self.settings.azure_storage_account_name:
+            self._service = BlobServiceClient(
+                account_url=f"https://{self.settings.azure_storage_account_name}.blob.core.windows.net",
+                credential=DefaultAzureCredential(),
+                api_version=AZURITE_BLOB_API_VERSION,
+            )
+        else:
+            self._service = BlobServiceClient.from_connection_string(
+                self.settings.azurite_blob_connection_string,
+                api_version=AZURITE_BLOB_API_VERSION,
+            )
         self._container = self._service.get_container_client(
             self.settings.blob_container_name
         )

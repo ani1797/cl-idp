@@ -374,6 +374,47 @@ accepted deliberately:
   HTTP request to the asynchronous work it caused.
 - **Production**: switch exporter to **Azure Monitor / Application
   Insights** via configuration, no code changes to instrumentation points.
+  All three OpenTelemetry signals — traces, metrics (business/pipeline
+  counters and histograms), and logs — export to Azure Monitor via the
+  `azure-monitor-opentelemetry-exporter` package whenever
+  `APPLICATIONINSIGHTS_CONNECTION_STRING` is set and no local OTLP collector
+  is configured (`app/observability.py`); this is what lands job volume,
+  SLA/duration, and cost-adjacent counters in `customMetrics` and
+  correlation-tagged structured logs in `AppTraces`, which the dashboards
+  below query.
+
+### Dashboards
+
+- **Local dev**: a Grafana "LGTM" stack (`otel-collector` in
+  `docker-compose.yml`) receives OTLP directly and renders two pre-built
+  dashboards (`infra/grafana/dashboards/cl-idp-ops.json` — job volume, SLA,
+  API/worker load, notifications, traces, live logs; and
+  `cl-idp-finops.json` — cost per business process/form type) via
+  Prometheus/Loki/Tempo.
+- **Production**: **Azure Managed Grafana** (`modules/grafana.bicep`)
+  provides the same capability — natively, with no separate
+  Prometheus/Loki/Tempo stack to run — using its built-in Azure Monitor
+  data source against the shared Log Analytics workspace, authenticated via
+  its own system-assigned managed identity (no API keys; see [RBAC
+  Permissions](#rbac-permissions)). Azure Monitor-flavored equivalents of
+  both dashboards (KQL over `customMetrics`/`AppTraces`/`AppRequests`/
+  `AppDependencies`, plus a native Grafana **Traces** panel querying
+  Application Insights directly) live under
+  `infra/grafana/azure-dashboards/` and are imported post-deploy via
+  `infra/scripts/import-grafana-dashboards.sh` (uses the `az grafana` CLI
+  extension against the deployed instance — ARM itself cannot provision
+  dashboard content).
+- **Percentile fidelity**: Azure Monitor's custom-metrics exporter drops
+  OTel histogram bucket boundaries (only sum/count/min/max survive), so
+  `histogram_quantile`-style p50/p95 cannot be reconstructed from an
+  exported histogram metric the way the local Prometheus dashboard does.
+  Durations that need a true percentile in production are instead recorded
+  as **spans** with the real elapsed interval
+  (`app/observability.py::record_duration_span`, used for the
+  `job.pipeline` end-to-end span) or already are spans (`worker.dequeue`,
+  the named pipeline-stage spans, and FastAPI's auto-instrumented request
+  spans) — Application Insights stores one row per call for these, so
+  `percentile(DurationMs, 50|95|99)` in KQL is exact, not reconstructed.
 
 ### Logging and PII
 
@@ -446,6 +487,7 @@ for the visual resource-group layout.
 | **Azure AI Foundry** (`AIServices` account + project + `gpt-4.1-mini` + `gpt-5-mini` deployments) | Content Understanding and the Foundry AI Agent Judge — see [Azure AI Content Understanding](#azure-ai-content-understanding) and [Azure Foundry AI Agent Judge](#azure-foundry-ai-agent-judge-pre-judgement). Provisioned inside this resource group so the whole stack is independently deployable. The project also holds an `AppInsights` connection into the Log Analytics/Application Insights resource below, for agent tracing. |
 | **Key Vault** (RBAC-authorized, no access policies) | Holds the Cosmos Mongo connection string; App Service/Function App read it via Key Vault references. |
 | **Log Analytics + Application Insights** | Centralized logs/traces/metrics for all three compute tiers — see [Observability](#observability). |
+| **Azure Managed Grafana** | Native dashboarding over the Log Analytics/Application Insights workspace above — operational (job volume, SLA/duration, API/worker load, notifications) and FinOps (cost per business process/form type) dashboards, built on the workspace's built-in Azure Monitor data source (no API keys). |
 
 ### Region note
 
@@ -476,15 +518,18 @@ fallback in production).
 | **worker** Function App | `Key Vault Secrets User` | Key Vault | Resolves the Cosmos Mongo connection string to persist job/review records. |
 | **worker** Function App | `Cognitive Services User` | AI Foundry account | Submits documents to Content Understanding and polls for results — the actual pipeline call; also backs the judge's calls to the Foundry project when `JUDGE_ENABLED` is true. |
 | **AI Foundry project** (system-assigned identity, not a compute tier) | `Log Analytics Reader` + `Privileged Monitoring Data Reader` | Application Insights component | Lets the Foundry project's own managed identity (distinct from api/worker's identities) read back the GenAI/agent traces it just wrote, which is what the Foundry portal's **Tracing** view and evaluation tooling need — `Privileged Monitoring Data Reader` specifically is required to read GenAI trace *content* (prompts/completions), not just metadata. |
+| **Azure Managed Grafana** (system-assigned identity) | `Monitoring Reader` | Resource group | Lets Grafana's built-in Azure Monitor data source discover/read Azure platform *metrics* (App Service/Function App/Cosmos/etc.) across every resource in the group. |
+| **Azure Managed Grafana** (system-assigned identity) | `Log Analytics Reader` | Log Analytics workspace | Grants the actual KQL query permission needed to read *logs/traces* (`AppTraces`, `AppRequests`, `AppDependencies`, `AppExceptions`, `customMetrics`) that back the dashboard panels — distinct from, and not implied by, `Monitoring Reader`. |
 | **web** App Service | `Key Vault Secrets User` | Key Vault | Reserved for future secrets (e.g. auth provider config) — the web tier has no direct Azure data-plane access today; it calls the API over HTTPS, never Azure resources directly. |
 | *(none)* | — | — | Nothing is granted `Contributor`/`Owner` on the resource group; all access is scoped to the single resource each identity needs, at the resource level. |
 
-Deployment-time role assignments (Bicep `modules/rbac-local.bicep` and
-`modules/rbac-cognitive-services.bicep`) are made by whichever principal
-runs `az deployment sub create` — that principal needs `Owner` or `User
-Access Administrator` at the subscription/resource-group scope for the
-duration of the deploy, but that is a one-time IaC-operator grant, not a
-permission any application component holds at runtime.
+Deployment-time role assignments (Bicep `modules/rbac-local.bicep`,
+`modules/rbac-cognitive-services.bicep`, and `modules/rbac-grafana.bicep`)
+are made by whichever principal runs `az deployment sub create` — that
+principal needs `Owner` or `User Access Administrator` at the
+subscription/resource-group scope for the duration of the deploy, but that
+is a one-time IaC-operator grant, not a permission any application
+component holds at runtime.
 
 ## Dev → Prod Mapping Summary
 

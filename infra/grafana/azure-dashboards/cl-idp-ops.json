@@ -1,0 +1,1194 @@
+{
+  "uid": "cl-idp-ops-azure",
+  "title": "CL-IDP \u2014 Operations (Azure Monitor)",
+  "description": "Azure Managed Grafana equivalent of the local docker-compose cl-idp-ops dashboard, backed by the shared Log Analytics/Application Insights workspace instead of Prometheus/Loki/Tempo. Pipeline-stage and end-to-end durations use real span percentiles (AppRequests/AppDependencies), not histogram averages \u2014 see docs/spec/TECHNOLOGY.md 'Dashboards'.",
+  "tags": [
+    "cl-idp",
+    "operations",
+    "azure-monitor"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "process_id",
+        "type": "textbox",
+        "label": "process_id (regex)",
+        "query": ".*",
+        "current": {
+          "text": ".*",
+          "value": ".*"
+        }
+      },
+      {
+        "name": "detected_form",
+        "type": "textbox",
+        "label": "detected_form (regex)",
+        "query": ".*",
+        "current": {
+          "text": ".*",
+          "value": ".*"
+        }
+      },
+      {
+        "name": "correlation_id",
+        "type": "textbox",
+        "label": "correlation_id (regex)",
+        "query": ".*",
+        "current": {
+          "text": ".*",
+          "value": ".*"
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Pipeline Volume & Business Reach",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Business processes onboarded",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"idp.business_processes_onboarded\"\n| top 1 by timestamp desc\n| project value = valueSum\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Jobs triggered",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"idp.jobs_triggered\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Jobs succeeded",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.jobs_processed\" | where tostring(customDimensions.outcome) == \"success\" and tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Jobs failed",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.jobs_processed\" | where tostring(customDimensions.outcome) == \"error\" and tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Needs review (flagged)",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.jobs_needs_review\" | where tostring(customDimensions.process_id) matches regex $process_id and tostring(customDimensions.detected_form) matches regex $detected_form | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Reviews saved",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"idp.jobs_reviewed\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Unclassified docs",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 9
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.jobs_unclassified\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 9,
+      "type": "gauge",
+      "title": "Job success ratio",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 4,
+        "y": 9
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.jobs_processed\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize total = sum(valueSum), success = sumif(valueSum, tostring(customDimensions.outcome) == \"success\")\n| project ratio = success * 1.0 / total\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Job volume over time, by outcome",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 14,
+        "x": 10,
+        "y": 9
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.jobs_processed\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize sum(valueSum) by bin(timestamp, 1h), outcome = tostring(customDimensions.outcome)\n| order by timestamp asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 11,
+      "type": "table",
+      "title": "Volumes by business process (drill-down)",
+      "description": "One row per business process, one column per pipeline-stage counter \u2014 the direct equivalent of the local dashboard's 'sum by (process_id)' PromQL panels.",
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"worker.jobs_processed\", \"worker.jobs_needs_review\", \"worker.jobs_unclassified\", \"idp.jobs_reviewed\", \"idp.jobs_triggered\")\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize total = sum(valueSum) by process_id = tostring(customDimensions.process_id), metric = name\n| evaluate pivot(metric, sum(total))\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Processing Time (SLA) \u2014 True Percentiles from Span Telemetry",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "panels": []
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "End-to-end pipeline duration \u2014 p50 / p95, by process (job.pipeline span)",
+      "description": "Real percentiles computed directly from the 'job.pipeline' span (submittedAt -> completedAt, recorded explicitly with the job's true elapsed wall-clock interval via observability.record_duration_span) \u2014 not an OTel histogram average. Azure Monitor's custom-metrics exporter drops histogram bucket boundaries, so this span is the accurate replacement for the local dashboard's `histogram_quantile(worker_job_pipeline_duration_seconds_bucket)` panel.",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppDependencies\n| where Name == \"job.pipeline\"\n| where tostring(Properties.process_id) matches regex $process_id and tostring(Properties.detected_form) matches regex $detected_form\n| summarize p50_s = percentile(DurationMs, 50) / 1000, p95_s = percentile(DurationMs, 95) / 1000 by bin(TimeGenerated, 1h), process_id = tostring(Properties.process_id)\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 14,
+      "type": "heatmap",
+      "title": "Pipeline duration distribution (all processes/forms)",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppDependencies\n| where Name == \"job.pipeline\"\n| where tostring(Properties.process_id) matches regex $process_id and tostring(Properties.detected_form) matches regex $detected_form\n| summarize count() by bin(TimeGenerated, 1h), bin(DurationMs, 2000)\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "p50 / p95 pipeline duration by business process x form type",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 30
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppDependencies\n| where Name == \"job.pipeline\"\n| where tostring(Properties.process_id) matches regex $process_id and tostring(Properties.detected_form) matches regex $detected_form\n| summarize calls = count(), p50_s = percentile(DurationMs, 50) / 1000, p95_s = percentile(DurationMs, 95) / 1000\n    by process_id = tostring(Properties.process_id), detected_form = tostring(Properties.detected_form)\n| order by p95_s desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 16,
+      "type": "table",
+      "title": "Pipeline named-span latency (trigger -> queue -> CU -> persist)",
+      "description": "True percentiles per named span, computed directly from raw Application Insights dependency telemetry (one row per call).",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 30
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppDependencies\n| where Name in (\"trigger.request\", \"blob.write\", \"queue.enqueue\", \"cu.analyze.submit\", \"cu.analyze.poll\", \"job.persist\", \"notify.email\", \"review.save\")\n| summarize calls = count(), p50_ms = percentile(DurationMs, 50), p95_ms = percentile(DurationMs, 95) by Name\n| order by p95_ms desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 17,
+      "type": "row",
+      "title": "Load \u2014 API & Worker",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 37
+      },
+      "panels": []
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "API request rate by route",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 38
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppRequests\n| where cloud_RoleName has \"api\"\n| summarize count() by bin(TimeGenerated, 5m), Name\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "API request latency (p50 / p95 / p99)",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 38
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppRequests\n| where cloud_RoleName has \"api\"\n| summarize p50 = percentile(DurationMs, 50), p95 = percentile(DurationMs, 95), p99 = percentile(DurationMs, 99) by bin(TimeGenerated, 5m)\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 20,
+      "type": "stat",
+      "title": "5xx error rate (selected range)",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 44
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppRequests\n| where cloud_RoleName has \"api\"\n| summarize errors = countif(ResultCode startswith \"5\"), total = count()\n| project error_rate = errors * 1.0 / total\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 21,
+      "type": "stat",
+      "title": "Active/in-flight requests (last 5m)",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 44
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppRequests\n| where cloud_RoleName has \"api\"\n| where TimeGenerated > ago(5m)\n| summarize count()\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Service health \u2014 requests/dependencies seen per role (proxy for 'up')",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 44
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "union AppRequests, AppDependencies\n| summarize count() by bin(TimeGenerated, 5m), cloud_RoleName\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Worker \u2014 message-handling duration p95 by outcome (worker.dequeue span)",
+      "description": "Real per-message percentiles from the 'worker.dequeue' root span, which wraps the entire dequeue->persist handling of one queue message.",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppRequests\n| where cloud_RoleName has \"worker\" and Name == \"worker.dequeue\"\n| summarize p95_s = percentile(DurationMs, 95) / 1000 by bin(TimeGenerated, 1h), outcome = tostring(Properties.outcome)\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Worker load \u2014 queue backlog (cumulative triggered minus processed)",
+      "description": "Cumulative idp.jobs_triggered minus cumulative worker.jobs_processed (both counters, same as the local Prometheus panel's running total).",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"idp.jobs_triggered\", \"worker.jobs_processed\")\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize triggered = sumif(valueSum, name == \"idp.jobs_triggered\"), processed = sumif(valueSum, name == \"worker.jobs_processed\") by bin(timestamp, 1h)\n| order by timestamp asc\n| extend cum_triggered = row_cumsum(triggered), cum_processed = row_cumsum(processed)\n| project timestamp, backlog = cum_triggered - cum_processed\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 25,
+      "type": "row",
+      "title": "Notifications \u2014 Review Emails",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 54
+      },
+      "panels": []
+    },
+    {
+      "id": 26,
+      "type": "stat",
+      "title": "Emails sent",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 55
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.notification_emails_sent\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 27,
+      "type": "stat",
+      "title": "Emails failed",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 55
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.notification_emails_failed\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 28,
+      "type": "table",
+      "title": "Top recipients (by emails sent)",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 55
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.notification_emails_sent\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize sent = sum(valueSum) by recipient = tostring(customDimensions.recipient)\n| top 10 by sent desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 29,
+      "type": "bargauge",
+      "title": "Emails sent by business process",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 55
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.notification_emails_sent\"\n| summarize sent = sum(valueSum) by process_id = tostring(customDimensions.process_id)\n| order by sent desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Traces",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 62
+      },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "traces",
+      "title": "Recent traces (filter by process/correlation via variables above)",
+      "description": "Native Grafana trace-waterfall view over Application Insights, via the Azure Monitor datasource's dedicated 'Traces' query type (Grafana >=10.3 / Azure Managed Grafana). Click any trace to drill into the full request+dependency span tree for that operation \u2014 the direct equivalent of the local Tempo-backed panel.",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 63
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Traces",
+          "azureTraces": {
+            "resources": [
+              "__APP_INSIGHTS_RESOURCE_ID__"
+            ],
+            "resultFormat": "trace",
+            "traceTypes": [
+              "request",
+              "dependency",
+              "exception",
+              "trace"
+            ],
+            "filters": [
+              {
+                "property": "process_id",
+                "operation": "eq",
+                "value": [
+                  "$process_id"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 32,
+      "type": "table",
+      "title": "Recent spans \u2014 tabular fallback (filter by process/correlation via variables above)",
+      "description": "Fallback if the Traces panel above isn't available on your Grafana version \u2014 also useful for free-text correlation_id searches the Traces query-builder filters don't cover.",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "union AppRequests, AppDependencies\n| where tostring(Properties.correlation_id) matches regex $correlation_id or $correlation_id == \".*\"\n| where tostring(Properties.process_id) matches regex $process_id or $process_id == \".*\"\n| project TimeGenerated, cloud_RoleName, Name, DurationMs, Success, correlation_id = tostring(Properties.correlation_id), process_id = tostring(Properties.process_id), OperationId\n| order by TimeGenerated desc\n| take 200\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 33,
+      "type": "row",
+      "title": "Logs (correlation_id-linked)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 81
+      },
+      "panels": []
+    },
+    {
+      "id": 34,
+      "type": "logs",
+      "title": "Live logs (filter by correlation_id above)",
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 82
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppTraces\n| where tostring(Properties.correlation_id) matches regex $correlation_id or $correlation_id == \".*\"\n| project TimeGenerated, SeverityLevel, Message, correlation_id = tostring(Properties.correlation_id), cloud_RoleName\n| order by TimeGenerated desc\n| take 500\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "logs"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "Log volume by severity level",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 90
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "AppTraces\n| summarize count() by bin(TimeGenerated, 15m), SeverityLevel\n| order by TimeGenerated asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

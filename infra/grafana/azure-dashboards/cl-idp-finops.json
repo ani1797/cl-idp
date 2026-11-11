@@ -1,0 +1,860 @@
+{
+  "uid": "cl-idp-finops-azure",
+  "title": "CL-IDP \u2014 FinOps (Azure Monitor)",
+  "description": "Azure Managed Grafana equivalent of the local docker-compose cl-idp-finops dashboard, backed by the shared Log Analytics/Application Insights workspace. Cost figures come from the worker.job_cost_usd OTel counter (Content Understanding per-page rate estimate, app/pricing.py), exported to customMetrics.",
+  "tags": [
+    "cl-idp",
+    "finops",
+    "azure-monitor"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "process_id",
+        "type": "textbox",
+        "label": "process_id (regex)",
+        "query": ".*",
+        "current": {
+          "text": ".*",
+          "value": ".*"
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Cost Overview",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total estimated cost (all time)",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.job_cost_usd\" | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cost in selected range",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Business processes onboarded",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"idp.business_processes_onboarded\"\n| top 1 by timestamp desc\n| project value = valueSum\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Total pages processed",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.pages_processed\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Avg cost per document",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"worker.job_cost_usd\", \"worker.jobs_processed\")\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize cost = sumif(valueSum, name == \"worker.job_cost_usd\"), docs = sumif(valueSum, name == \"worker.jobs_processed\" and tostring(customDimensions.outcome) == \"success\")\n| project avg_cost = cost / docs\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Forecast: next 24h spend (linear, trailing 24h rate)",
+      "description": "Trailing-24h spend used as the linear forecast baseline for the next 24h, same assumption as the local Grafana panel's `predict_linear`.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| where timestamp > ago(24h)\n| summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Cumulative estimated cost over time",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize cost = sum(valueSum) by bin(timestamp, 1h)\n| order by timestamp asc\n| extend cumulative_cost = row_cumsum(cost)\n| project timestamp, cumulative_cost\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Cost burn rate (per hour)",
+      "description": "",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize cost_per_hour = sum(valueSum) by bin(timestamp, 1h)\n| order by timestamp asc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "time_series"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Cost per Business Process",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "bargauge",
+      "title": "Cost by business process (process_id)",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| summarize cost = sum(valueSum) by process_id = tostring(customDimensions.process_id)\n| order by cost desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 12,
+      "type": "piechart",
+      "title": "Cost share by business process",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| summarize cost = sum(valueSum) by process_id = tostring(customDimensions.process_id)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Business process cost detail",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"worker.job_cost_usd\", \"worker.pages_processed\", \"worker.jobs_processed\")\n| summarize total = sum(valueSum) by process_id = tostring(customDimensions.process_id), metric = name\n| evaluate pivot(metric, sum(total))\n| project process_id, cost_usd = [\"worker.job_cost_usd\"], pages = [\"worker.pages_processed\"], jobs_processed = [\"worker.jobs_processed\"]\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 14,
+      "type": "row",
+      "title": "Cost per Form Type \u2014 Across All Business Processes",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "panels": []
+    },
+    {
+      "id": 15,
+      "type": "bargauge",
+      "title": "Cost by form type (detected_form), all processes",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 20
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| summarize cost = sum(valueSum) by detected_form = tostring(customDimensions.detected_form)\n| order by cost desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 16,
+      "type": "piechart",
+      "title": "Cost share by form type, all processes",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 20
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| summarize cost = sum(valueSum) by detected_form = tostring(customDimensions.detected_form)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 17,
+      "type": "table",
+      "title": "Form type cost detail (all processes)",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 20
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"worker.job_cost_usd\", \"worker.pages_processed\")\n| summarize total = sum(valueSum) by detected_form = tostring(customDimensions.detected_form), metric = name\n| evaluate pivot(metric, sum(total))\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 18,
+      "type": "row",
+      "title": "Cost per Form Type \u2014 Within a Business Process (drill-down)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "panels": []
+    },
+    {
+      "id": 19,
+      "type": "text",
+      "title": "How to drill down",
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "content": "Set the `process_id` dashboard variable (top of page) to a regex matching one business process (e.g. `^invoice-processing$`) to filter the two panels below to just that process.",
+        "mode": "markdown"
+      }
+    },
+    {
+      "id": 20,
+      "type": "bargauge",
+      "title": "Cost by form type, filtered by $process_id",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.job_cost_usd\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize cost = sum(valueSum) by detected_form = tostring(customDimensions.detected_form)\n| order by cost desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 21,
+      "type": "table",
+      "title": "Form type cost detail, filtered by $process_id",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name in (\"worker.job_cost_usd\", \"worker.pages_processed\")\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize total = sum(valueSum) by detected_form = tostring(customDimensions.detected_form), metric = name\n| evaluate pivot(metric, sum(total))\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 22,
+      "type": "row",
+      "title": "Token Usage",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "panels": []
+    },
+    {
+      "id": 23,
+      "type": "text",
+      "title": "Not yet instrumented",
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "content": "No token-count metric is currently emitted by the Content Understanding/judge call sites (`app/worker/main.py`, `app/judge/`). To light this up: record an OTel counter (e.g. `worker.tokens_used`, attributes `process_id`/`model`/`token_type`) at each Foundry/CU call site, same pattern as `worker.job_cost_usd` \u2014 then this row becomes real panels identically to Cost per Business Process above.",
+        "mode": "markdown"
+      }
+    },
+    {
+      "id": 24,
+      "type": "row",
+      "title": "Notification Cost Drivers",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "panels": []
+    },
+    {
+      "id": 25,
+      "type": "stat",
+      "title": "Emails sent (selected range)",
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 43
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics | where name == \"worker.notification_emails_sent\" | where tostring(customDimensions.process_id) matches regex $process_id | summarize sum(valueSum)\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 26,
+      "type": "table",
+      "title": "Top recipients (by emails sent)",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 4,
+        "y": 43
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.notification_emails_sent\"\n| where tostring(customDimensions.process_id) matches regex $process_id\n| summarize sent = sum(valueSum) by recipient = tostring(customDimensions.recipient)\n| top 10 by sent desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 27,
+      "type": "bargauge",
+      "title": "Emails sent by business process",
+      "description": "",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 14,
+        "y": 43
+      },
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource"
+          },
+          "queryType": "Azure Log Analytics",
+          "azureLogAnalytics": {
+            "query": "customMetrics\n| where name == \"worker.notification_emails_sent\"\n| summarize sent = sum(valueSum) by process_id = tostring(customDimensions.process_id)\n| order by sent desc\n",
+            "resources": [
+              "__LOG_ANALYTICS_WORKSPACE_RESOURCE_ID__"
+            ],
+            "resultFormat": "table"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

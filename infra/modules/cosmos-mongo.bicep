@@ -40,6 +40,9 @@ resource cosmosMongo 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
       defaultConsistencyLevel: 'Session'
     }
     minimalTlsVersion: 'Tls12'
+    // The current App Service/Function topology has no VNet/private endpoint
+    // path, so the API and worker need public access to Cosmos MongoDB.
+    publicNetworkAccess: 'Enabled'
   }
 }
 

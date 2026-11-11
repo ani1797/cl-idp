@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from azure.core.exceptions import AzureError, ResourceExistsError
+from azure.identity import DefaultAzureCredential
 from azure.storage.queue import QueueMessage, QueueServiceClient
 
 from app.config import Settings
@@ -16,10 +17,17 @@ class QueueService:
     settings: Settings
 
     def __post_init__(self) -> None:
-        self._service = QueueServiceClient.from_connection_string(
-            self.settings.azurite_queue_connection_string,
-            api_version=AZURITE_QUEUE_API_VERSION,
-        )
+        if self.settings.azure_storage_account_name:
+            self._service = QueueServiceClient(
+                account_url=f"https://{self.settings.azure_storage_account_name}.queue.core.windows.net",
+                credential=DefaultAzureCredential(),
+                api_version=AZURITE_QUEUE_API_VERSION,
+            )
+        else:
+            self._service = QueueServiceClient.from_connection_string(
+                self.settings.azurite_queue_connection_string,
+                api_version=AZURITE_QUEUE_API_VERSION,
+            )
         self._queue = self._service.get_queue_client(self.settings.queue_name)
 
     def ensure_queue(self) -> None:

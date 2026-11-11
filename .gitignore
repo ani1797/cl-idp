@@ -6,3 +6,6 @@ apps/web/next-env.d.ts
 .env.local
 .env.*.local
 
+
+# generated slide exports
+docs/slides/*/output/

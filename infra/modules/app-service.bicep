@@ -16,6 +16,8 @@ param containerRegistryLoginServer string = ''
 @description('Optional subnet resource ID for regional VNet integration (outbound). Set this when the app must reach a private authenticated mail relay (or any other private endpoint) that is not reachable over the public internet. Leave empty (default) for no VNet integration — existing deployments are unaffected.')
 param vnetIntegrationSubnetId string = ''
 
+param healthCheckPath string = ''
+
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: '${name}-plan'
   location: location
@@ -44,6 +46,8 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
     siteConfig: {
       linuxFxVersion: linuxFxVersion
       alwaysOn: skuName != 'F1'
+      healthCheckPath: healthCheckPath
+      vnetRouteAllEnabled: !empty(vnetIntegrationSubnetId)
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       acrUseManagedIdentityCreds: !empty(containerRegistryLoginServer)

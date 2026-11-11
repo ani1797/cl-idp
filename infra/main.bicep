@@ -106,6 +106,13 @@ param workerPlanSkuName string = 'Y1'
 @description('Worker Function App hosting plan tier, paired with `workerPlanSkuName`.')
 param workerPlanTier string = 'Dynamic'
 
+@description('Provisions Azure Managed Grafana, wired via its own system-assigned managed identity (no API keys) to the Log Analytics/Application Insights workspace below, for native dashboarding (job volume, SLA, cost/FinOps, drill-down) equivalent to the local docker-compose Grafana stack.')
+param enableManagedGrafana bool = true
+
+@description('Azure Managed Grafana SKU: "Essential" (cheaper, dev/preview — no SLA, no private networking) or "Standard" (prod-ready: HA, private link, Azure Monitor alerting integration).')
+@allowed(['Essential', 'Standard'])
+param grafanaSkuName string = 'Standard'
+
 var tags = {
   application: 'enterprise-idp'
   environment: 'prod-demo'
@@ -375,23 +382,20 @@ module apiApp 'modules/app-service.bicep' = {
     containerRegistryLoginServer: containerRegistry.outputs.loginServer
     appInsightsConnectionString: observability.outputs.appInsightsConnectionString
     logAnalyticsWorkspaceId: observability.outputs.logAnalyticsWorkspaceId
-    vnetIntegrationSubnetId: mailRelaySubnetId
+    vnetIntegrationSubnetId: empty(mailRelaySubnetId) ? apiPrivateConnectivity.outputs.integrationSubnetId : mailRelaySubnetId
+    healthCheckPath: '/healthz'
     appSettings: concat([
       {
         name: 'DB_BACKEND'
         value: 'mongo'
       }
       {
+        name: 'AZURE_STORAGE_ACCOUNT_NAME'
+        value: storage.outputs.storageAccountName
+      }
+      {
         name: 'MONGO_CONNECTION_STRING'
         value: '@Microsoft.KeyVault(SecretUri=${mongoSecretUri})'
-      }
-      {
-        name: 'AZURITE_BLOB_CONNECTION_STRING'
-        value: '@Microsoft.KeyVault(SecretUri=${storageSecretUri})'
-      }
-      {
-        name: 'AZURITE_QUEUE_CONNECTION_STRING'
-        value: '@Microsoft.KeyVault(SecretUri=${storageSecretUri})'
       }
       {
         name: 'CU_ENDPOINT'
@@ -418,6 +422,18 @@ module apiApp 'modules/app-service.bicep' = {
         value: 'none'
       }
     ], mailAppSettings)
+  }
+}
+
+module apiPrivateConnectivity 'api-private-connectivity.bicep' = {
+  name: 'api-private-connectivity'
+  scope: rg
+  params: {
+    location: computeLocation
+    namePrefix: namePrefix
+    keyVaultName: keyVault.outputs.keyVaultName
+    cosmosAccountName: cosmosMongo.outputs.accountName
+    storageAccountName: storage.outputs.storageAccountName
   }
 }
 
@@ -532,6 +548,31 @@ module rbacAcr 'modules/rbac-acr.bicep' = {
   }
 }
 
+// --- Azure Managed Grafana: native dashboarding over the shared Log
+// Analytics/Application Insights workspace (see docs/spec/TECHNOLOGY.md
+// "Dashboards"). Deployed in the same `location` as the workspace itself
+// (not `computeLocation`) since it is a data/observability resource, not an
+// App Service/Function App compute tier bound by that region's plan quota.
+module grafana 'modules/grafana.bicep' = if (enableManagedGrafana) {
+  name: 'grafana'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
+    name: '${namePrefix}-grafana'
+    skuName: grafanaSkuName
+  }
+}
+
+module rbacGrafana 'modules/rbac-grafana.bicep' = if (enableManagedGrafana) {
+  name: 'rbac-grafana'
+  scope: rg
+  params: {
+    logAnalyticsWorkspaceName: last(split(observability.outputs.logAnalyticsWorkspaceId, '/'))
+    grafanaPrincipalId: grafana.outputs.principalId
+  }
+}
+
 output webAppUrl string = 'https://${webApp.outputs.defaultHostName}'
 output apiAppUrl string = 'https://${apiApp.outputs.defaultHostName}'
 output workerAppName string = workerApp.outputs.functionAppName
@@ -540,3 +581,6 @@ output cosmosMongoAccountName string = cosmosMongo.outputs.accountName
 output storageAccountName string = storage.outputs.storageAccountName
 output contentUnderstandingEndpoint string = contentUnderstanding.outputs.endpoint
 output containerRegistryLoginServer string = containerRegistry.outputs.loginServer
+output logAnalyticsWorkspaceName string = last(split(observability.outputs.logAnalyticsWorkspaceId, '/'))
+output grafanaEndpoint string = enableManagedGrafana ? grafana.outputs.grafanaEndpoint : ''
+output grafanaName string = enableManagedGrafana ? grafana.outputs.grafanaName : ''

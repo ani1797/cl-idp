@@ -92,7 +92,59 @@ a private Key Vault/Cosmos endpoint — so this demo genuinely needs public
 reachability, and `SecurityControl: Ignore` is the policy authors' own
 documented exemption tag for exactly this case (checked at resource **or**
 resource-group scope). A real production deployment would instead add VNet
-integration + private endpoints and drop this tag.
+integration + private endpoints and drop this tag. The Bicep modules also
+explicitly set `publicNetworkAccess: 'Enabled'` on Storage, Key Vault, and
+Cosmos MongoDB; the tag alone is not sufficient when the governance policy has
+already modified a resource. Without public Key Vault access, App Service
+Key Vault references remain unresolved and the API can fail during startup
+before `/healthz` or `/auth/login` is reachable.
+
+### Durable hosted-login connectivity
+
+The API no longer needs the legacy public-network exception above.
+`api-private-connectivity.bicep` adds a `canadaeast` VNet, a delegated API
+integration subnet, a separate private-endpoint subnet, and private endpoints
+with DNS zone groups/VNet links for Key Vault, Cosmos MongoDB, Blob and Queue.
+It references the existing data services without replacing them. Their public
+access stays disabled; Storage Shared Key stays disabled.
+
+The API uses `AZURE_STORAGE_ACCOUNT_NAME` and its existing managed-identity
+Blob/Queue roles instead of storage account keys. Mongo RU credentials remain
+in Key Vault; the API's existing Secrets User assignment resolves them. Linux
+App Service must route traffic through the VNet to resolve private Key Vault
+references. Always On and the dependency-aware `/healthz` check are enabled.
+
+For an existing environment, preview and deploy **only** the additive template,
+then configure the API with a newly built, unique-tag, identity-capable image:
+
+```bash
+SUBSCRIPTION=6c2eb3e0-ae84-4bce-9cfc-45d928e50254
+az deployment group what-if --subscription "$SUBSCRIPTION" \
+  -g rg-cl-idp-prod-eus2 --template-file infra/api-private-connectivity.bicep
+az deployment group create --subscription "$SUBSCRIPTION" \
+  -g rg-cl-idp-prod-eus2 --template-file infra/api-private-connectivity.bicep \
+  --mode Incremental
+bash infra/scripts/configure-api-private-access.sh "$SUBSCRIPTION" \
+  clidpprodacr.azurecr.io/clidp-api:UNIQUE_TAG
+curl --fail https://clidpprod-web.azurewebsites.net/api-proxy/healthz
+```
+
+The configuration script checks all four endpoint approvals, preserves any
+different existing VNet integration by refusing to replace it, refreshes Key
+Vault references, and waits for API dependency health. Verify an actual
+`/api-proxy/auth/login` followed by `/api-proxy/auth/me` with the returned
+cookie before declaring login restored. Do not log passwords or cookies.
+
+`main.bicep` also wires this network and storage setting into future full
+deployments. An explicit `mailRelaySubnetId` override must have connectivity
+and DNS resolution to these same private dependencies.
+
+This repair deliberately does **not** migrate the legacy Y1 Consumption worker:
+that hosting plan cannot use VNet integration/private storage. It needs a
+separately approved hosting/network migration; restoring API login does not
+establish that background document processing is healthy. Four private
+endpoints add approximately US$30-40/month plus traffic. This is not a
+multi-instance or multi-region availability guarantee.
 
 ### Content Understanding and the Foundry AI Agent Judge
 
@@ -175,4 +227,3 @@ real traffic, not the platform's default placeholder page.
   `apps/api/app/db/mongo.py`: it does not support the `collation` index
   option (falls back to a case-sensitive unique index) and requires an
   explicit index on any field used in an unfiltered `.sort()`.
-

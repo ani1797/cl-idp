@@ -45,6 +45,7 @@ connection-string/API-key auth wherever possible.
 | `AZURITE_QUEUE_CONNECTION_STRING` | Azurite's documented default dev key | Queue storage connection string for the `jobs` queue (async job dispatch, consumed by the worker). Same production/Key-Vault note as above. |
 | `BLOB_CONTAINER_NAME` | `documents` | Blob container name. Not in `.env.example` — rarely needs overriding. |
 | `QUEUE_NAME` | `jobs` | Storage queue name. Not in `.env.example` — rarely needs overriding. |
+| `AZURE_STORAGE_ACCOUNT_NAME` | unset | When set, Blob/Queue clients use `DefaultAzureCredential` against this account's HTTPS endpoints instead of either `AZURITE_*_CONNECTION_STRING`. The hosted API sets this and uses its managed identity with Storage Blob/Queue Data Contributor roles. This works when governance disables Shared Key. Leave unset for Azurite/local connection-string authentication. |
 
 ### Mail (review-needed notifications)
 

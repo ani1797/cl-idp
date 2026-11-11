@@ -53,6 +53,7 @@ def configure_test_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None
     # dedicated container/queue name so tests never touch the dev ones.
     monkeypatch.setenv("BLOB_CONTAINER_NAME", "documents-test")
     monkeypatch.setenv("QUEUE_NAME", "jobs-test")
+    monkeypatch.setenv("AZURE_STORAGE_ACCOUNT_NAME", "")
     monkeypatch.setenv("SMTP_HOST", "127.0.0.1")
     monkeypatch.setenv("SMTP_PORT", "1025")
     monkeypatch.setenv("WEB_ORIGIN", "http://localhost:3000")

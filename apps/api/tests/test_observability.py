@@ -64,7 +64,12 @@ def test_create_span_exporter_prefers_otlp_endpoint_over_azure_monitor() -> None
 
 
 def test_create_metric_reader_defaults_to_console_exporter() -> None:
-    settings = get_settings().model_copy(update={"otel_exporter_otlp_endpoint": None})
+    settings = get_settings().model_copy(
+        update={
+            "otel_exporter_otlp_endpoint": None,
+            "applicationinsights_connection_string": None,
+        }
+    )
 
     reader = create_metric_reader(settings)
 
@@ -81,8 +86,40 @@ def test_create_metric_reader_uses_otlp_when_endpoint_is_set() -> None:
     assert isinstance(reader._exporter, OTLPMetricExporter)
 
 
-def test_create_log_exporter_is_none_without_otlp_endpoint() -> None:
-    settings = get_settings().model_copy(update={"otel_exporter_otlp_endpoint": None})
+def test_create_metric_reader_uses_azure_monitor_when_connection_string_is_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = get_settings().model_copy(
+        update={
+            "otel_exporter_otlp_endpoint": None,
+            "applicationinsights_connection_string": "InstrumentationKey=test-key",
+        }
+    )
+    captured: dict[str, str] = {}
+
+    class FakeAzureMonitorMetricExporter(ConsoleMetricExporter):
+        def __init__(self, *, connection_string: str) -> None:
+            super().__init__()
+            captured["connection_string"] = connection_string
+
+    monkeypatch.setattr(
+        "app.observability._load_azure_monitor_metric_exporter",
+        lambda: FakeAzureMonitorMetricExporter,
+    )
+
+    reader = create_metric_reader(settings)
+
+    assert isinstance(reader._exporter, FakeAzureMonitorMetricExporter)
+    assert captured["connection_string"] == "InstrumentationKey=test-key"
+
+
+def test_create_log_exporter_is_none_without_otlp_endpoint_or_connection_string() -> None:
+    settings = get_settings().model_copy(
+        update={
+            "otel_exporter_otlp_endpoint": None,
+            "applicationinsights_connection_string": None,
+        }
+    )
 
     assert create_log_exporter(settings) is None
 
@@ -95,6 +132,32 @@ def test_create_log_exporter_uses_otlp_when_endpoint_is_set() -> None:
     exporter = create_log_exporter(settings)
 
     assert isinstance(exporter, OTLPLogExporter)
+
+
+def test_create_log_exporter_uses_azure_monitor_when_connection_string_is_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = get_settings().model_copy(
+        update={
+            "otel_exporter_otlp_endpoint": None,
+            "applicationinsights_connection_string": "InstrumentationKey=test-key",
+        }
+    )
+    captured: dict[str, str] = {}
+
+    class FakeAzureMonitorLogExporter:
+        def __init__(self, *, connection_string: str) -> None:
+            captured["connection_string"] = connection_string
+
+    monkeypatch.setattr(
+        "app.observability._load_azure_monitor_log_exporter",
+        lambda: FakeAzureMonitorLogExporter,
+    )
+
+    exporter = create_log_exporter(settings)
+
+    assert isinstance(exporter, FakeAzureMonitorLogExporter)
+    assert captured["connection_string"] == "InstrumentationKey=test-key"
 
 
 def test_correlation_scope_injects_correlation_id_into_log_records(
